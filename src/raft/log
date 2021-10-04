@@ -1,0 +1,353 @@
+Test (2A): initial election ...
+2021/12/04 21:52:14 [INFO] peer 1 start election in term 1
+2021/12/04 21:52:14 [INFO] 0 's term get updated from 0 to 1
+2021/12/04 21:52:14 [INFO] 2 's term get updated from 0 to 1
+2021/12/04 21:52:14 [INFO] 1 get 3 votes in term 1
+2021/12/04 21:52:14 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:14 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:14 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:14 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:14 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:14 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:14 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:14 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:15 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:16 [INFO] 0 get AE/RV in term 1
+  ... Passed --   3.0  3  102   24894    0
+Test (2A): election after network failure ...
+2021/12/04 21:52:17 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] peer 2 start election in term 1
+2021/12/04 21:52:17 [INFO] 1 's term get updated from 0 to 1
+2021/12/04 21:52:17 [INFO] 0 's term get updated from 0 to 1
+2021/12/04 21:52:17 [INFO] 2 get 3 votes in term 1
+2021/12/04 21:52:17 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:17 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:18 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:18 [INFO] peer 1 start election in term 2
+2021/12/04 21:52:18 [INFO] 0 's term get updated from 1 to 2
+2021/12/04 21:52:18 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:18 [INFO] 2 's term get updated from 1 to 2
+2021/12/04 21:52:18 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:18 [INFO] 2 get AE/RV in term 2
+2021/12/04 21:52:18 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:18 [INFO] 2 get AE/RV in term 2
+2021/12/04 21:52:19 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:19 [INFO] 2 get AE/RV in term 2
+2021/12/04 21:52:19 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:19 [INFO] 2 get AE/RV in term 2
+2021/12/04 21:52:19 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:19 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:19 [INFO] peer 2 start election in term 3
+2021/12/04 21:52:19 [FAILURE] RV from 2 to 1 fails
+2021/12/04 21:52:19 [INFO] peer 0 start election in term 3
+2021/12/04 21:52:19 [INFO] peer 2 start election in term 4
+2021/12/04 21:52:20 [INFO] peer 0 start election in term 4
+2021/12/04 21:52:20 [INFO] peer 2 start election in term 5
+2021/12/04 21:52:20 [FAILURE] RV from 2 to 0 fails
+2021/12/04 21:52:20 [INFO] 2 get 1 votes in term 5
+2021/12/04 21:52:20 [INFO] peer 2 start election in term 6
+2021/12/04 21:52:20 [INFO] peer 0 start election in term 5
+2021/12/04 21:52:20 [INFO] peer 2 start election in term 7
+2021/12/04 21:52:20 [INFO] peer 0 start election in term 6
+2021/12/04 21:52:20 [INFO] peer 2 start election in term 8
+2021/12/04 21:52:20 [INFO] peer 0 start election in term 7
+2021/12/04 21:52:20 [INFO] peer 2 start election in term 9
+2021/12/04 21:52:20 [INFO] 0 's term get updated from 7 to 9
+2021/12/04 21:52:21 [INFO] 0 get AE/RV in term 9
+2021/12/04 21:52:21 [INFO] 0 get AE/RV in term 9
+2021/12/04 21:52:21 [FAILURE] RV from 0 to 2 fails
+2021/12/04 21:52:21 [FAILURE] RV from 0 to 1 fails
+2021/12/04 21:52:21 [FAILURE] RV from 1 to 2 fails
+2021/12/04 21:52:21 [INFO] 1 get 2 votes in term 2
+2021/12/04 21:52:21 [INFO] 0 get AE/RV in term 9
+2021/12/04 21:52:21 [INFO] 1 's term get updated from 2 to 9
+2021/12/04 21:52:21 [INFO] 1 get AE/RV in term 9
+2021/12/04 21:52:21 [INFO] 0 get AE/RV in term 9
+2021/12/04 21:52:21 [FAILURE] RV from 0 to 1 fails
+2021/12/04 21:52:21 [INFO] 0 get 1 votes in term 9
+2021/12/04 21:52:21 [INFO] 1 get AE/RV in term 9
+2021/12/04 21:52:21 [INFO] 0 get AE/RV in term 9
+  ... Passed --   4.9  3  160   29868    0
+Test (2A): multiple elections ...
+2021/12/04 21:52:22 [INFO] peer 4 start election in term 1
+2021/12/04 21:52:22 [INFO] 0 's term get updated from 0 to 1
+2021/12/04 21:52:22 [INFO] 2 's term get updated from 0 to 1
+2021/12/04 21:52:22 [INFO] 1 's term get updated from 0 to 1
+2021/12/04 21:52:22 [INFO] 6 's term get updated from 0 to 1
+2021/12/04 21:52:22 [INFO] 3 's term get updated from 0 to 1
+2021/12/04 21:52:22 [INFO] 5 's term get updated from 0 to 1
+2021/12/04 21:52:22 [INFO] 4 get 7 votes in term 1
+2021/12/04 21:52:22 [INFO] 3 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 0 get AE/RV in term 9
+2021/12/04 21:52:22 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 6 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 1 get AE/RV in term 9
+2021/12/04 21:52:22 [INFO] 5 get AE/RV in term 1
+2021/12/04 21:52:22 [FAILURE] RV from 2 to 0 fails
+2021/12/04 21:52:22 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 3 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 5 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 6 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 3 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 6 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 5 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:22 [FAILURE] RV from 2 to 1 fails
+2021/12/04 21:52:22 [INFO] 6 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 3 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 5 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:22 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 6 get AE/RV in term 1
+2021/12/04 21:52:23 [FAILURE] RV from 0 to 2 fails
+2021/12/04 21:52:23 [INFO] 5 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 3 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:23 [FAILURE] RV from 2 to 0 fails
+2021/12/04 21:52:23 [INFO] 2 get 1 votes in term 9
+2021/12/04 21:52:23 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 6 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 3 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 5 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 2 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 1 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] peer 6 start election in term 2
+2021/12/04 21:52:23 [INFO] 0 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 5 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] 3 get AE/RV in term 1
+2021/12/04 21:52:23 [INFO] peer 6 start election in term 3
+2021/12/04 21:52:23 [INFO] peer 2 start election in term 2
+2021/12/04 21:52:23 [INFO] 1 's term get updated from 1 to 2
+2021/12/04 21:52:23 [INFO] 3 's term get updated from 1 to 2
+2021/12/04 21:52:23 [INFO] 0 's term get updated from 1 to 2
+2021/12/04 21:52:23 [FAILURE] RV from 6 to 1 fails
+2021/12/04 21:52:23 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:23 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:23 [FAILURE] RV from 2 to 1 fails
+2021/12/04 21:52:23 [INFO] peer 5 start election in term 2
+2021/12/04 21:52:23 [INFO] peer 6 start election in term 4
+2021/12/04 21:52:23 [INFO] 3 get AE/RV in term 2
+2021/12/04 21:52:23 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:23 [INFO] 4 's term get updated from 1 to 2
+2021/12/04 21:52:23 [INFO] peer 6 start election in term 5
+2021/12/04 21:52:23 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 3 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 5 get AE/RV in term 2
+2021/12/04 21:52:24 [FAILURE] RV from 2 to 1 fails
+2021/12/04 21:52:24 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 4 fails
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 1 fails
+2021/12/04 21:52:24 [INFO] peer 6 start election in term 6
+2021/12/04 21:52:24 [INFO] 4 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 5 get AE/RV in term 2
+2021/12/04 21:52:24 [FAILURE] RV from 2 to 1 fails
+2021/12/04 21:52:24 [INFO] 3 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 2 get 2 votes in term 9
+2021/12/04 21:52:24 [INFO] 4 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] peer 6 start election in term 7
+2021/12/04 21:52:24 [INFO] 0 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] 4 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] peer 3 start election in term 3
+2021/12/04 21:52:24 [INFO] 0 's term get updated from 2 to 3
+2021/12/04 21:52:24 [INFO] 2 's term get updated from 2 to 3
+2021/12/04 21:52:24 [INFO] 5 's term get updated from 2 to 3
+2021/12/04 21:52:24 [INFO] 4 's term get updated from 2 to 3
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 4 fails
+2021/12/04 21:52:24 [INFO] peer 6 start election in term 8
+2021/12/04 21:52:24 [INFO] 5 get AE/RV in term 3
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 4 fails
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 2 fails
+2021/12/04 21:52:24 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 4 fails
+2021/12/04 21:52:24 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:24 [INFO] 2 get AE/RV in term 3
+2021/12/04 21:52:24 [INFO] peer 6 start election in term 9
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 5 fails
+2021/12/04 21:52:24 [INFO] 5 get AE/RV in term 3
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 3 fails
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 3 fails
+2021/12/04 21:52:24 [INFO] 4 get AE/RV in term 3
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 4 fails
+2021/12/04 21:52:24 [INFO] 5 get AE/RV in term 3
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 1 fails
+2021/12/04 21:52:24 [INFO] 2 get AE/RV in term 3
+2021/12/04 21:52:24 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:24 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:24 [INFO] peer 6 start election in term 10
+2021/12/04 21:52:24 [FAILURE] RV from 6 to 5 fails
+2021/12/04 21:52:25 [FAILURE] RV from 2 to 0 fails
+2021/12/04 21:52:25 [INFO] 2 get 1 votes in term 9
+2021/12/04 21:52:25 [INFO] 4 get AE/RV in term 3
+2021/12/04 21:52:25 [INFO] 5 get AE/RV in term 3
+2021/12/04 21:52:25 [INFO] 2 get AE/RV in term 3
+2021/12/04 21:52:25 [FAILURE] RV from 2 to 0 fails
+2021/12/04 21:52:25 [FAILURE] RV from 0 to 1 fails
+2021/12/04 21:52:25 [INFO] 0 get 1 votes in term 9
+2021/12/04 21:52:25 [INFO] peer 6 start election in term 11
+2021/12/04 21:52:25 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:25 [FAILURE] RV from 6 to 3 fails
+2021/12/04 21:52:25 [FAILURE] RV from 6 to 0 fails
+2021/12/04 21:52:25 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:25 [INFO] 2 get AE/RV in term 3
+2021/12/04 21:52:25 [INFO] 4 get AE/RV in term 3
+2021/12/04 21:52:25 [INFO] 5 get AE/RV in term 3
+2021/12/04 21:52:25 [INFO] peer 6 start election in term 12
+2021/12/04 21:52:25 [FAILURE] RV from 0 to 1 fails
+2021/12/04 21:52:25 [FAILURE] RV from 5 to 3 fails
+2021/12/04 21:52:25 [FAILURE] RV from 6 to 1 fails
+2021/12/04 21:52:25 [FAILURE] RV from 6 to 3 fails
+2021/12/04 21:52:25 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:25 [INFO] 1 get AE/RV in term 2
+2021/12/04 21:52:25 [INFO] peer 6 start election in term 13
+2021/12/04 21:52:25 [INFO] 2 's term get updated from 3 to 13
+2021/12/04 21:52:25 [INFO] 1 's term get updated from 2 to 13
+2021/12/04 21:52:25 [INFO] 5 's term get updated from 3 to 13
+2021/12/04 21:52:25 [INFO] 4 get AE/RV in term 3
+2021/12/04 21:52:25 [FAILURE] RV from 6 to 3 fails
+2021/12/04 21:52:25 [INFO] 5 get AE/RV in term 13
+2021/12/04 21:52:25 [INFO] 2 get AE/RV in term 13
+2021/12/04 21:52:25 [FAILURE] RV from 0 to 1 fails
+2021/12/04 21:52:25 [FAILURE] RV from 5 to 4 fails
+2021/12/04 21:52:25 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:25 [INFO] 5 get AE/RV in term 13
+2021/12/04 21:52:25 [FAILURE] RV from 0 to 2 fails
+2021/12/04 21:52:25 [INFO] 0 get 1 votes in term 9
+2021/12/04 21:52:25 [INFO] 1 get AE/RV in term 13
+2021/12/04 21:52:25 [INFO] 2 get AE/RV in term 13
+2021/12/04 21:52:25 [INFO] 4 get AE/RV in term 3
+2021/12/04 21:52:25 [FAILURE] RV from 2 to 1 fails
+2021/12/04 21:52:25 [INFO] 2 get 1 votes in term 9
+2021/12/04 21:52:25 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:25 [FAILURE] RV from 6 to 1 fails
+2021/12/04 21:52:25 [FAILURE] RV from 6 to 2 fails
+2021/12/04 21:52:25 [INFO] 5 get AE/RV in term 13
+2021/12/04 21:52:25 [FAILURE] RV from 0 to 2 fails
+2021/12/04 21:52:25 [INFO] 0 get 1 votes in term 9
+2021/12/04 21:52:25 [INFO] 3 's term get updated from 3 to 13
+2021/12/04 21:52:25 [INFO] 4 's term get updated from 3 to 13
+2021/12/04 21:52:25 [INFO] 1 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:26 [FAILURE] RV from 6 to 2 fails
+2021/12/04 21:52:26 [INFO] 2 get AE/RV in term 13
+2021/12/04 21:52:26 [FAILURE] RV from 6 to 5 fails
+2021/12/04 21:52:26 [INFO] 4 get AE/RV in term 13
+2021/12/04 21:52:26 [FAILURE] RV from 2 to 0 fails
+2021/12/04 21:52:26 [INFO] 2 get 1 votes in term 9
+2021/12/04 21:52:26 [INFO] 3 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 5 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 1 get AE/RV in term 13
+2021/12/04 21:52:26 [FAILURE] RV from 0 to 2 fails
+2021/12/04 21:52:26 [INFO] 0 get 1 votes in term 9
+2021/12/04 21:52:26 [INFO] 2 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 4 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 0 get AE/RV in term 3
+2021/12/04 21:52:26 [INFO] 3 get AE/RV in term 13
+2021/12/04 21:52:26 [FAILURE] RV from 5 to 1 fails
+2021/12/04 21:52:26 [INFO] 5 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 2 get AE/RV in term 13
+2021/12/04 21:52:26 [FAILURE] RV from 5 to 0 fails
+2021/12/04 21:52:26 [INFO] 4 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 1 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] peer 0 start election in term 4
+2021/12/04 21:52:26 [FAILURE] RV from 6 to 0 fails
+2021/12/04 21:52:26 [INFO] 5 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 3 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 2 get AE/RV in term 13
+2021/12/04 21:52:26 [FAILURE] RV from 6 to 2 fails
+2021/12/04 21:52:26 [INFO] peer 0 start election in term 5
+2021/12/04 21:52:26 [INFO] 4 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 1 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 5 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 4 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] 3 get AE/RV in term 13
+2021/12/04 21:52:26 [FAILURE] RV from 2 to 1 fails
+2021/12/04 21:52:26 [INFO] 2 get 1 votes in term 9
+2021/12/04 21:52:26 [INFO] 2 get AE/RV in term 13
+2021/12/04 21:52:26 [INFO] peer 0 start election in term 14
+2021/12/04 21:52:26 [INFO] 1 's term get updated from 13 to 14
+2021/12/04 21:52:26 [INFO] 4 's term get updated from 13 to 14
+2021/12/04 21:52:26 [INFO] 3 's term get updated from 13 to 14
+2021/12/04 21:52:26 [INFO] 5 's term get updated from 13 to 14
+2021/12/04 21:52:26 [INFO] 1 get AE/RV in term 14
+2021/12/04 21:52:26 [FAILURE] RV from 6 to 2 fails
+2021/12/04 21:52:27 [INFO] 6 's term get updated from 13 to 14
+2021/12/04 21:52:27 [INFO] 2 's term get updated from 13 to 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 0 fails
+2021/12/04 21:52:27 [INFO] 5 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 3 fails
+2021/12/04 21:52:27 [INFO] 4 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 5 fails
+2021/12/04 21:52:27 [INFO] 1 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 3 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 2 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 5 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 1 fails
+2021/12/04 21:52:27 [INFO] 6 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 4 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 0 fails
+2021/12/04 21:52:27 [INFO] 2 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 1 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 2 fails
+2021/12/04 21:52:27 [INFO] 3 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 4 fails
+2021/12/04 21:52:27 [INFO] 5 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 4 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 6 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 3 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 4 fails
+2021/12/04 21:52:27 [INFO] 5 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 2 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 1 fails
+2021/12/04 21:52:27 [FAILURE] RV from 6 to 5 fails
+2021/12/04 21:52:27 [INFO] 1 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 4 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 6 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 0 to 3 fails
+2021/12/04 21:52:27 [INFO] 5 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 3 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 2 get AE/RV in term 14
+2021/12/04 21:52:27 [FAILURE] RV from 3 to 6 fails
+2021/12/04 21:52:27 [INFO] peer 1 start election in term 15
+2021/12/04 21:52:27 [INFO] 4 get AE/RV in term 14
+2021/12/04 21:52:27 [INFO] 6 get AE/RV in term 14
+--- FAIL: TestManyElections2A (6.06s)
+    config.go:389: term 14 has 2 (>1) leaders
+FAIL
+exit status 1
+FAIL	6.824/raft	14.026s
