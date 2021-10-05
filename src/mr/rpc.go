@@ -24,19 +24,33 @@ type ExampleReply struct {
 	Y int
 }
 
-// AskForTask args and reply
+// Ping args and reply
 type HeartBeatArgs struct {
 	WorkerId int
 }
 
 type HeartBeatReply struct {
-	TaskType int // 0 for map task, 1 for reduce task
-	FileName []string
-	TaskNum  int
+	Done bool
+}
+
+// AskForTask args and reply
+type TaskArgs struct {
+	WorkerId int
+}
+
+type TaskReply struct {
+	TaskType  int // 0 for map task, 1 for reduce task
+	FileName  []string
+	TaskNum   int
+	ReduceNum int
 }
 
 // CompleteTask args and reply
 type CompleteTaskArgs struct {
+	WorkerId int
+	TaskType int
+	FileName []string
+	TaskNum  int
 }
 
 type CompleteTaskReply struct {
