@@ -20,12 +20,23 @@ type KeyValue struct {
 	Value string
 }
 
+type CompleteTaskInfo struct {
+	WorkerId int
+	TaskType int
+	FileName []string
+	TaskNum  int
+}
+
 type KVs []KeyValue
 
 // interfaces for sort
 func (a KVs) Len() int           { return len(a) }
 func (a KVs) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a KVs) Less(i, j int) bool { return a[i].Key < a[j].Key }
+
+func DebugOut(format string, a ...interface{}) {
+	//fmt.Printf(format, a...)
+}
 
 //
 // use ihash(key) % NReduce to choose the reduce
@@ -42,48 +53,63 @@ func ihash(key string) int {
 //
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
-
-	// Your worker implementation here.
-
-	// uncomment to send the Example RPC to the coordinator.
-	// CallExample()
-
+	complete := make(chan bool, 1)
+	go WorkerLoop(mapf, reducef, complete)
+	// wait until coordinator is dead
+	<-complete
 }
 
-func WorkLoop(mapf func(string, string) []KeyValue,
-	reducef func(string, []string) string) {
+func WorkerLoop(mapf func(string, string) []KeyValue,
+	reducef func(string, []string) string, complete chan<- bool) {
 	for {
+		// ask for task periodically
 		reply, err := WorkerAskForTask()
-		if !err {
+		if err {
+			// get no task to do
+			if reply.TaskType == -1 {
+				time.Sleep(1.0 * time.Second)
+				continue
+			}
+
+			if reply.TaskType == 0 {
+				DebugOut("%d get the map task %d.\n", os.Getpid(), reply.TaskNum)
+			} else {
+				DebugOut("%d get the reduce task %d.\n", os.Getpid(), reply.TaskNum)
+			}
 			done := runTask(reply, mapf, reducef)
 
-			for {
+			taskComplete := false
+			for !taskComplete {
 				select {
 				case <-done:
-					fmt.Printf("%v complete task %d\n", os.Getuid(), reply.TaskNum)
-
-					break
+					DebugOut("%d complete task %d\n", os.Getpid(), reply.TaskNum)
+					//DebugOut("%d complete task %d\n", os.Getpid(), reply.TaskNum)
+					taskComplete = true
 				case <-time.After(2 * time.Second):
-					fmt.Printf("%v pings.\n", os.Getuid())
-					WorkerHeatBeat()
+					DebugOut("%d pings.\n", os.Getpid())
+					ret := WorkerHeatBeat()
+					if !ret {
+						complete <- true
+						return
+					}
 				}
 			}
 		} else {
-			time.Sleep(1 * time.Second)
+			DebugOut("Coordinator is dead.\n")
+			complete <- true
+			return
 		}
 	}
 }
 
 func runTask(taskInfo TaskReply, mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) chan bool {
-	done := make(chan bool)
+	done := make(chan bool, 1)
 
 	if taskInfo.TaskType == 0 {
 		go runMapTask(taskInfo, mapf, done)
 	} else if taskInfo.TaskType == 1 {
 		go runReduceTask(taskInfo, reducef, done)
-	} else {
-		log.Fatalln("Wrong task type %v", taskInfo.TaskType)
 	}
 
 	return done
@@ -95,17 +121,17 @@ func runMapTask(mapTaskInfo TaskReply, mapf func(string, string) []KeyValue, don
 	}
 
 	if len(mapTaskInfo.FileName) != 1 {
-		log.Fatal("Map task has more than one input")
+		log.Fatalf("Map task has more than one input")
 	}
 
 	// read split
 	file, err := os.Open(mapTaskInfo.FileName[0])
 	if err != nil {
-		log.Fatal("Map task fails to open split %v", mapTaskInfo.FileName[0])
+		log.Fatalf("Map task fails to open split %s", mapTaskInfo.FileName[0])
 	}
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
-		log.Fatal("Map task fails to read split %v", mapTaskInfo.FileName[0])
+		log.Fatalf("Map task fails to read split %s", mapTaskInfo.FileName[0])
 	}
 	file.Close()
 
@@ -120,6 +146,7 @@ func runMapTask(mapTaskInfo TaskReply, mapf func(string, string) []KeyValue, don
 	}
 
 	// write intermediate buffer to local disk
+	outputFileNames := []string{}
 	for partitionNum, kvs := range intermediateData {
 		if len(kvs) == 0 {
 			continue
@@ -127,29 +154,35 @@ func runMapTask(mapTaskInfo TaskReply, mapf func(string, string) []KeyValue, don
 
 		// create output file
 		oname := makeMapOutput(mapTaskInfo, partitionNum)
+		outputFileNames = append(outputFileNames, oname)
 		ofile, err := os.Create(oname)
 		if err != nil {
-			log.Fatal("Map output can't create file %v.", oname)
+			log.Fatalf("Map output can't create file %s.", oname)
 		}
 		enc := json.NewEncoder(ofile)
 		for _, kv := range kvs {
 			err := enc.Encode(&kv)
 			if err != nil {
-				log.Fatal("Map output can't encode.")
+				log.Fatalf("Map output can't encode.")
 			}
 		}
 		ofile.Close()
 	}
+
+	// finish the task, inform the coordinator
+	completeTaskInfo := CompleteTaskInfo{
+		WorkerId: os.Getpid(),
+		TaskType: 0,
+		FileName: outputFileNames,
+		TaskNum:  mapTaskInfo.TaskNum,
+	}
+	WorkerCompleteTask(completeTaskInfo)
 	done <- true
 }
 
 func runReduceTask(reduceTaskInfo TaskReply, reducef func(string, []string) string, done chan<- bool) {
 	if reduceTaskInfo.TaskType != 1 {
-		log.Fatalln("Not reduce task.")
-	}
-
-	if len(reduceTaskInfo.FileName) < 1 {
-		log.Fatal("Reduce input files less than one.")
+		log.Fatalf("Not reduce task.")
 	}
 
 	// read all the splits and kvas
@@ -157,7 +190,7 @@ func runReduceTask(reduceTaskInfo TaskReply, reducef func(string, []string) stri
 	for _, fileName := range reduceTaskInfo.FileName {
 		file, err := os.Open(fileName)
 		if err != nil {
-			log.Fatal("Map task fails to open split %v", fileName)
+			log.Fatalf("Reduce task fails to open split %s", fileName)
 		}
 
 		dec := json.NewDecoder(file)
@@ -197,6 +230,13 @@ func runReduceTask(reduceTaskInfo TaskReply, reducef func(string, []string) stri
 	}
 	ofile.Close()
 
+	completeTaskInfo := CompleteTaskInfo{
+		WorkerId: os.Getpid(),
+		TaskType: 1,
+		FileName: []string{oname},
+		TaskNum:  reduceTaskInfo.TaskNum,
+	}
+	WorkerCompleteTask(completeTaskInfo)
 	done <- true
 }
 
@@ -228,12 +268,12 @@ func CallExample() {
 	call("Coordinator.Example", &args, &reply)
 
 	// reply.Y should be 100.
-	fmt.Printf("reply.Y %v\n", reply.Y)
+	DebugOut("reply.Y %v\n", reply.Y)
 }
 
 func WorkerAskForTask() (TaskReply, bool) {
 	args := TaskArgs{
-		WorkerId: os.Geteuid(),
+		WorkerId: os.Getpid(),
 	}
 
 	reply := TaskReply{}
@@ -241,13 +281,21 @@ func WorkerAskForTask() (TaskReply, bool) {
 	return reply, ret
 }
 
-func WorkerHeatBeat() {
+func WorkerHeatBeat() bool {
 	args := HeartBeatArgs{
-		WorkerId: os.Geteuid(),
+		WorkerId: os.Getpid(),
 	}
 	reply := HeartBeatReply{}
 
-	call("Coordinator.HeartBeat", &args, &reply)
+	return call("Coordinator.HeartBeat", &args, &reply)
+}
+
+func WorkerCompleteTask(completeTaskInfo CompleteTaskInfo) bool {
+	args := CompleteTaskArgs(completeTaskInfo)
+
+	reply := CompleteTaskReply{}
+
+	return call("Coordinator.CompleteTask", &args, &reply)
 }
 
 //
