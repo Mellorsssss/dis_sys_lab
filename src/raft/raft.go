@@ -80,6 +80,9 @@ type Raft struct {
 	commitInd int // commitIndex
 	lastApply int // last applied
 
+	/* apply msg channel */
+	appCond sync.Cond
+
 	nextInd  []int // next Indexes
 	matchInd []int // match Indexes
 
@@ -94,6 +97,10 @@ func (rf *Raft) GetState() (int, bool) {
 	// @TODO: check killed
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
+	if rf.killed() {
+		return NONE_TERM, false
+	}
+
 	return rf.term, rf.leaderId == rf.me
 }
 
@@ -171,10 +178,18 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 //
 func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	index := -1
-	term := -1
-	isLeader := true
 
 	// Your code here (2B).
+	term, isLeader := rf.GetState()
+	if !isLeader {
+		return index, term, isLeader
+	}
+
+	_, lastIndex := rf.GetLastLogInfo()
+	index = lastIndex + 1
+
+	DPrintf("%v begins agree", rf.me)
+	go rf.agree(command)
 
 	return index, term, isLeader
 }
@@ -231,6 +246,45 @@ func (rf *Raft) ticker() {
 	}
 }
 
+// The applyer will apply the command to the applyCh
+func (rf *Raft) applyer(appCh chan ApplyMsg) {
+	rf.appCond.L.Lock()
+	for !rf.killed() {
+		// wait until should apply new msg
+		rf.mu.Lock()
+		for rf.commitInd == rf.lastApply {
+			rf.mu.Unlock()
+			rf.appCond.Wait()
+			rf.mu.Lock()
+		}
+		rf.mu.Unlock()
+
+		// apply new msg
+		rf.mu.Lock()
+		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
+		if indToCommit == -1 {
+			Error("Log should be commited is None in %v in term %v", rf.me, rf.term)
+			rf.mu.Unlock()
+			return
+		}
+		for rf.commitInd > rf.lastApply {
+			rf.lastApply++
+			DPrintf("%v apply msg %v in term %v", rf.me, rf.lastApply, rf.term)
+			appCh <- ApplyMsg{
+				true,
+				rf.logs[indToCommit].Command,
+				rf.logs[indToCommit].Index,
+				false,
+				[]byte{},
+				0,
+				0,
+			}
+			indToCommit++
+		}
+		rf.mu.Unlock()
+	}
+}
+
 func (rf *Raft) heartbeat() {
 	rf.mu.Lock()
 	term := rf.term
@@ -239,32 +293,27 @@ func (rf *Raft) heartbeat() {
 		time.Sleep(time.Duration(HEARTBEAT_DUR) * time.Millisecond)
 
 		// check if still leader
-		_, isLeader := rf.GetState()
-		if !isLeader {
-			return
-		}
-
-		// send heart beat to all peers
 		rf.mu.Lock()
-		if term != rf.term {
+		if !rf.IsStillLeader(term) {
 			rf.mu.Unlock()
 			return
 		}
-		args := &AppendEntriesArgs{
-			rf.term,
-			rf.me,
-			0,
-			0,
-			nil,
-			rf.commitInd,
-		}
-		rf.mu.Unlock()
+
 		for ind, _ := range rf.peers {
 			if ind == rf.me {
 				continue
 			}
 
 			_ind := ind
+			_, prevLogInd, prevLogTerm := rf.GetLogToSend(ind)
+			args := &AppendEntriesArgs{
+				term,
+				rf.me,
+				prevLogInd,
+				prevLogTerm,
+				[]Log{},
+				rf.commitInd,
+			}
 			reply := &AppendEntriesReply{}
 			go func(i int, _args *AppendEntriesArgs, _reply *AppendEntriesReply) {
 				ok := rf.sendAppendEntries(i, _args, _reply)
@@ -274,10 +323,29 @@ func (rf *Raft) heartbeat() {
 
 				// use the reply to check if there are new terms
 				rf.mu.Lock()
-				rf.updateTerm(_reply.Term)
+
+				if _reply.Success { // there could be a update
+					rf.matchInd[i] = MaxInt(_args.PrevLogInd, rf.matchInd[i])
+					rf.updateCommitIndexOfLeader()
+					DPrintf("heartbeat: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, i, rf.nextInd[i], rf.matchInd[i])
+					rf.mu.Unlock()
+					return
+				}
+
+				// handle the failure situation, down to follower
+				// or retry with new nextInd
+				update := rf.updateTerm(_reply.Term)
+				if update != GREATER_TERM {
+					rf.nextInd[i]--
+					if rf.nextInd[i] <= 0 {
+						Error("heart: %v has error in nextInd", rf.me)
+					}
+				}
 				rf.mu.Unlock()
 			}(_ind, args, reply)
 		}
+
+		rf.mu.Unlock()
 	}
 }
 
@@ -335,6 +403,9 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.commitInd = 0
 	rf.lastApply = 0
 
+	rf.appCond = *sync.NewCond(&sync.Mutex{})
+
+	// re-init after election
 	rf.nextInd = make([]int, len(peers))
 	rf.matchInd = make([]int, len(peers))
 
@@ -347,7 +418,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// start ticker goroutine to start elections
 	go rf.ticker()
-
+	go rf.applyer(applyCh)
 	return rf
 }
 
@@ -361,6 +432,7 @@ func (rf *Raft) NotifyMsg() {
 	}
 }
 
+// return the term and index of last log
 func (rf *Raft) GetLastLogInfo() (int, int) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
@@ -369,4 +441,67 @@ func (rf *Raft) GetLastLogInfo() (int, int) {
 	}
 
 	return rf.logs[len(rf.logs)-1].Term, rf.logs[len(rf.logs)-1].Index
+}
+
+// **must hold the rf.mu.Lock() ***
+func (rf *Raft) GetLastLogIndex() int {
+	if len(rf.logs) == 0 {
+		return NONE_IND
+	}
+
+	return rf.logs[len(rf.logs)-1].Index
+}
+
+// **must hold the rf.mu.Lock() **
+// return the index in rf.logs of log with index
+// return -1 if not match
+func (rf *Raft) GetLogWithIndex(index int) int {
+	if len(rf.logs) == 0 {
+		return -1
+	}
+
+	for ind, v := range rf.logs {
+		if v.Index == index {
+			return ind
+		} else if v.Index > index {
+			return -1
+		}
+	}
+
+	return -1
+}
+
+/*
+must hold the rf.mu.Lock()
+check if rf is still the leader and in the same term
+*/
+func (rf *Raft) IsStillLeader(term int) bool {
+	return rf.leaderId == rf.me && rf.term == term
+}
+
+/*
+   must hold rf.mu.Lock()
+   only can be called from leader
+   return the index, prevLogInd, prevLogTerm
+*/
+func (rf *Raft) GetLogToSend(server int) (int, int, int) {
+	indToSend := rf.GetLogWithIndex(rf.nextInd[server])
+	if indToSend == -1 {
+		if len(rf.logs) != 0 {
+			return -1, rf.logs[len(rf.logs)-1].Index, rf.logs[len(rf.logs)-1].Term
+		} else {
+			return -1, 0, 0
+		}
+	}
+	// get the prevLog info
+	var prevLogInd int
+	var prevLogTerm int
+	if indToSend == 0 {
+		prevLogInd = NONE_IND
+		prevLogTerm = NONE_TERM
+	} else {
+		prevLogInd, prevLogTerm = rf.logs[indToSend-1].Index, rf.logs[indToSend-1].Term
+	}
+
+	return indToSend, prevLogInd, prevLogTerm
 }

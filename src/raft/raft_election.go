@@ -120,6 +120,17 @@ func (rf *Raft) startNewElection() {
 
 		if voteCount >= leaderThresh { // become leader, timer will be shut
 			rf.leaderId = rf.me
+			// init the nextInd and matchInd
+			lastLogInd := rf.GetLastLogIndex()
+			if len(rf.nextInd) != len(rf.matchInd) || len(rf.nextInd) != len(rf.peers) {
+				Error("nextInd's size should be the same as matchInd or wrong size")
+			}
+
+			DPrintf("leader %v init nextInd to %v", rf.me, lastLogInd+1)
+			for i, _ := range rf.nextInd {
+				rf.nextInd[i] = lastLogInd + 1
+				rf.matchInd[i] = 0
+			}
 			go rf.heartbeat() // heartbeat
 			Info("%v is leader in term %v", rf.me, term)
 			rf.mu.Unlock()
