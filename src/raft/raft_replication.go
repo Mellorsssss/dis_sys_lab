@@ -145,6 +145,7 @@ func (rf *Raft) agree(command interface{}) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
+	DPrintf("leader %v begin agree in term %v", rf.me, rf.term)
 	term := rf.term // save the term for checking
 
 	// append command to leader's own logs
@@ -226,7 +227,7 @@ func (rf *Raft) agree(command interface{}) {
 
 				if _reply.Success {
 					_rf.nextInd[i] = MaxInt(_args.Logs[len(_args.Logs)-1].Index+1, _rf.nextInd[i])
-					_rf.matchInd[i] = MaxInt(_args.PrevLogInd, _rf.matchInd[i])
+					_rf.matchInd[i] = MaxInt(_args.Logs[len(_args.Logs)-1].Index, _rf.matchInd[i])
 					DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", _rf.me, i, _rf.nextInd[i], _rf.matchInd[i])
 					// check if there is a chance to update the commit
 					_rf.updateCommitIndexOfLeader()

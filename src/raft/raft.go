@@ -188,7 +188,6 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	_, lastIndex := rf.GetLastLogInfo()
 	index = lastIndex + 1
 
-	DPrintf("%v begins agree", rf.me)
 	go rf.agree(command)
 
 	return index, term, isLeader
@@ -269,7 +268,7 @@ func (rf *Raft) applyer(appCh chan ApplyMsg) {
 		}
 		for rf.commitInd > rf.lastApply {
 			rf.lastApply++
-			DPrintf("%v apply msg %v in term %v", rf.me, rf.lastApply, rf.term)
+			DPrintf("%v apply msg %v[%v] %v in term %v", rf.me, rf.lastApply, indToCommit, rf.logs[indToCommit].Command, rf.term)
 			appCh <- ApplyMsg{
 				true,
 				rf.logs[indToCommit].Command,
