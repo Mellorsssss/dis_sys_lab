@@ -23,7 +23,7 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 
 	reply.Term = rf.term
 	update := rf.updateTerm(args.Term)
-	if !update {
+	if update == SMALLER_TERM {
 		reply.VoteGranted = false
 		return
 	}
@@ -49,44 +49,17 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	}
 }
 
-//
-// example code to send a RequestVote RPC to a server.
-// server is the index of the target server in rf.peers[].
-// expects RPC arguments in args.
-// fills in *reply with RPC reply, so caller should
-// pass &reply.
-// the types of the args and reply passed to Call() must be
-// the same as the types of the arguments declared in the
-// handler function (including whether they are pointers).
-//
-// The labrpc package simulates a lossy network, in which servers
-// may be unreachable, and in which requests and replies may be lost.
-// Call() sends a request and waits for a reply. If a reply arrives
-// within a timeout interval, Call() returns true; otherwise
-// Call() returns false. Thus Call() may not return for a while.
-// A false return can be caused by a dead server, a live server that
-// can't be reached, a lost request, or a lost reply.
-//
-// Call() is guaranteed to return (perhaps after a delay) *except* if the
-// handler function on the server side does not return.  Thus there
-// is no need to implement your own timeouts around Call().
-//
-// look at the comments in ../labrpc/labrpc.go for more details.
-//
-// if you're having trouble getting RPC to work, check that you've
-// capitalized all field names in structs passed over RPC, and
-// that the caller passes the address of the reply struct with &, not
-// the struct itself.
-//
 func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *RequestVoteReply) bool {
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
 	return ok
 }
 
 func (rf *Raft) startNewElection() {
+	// inc term, reset leaderId, vote itself
 	rf.mu.Lock()
 	rf.term++
-	term := rf.term
+	rf.leaderId = NONE_LEADER
+	term := rf.term // check if term has changed later
 	rf.vote = rf.me
 	rf.mu.Unlock()
 
@@ -95,10 +68,11 @@ func (rf *Raft) startNewElection() {
 	leaderThresh := len(rf.peers)/2 + 1 // more than half
 
 	rf.mu.Lock()
-	DPrintf("[INFO] peer %v start election in term %v", rf.me, rf.term)
+	Info("peer %v start election in term %v", rf.me, rf.term)
 	rf.mu.Unlock()
+
 	// send RV to all the peers
-	notifyVote := make(chan RequestVoteReply, len(rf.peers)-1)
+	notifyVote := make(chan RequestVoteReply, len(rf.peers)-1) // let GC close it
 
 	lastTerm, lastInd := rf.GetLastLogInfo() // shouldn't receive any new log
 	args := &RequestVoteArgs{
@@ -117,7 +91,7 @@ func (rf *Raft) startNewElection() {
 		go func(sender *Raft, i int, ch chan<- RequestVoteReply, args *RequestVoteArgs, reply *RequestVoteReply, ind int) {
 			ok := sender.sendRequestVote(i, args, reply)
 			if !ok {
-				DPrintf("[FAILURE] RV from %v to %v fails", sender.me, i)
+				Error("RV from %v to %v fails", sender.me, i)
 				ch <- RequestVoteReply{NONE_TERM, false}
 				return
 			}
@@ -145,8 +119,11 @@ func (rf *Raft) startNewElection() {
 		}
 
 		if voteCount >= leaderThresh { // become leader, timer will be shut
-			rf.isLeader = true
+			rf.leaderId = rf.me
 			go rf.heartbeat() // heartbeat
+			Info("%v is leader in term %v", rf.me, term)
+			rf.mu.Unlock()
+			return
 		}
 		rf.mu.Unlock()
 		voteTot--
@@ -154,5 +131,5 @@ func (rf *Raft) startNewElection() {
 			break
 		}
 	}
-	DPrintf("[INFO] %v get %v votes in term %v", rf.me, voteCount, term)
+	Info("%v get %v votes in term %v", rf.me, voteCount, term)
 }

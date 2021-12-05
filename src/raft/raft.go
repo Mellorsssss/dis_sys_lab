@@ -83,8 +83,7 @@ type Raft struct {
 	nextInd  []int // next Indexes
 	matchInd []int // match Indexes
 
-	isLeader bool // true if is leader
-
+	leaderId int // id of current term's leader
 	/* notifyMsg for AE or RV */
 	notifyMsg chan struct{} // notify when recv RE/RV
 }
@@ -95,7 +94,7 @@ func (rf *Raft) GetState() (int, bool) {
 	// @TODO: check killed
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
-	return rf.term, rf.isLeader
+	return rf.term, rf.leaderId == rf.me
 }
 
 //
@@ -203,6 +202,7 @@ func (rf *Raft) killed() bool {
 
 // The ticker go routine starts a new election if this peer hasn't received
 // heartsbeats recently.
+// when leader becomes a follower, it needs to call ticker() mannually
 func (rf *Raft) ticker() {
 	rand.Seed(time.Now().UnixNano())
 	max := ELECTION_MAX
@@ -220,7 +220,9 @@ func (rf *Raft) ticker() {
 		select {
 		case <-rf.notifyMsg: // got msg during timer
 			rf.mu.Lock()
-			DPrintf("[INFO] %v get AE/RV in term %v", rf.me, rf.term)
+			if rf.leaderId != NONE_LEADER {
+				Info("%v follows to %v in term %v", rf.me, rf.leaderId, rf.term)
+			}
 			rf.mu.Unlock()
 			continue
 		default: // start new election
@@ -230,14 +232,24 @@ func (rf *Raft) ticker() {
 }
 
 func (rf *Raft) heartbeat() {
+	rf.mu.Lock()
+	term := rf.term
+	rf.mu.Unlock()
 	for !rf.killed() {
+		time.Sleep(time.Duration(HEARTBEAT_DUR) * time.Millisecond)
+
+		// check if still leader
 		_, isLeader := rf.GetState()
 		if !isLeader {
 			return
 		}
 
-		time.Sleep(time.Duration(HEARTBEAT_DUR) * time.Millisecond)
+		// send heart beat to all peers
 		rf.mu.Lock()
+		if term != rf.term {
+			rf.mu.Unlock()
+			return
+		}
 		args := &AppendEntriesArgs{
 			rf.term,
 			rf.me,
@@ -252,8 +264,19 @@ func (rf *Raft) heartbeat() {
 				continue
 			}
 
+			_ind := ind
 			reply := &AppendEntriesReply{}
-			go rf.sendAppendEntries(ind, args, reply)
+			go func(i int, _args *AppendEntriesArgs, _reply *AppendEntriesReply) {
+				ok := rf.sendAppendEntries(i, _args, _reply)
+				if !ok {
+					return
+				}
+
+				// use the reply to check if there are new terms
+				rf.mu.Lock()
+				rf.updateTerm(_reply.Term)
+				rf.mu.Unlock()
+			}(_ind, args, reply)
 		}
 	}
 }
@@ -263,22 +286,28 @@ func (rf *Raft) heartbeat() {
 // updated
 // clear the voteFor, and reboot the ticker if
 // leader
-// return true if update successfully
-func (rf *Raft) updateTerm(newTerm int) bool {
-	if newTerm <= rf.term {
-		return false
+func (rf *Raft) updateTerm(newTerm int) int {
+	if newTerm < rf.term {
+		return SMALLER_TERM
 	}
 
-	DPrintf("[INFO] %v 's term get updated from %v to %v", rf.me, rf.term, newTerm)
+	if newTerm == rf.term {
+		return EQ_TERM
+	}
+	Info("%v 's term get updated from %v to %v", rf.me, rf.term, newTerm)
 	rf.term = newTerm
-	if rf.isLeader {
-		rf.isLeader = false
+	if rf.leaderId == rf.me {
+		rf.leaderId = NONE_LEADER
+		Info("%v down to a follower in term %v", rf.me, rf.term)
 		go rf.ticker()
+	} else {
+		rf.leaderId = NONE_LEADER
+		Info("%v has no leader in term %v", rf.me, rf.term)
 	}
 
 	rf.vote = NONE_VOTE
 
-	return true
+	return GREATER_TERM
 }
 
 //
@@ -308,6 +337,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	rf.nextInd = make([]int, len(peers))
 	rf.matchInd = make([]int, len(peers))
+
+	rf.leaderId = NONE_LEADER
 
 	rf.notifyMsg = make(chan struct{}, 5)
 
