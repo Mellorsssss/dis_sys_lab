@@ -185,8 +185,22 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		return index, term, isLeader
 	}
 
-	_, lastIndex := rf.GetLastLogInfo()
-	index = lastIndex + 1
+	rf.mu.Lock()
+	// append command to leader's own logs
+	newLog := Log{}
+	if len(rf.logs) == 0 {
+		index = 1
+	} else {
+		index = rf.logs[len(rf.logs)-1].Index + 1
+	}
+	newLog.Index = index
+	newLog.Command = command
+	newLog.Term = term
+
+	DPrintf("leader %v begin agree on index %v in term %v", rf.me, newLog.Index, rf.term)
+
+	rf.logs = append(rf.logs, newLog)
+	rf.mu.Unlock()
 
 	go rf.agree(command)
 
@@ -335,6 +349,10 @@ func (rf *Raft) heartbeat() {
 				// or retry with new nextInd
 				update := rf.updateTerm(_reply.Term)
 				if update != GREATER_TERM {
+					if rf.nextInd[i] != _args.PrevLogInd + 1{
+						rf.mu.Unlock()
+						return
+					}
 					rf.nextInd[i]--
 					if rf.nextInd[i] <= 0 {
 						Error("heart: %v has error in nextInd", rf.me)
@@ -361,15 +379,15 @@ func (rf *Raft) updateTerm(newTerm int) int {
 	if newTerm == rf.term {
 		return EQ_TERM
 	}
-	Info("%v 's term get updated from %v to %v", rf.me, rf.term, newTerm)
+	DPrintf("%v 's term get updated from %v to %v", rf.me, rf.term, newTerm)
 	rf.term = newTerm
 	if rf.leaderId == rf.me {
 		rf.leaderId = NONE_LEADER
-		Info("%v down to a follower in term %v", rf.me, rf.term)
+		DPrintf("%v down to a follower in term %v", rf.me, rf.term)
 		go rf.ticker()
 	} else {
 		rf.leaderId = NONE_LEADER
-		Info("%v has no leader in term %v", rf.me, rf.term)
+		DPrintf("%v has no leader in term %v", rf.me, rf.term)
 	}
 
 	rf.vote = NONE_VOTE

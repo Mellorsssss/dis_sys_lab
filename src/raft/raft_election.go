@@ -68,7 +68,7 @@ func (rf *Raft) startNewElection() {
 	leaderThresh := len(rf.peers)/2 + 1 // more than half
 
 	rf.mu.Lock()
-	Info("peer %v start election in term %v", rf.me, rf.term)
+	DPrintf("peer %v start election in term %v", rf.me, rf.term)
 	rf.mu.Unlock()
 
 	// send RV to all the peers
@@ -78,8 +78,8 @@ func (rf *Raft) startNewElection() {
 	args := &RequestVoteArgs{
 		term,
 		rf.me,
-		lastTerm,
 		lastInd,
+		lastTerm,
 	}
 	for ind, _ := range rf.peers {
 		if ind == rf.me {
@@ -132,7 +132,7 @@ func (rf *Raft) startNewElection() {
 				rf.matchInd[i] = 0
 			}
 			go rf.heartbeat() // heartbeat
-			Info("%v is leader in term %v", rf.me, term)
+			DPrintf("%v is leader in term %v", rf.me, term)
 			rf.mu.Unlock()
 			return
 		}
@@ -142,5 +142,4 @@ func (rf *Raft) startNewElection() {
 			break
 		}
 	}
-	Info("%v get %v votes in term %v", rf.me, voteCount, term)
 }

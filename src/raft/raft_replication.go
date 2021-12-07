@@ -145,22 +145,7 @@ func (rf *Raft) agree(command interface{}) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	DPrintf("leader %v begin agree in term %v", rf.me, rf.term)
-	term := rf.term // save the term for checking
-
-	// append command to leader's own logs
-	newLog := Log{}
-	if len(rf.logs) == 0 {
-		newLog.Index = 1
-	} else {
-		newLog.Index = rf.logs[len(rf.logs)-1].Index + 1
-	}
-	newLog.Command = command
-	newLog.Term = term
-
-	Info("leader %v start to agree on %v in term %v", rf.me, newLog.Index, term)
-
-	rf.logs = append(rf.logs, newLog)
+	term := rf.term
 
 	// send AE to all peers until all of them are sync to the leader
 	// use goroutine to send AE until success
@@ -185,7 +170,7 @@ func (rf *Raft) agree(command interface{}) {
 		if indToSend == -1 {
 			return
 		}
-		logsToSend := rf.logs[indToSend:len(rf.logs)]
+		logsToSend := append([]Log{}, rf.logs[indToSend:len(rf.logs)]...)
 
 		// get the prevLog info
 		var prevLogInd int
@@ -205,8 +190,7 @@ func (rf *Raft) agree(command interface{}) {
 			logsToSend,
 			rf.commitInd,
 		}
-		reply := &AppendEntriesReply{}
-		go func(i int, _rf *Raft, _args *AppendEntriesArgs, _reply *AppendEntriesReply) {
+		go func(i int, _rf *Raft, _args *AppendEntriesArgs) {
 			for !_rf.killed() {
 				_rf.mu.Lock()
 				if !_rf.IsStillLeader(_args.Term) {
@@ -215,10 +199,12 @@ func (rf *Raft) agree(command interface{}) {
 				}
 				_rf.mu.Unlock()
 
+				_reply := &AppendEntriesReply{}
 				ok := _rf.sendAppendEntries(i, _args, _reply)
 				if !ok {
 					continue
 				}
+
 				_rf.mu.Lock()
 				if !_rf.IsStillLeader(_args.Term) {
 					_rf.mu.Unlock()
@@ -237,6 +223,11 @@ func (rf *Raft) agree(command interface{}) {
 
 				update := _rf.updateTerm(_reply.Term)
 				if update != GREATER_TERM { // decrease the nextInd and retry
+					if _rf.nextInd[i] != _args.Logs[0].Index{ // nextInd has changed
+						_rf.mu.Unlock()
+						continue
+					}
+
 					_rf.nextInd[i]--
 					if _rf.nextInd[i] <= 0 {
 						Error("%v has error in nextInd", _rf.me)
@@ -249,7 +240,7 @@ func (rf *Raft) agree(command interface{}) {
 						_rf.mu.Unlock()
 						return
 					}
-					_args.Logs = _rf.logs[_indToSend:len(_rf.logs)]
+					_args.Logs = append(_args.Logs[:0], _rf.logs[_indToSend:len(_rf.logs)]...)
 					if _indToSend == 0 {
 						_args.PrevLogInd, _args.PrevLogTerm = NONE_IND, NONE_TERM
 					} else {
@@ -261,6 +252,6 @@ func (rf *Raft) agree(command interface{}) {
 				}
 				_rf.mu.Unlock()
 			}
-		}(_ind, rf, args, reply)
+		}(_ind, rf, args)
 	}
 }
