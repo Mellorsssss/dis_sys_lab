@@ -42,6 +42,7 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		if args.LastLogTerm > LastLogTerm || (args.LastLogTerm == LastLogTerm && args.LastLogInd >= LastLogInd) {
 			reply.VoteGranted = true
 			rf.vote = args.ID
+			rf.persist()
 			rf.NotifyMsg()
 		} else {
 			reply.VoteGranted = false
@@ -61,6 +62,7 @@ func (rf *Raft) startNewElection() {
 	rf.leaderId = NONE_LEADER
 	term := rf.term // check if term has changed later
 	rf.vote = rf.me
+	rf.persist()
 	rf.mu.Unlock()
 
 	voteCount := 1
@@ -114,6 +116,7 @@ func (rf *Raft) startNewElection() {
 
 		if v.Term > rf.term { // update term and become follower
 			rf.term = v.Term
+			rf.persist()
 			rf.mu.Unlock()
 			return
 		}

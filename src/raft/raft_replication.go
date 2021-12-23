@@ -75,6 +75,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 
 		if args.Logs[ind].Term != rf.logs[indMatch].Term {
 			rf.logs = rf.logs[0:indMatch]
+			rf.persist()
 			break
 		}
 
@@ -82,6 +83,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 	if ind < len(args.Logs) {
 		rf.logs = append(rf.logs, args.Logs[ind:]...)
+		rf.persist()
 	}
 
 	// update the commitInd

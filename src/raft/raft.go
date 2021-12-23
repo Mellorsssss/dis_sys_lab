@@ -18,6 +18,8 @@ package raft
 //
 
 import (
+	"6.824/labgob"
+	"bytes"
 	//	"bytes"
 	"math/rand"
 	"sync"
@@ -117,6 +119,13 @@ func (rf *Raft) persist() {
 	// e.Encode(rf.yyy)
 	// data := w.Bytes()
 	// rf.persister.SaveRaftState(data)
+	buffer := new(bytes.Buffer)
+	enc := labgob.NewEncoder(buffer)
+	enc.Encode(rf.term)
+	enc.Encode(rf.vote)
+	enc.Encode(rf.logs)
+	data := buffer.Bytes()
+	rf.persister.SaveRaftState(data)
 }
 
 //
@@ -124,6 +133,9 @@ func (rf *Raft) persist() {
 //
 func (rf *Raft) readPersist(data []byte) {
 	if data == nil || len(data) < 1 { // bootstrap without any state?
+		rf.term = NONE_TERM
+		rf.vote = NONE_VOTE
+		rf.logs = []Log{}
 		return
 	}
 	// Your code here (2C).
@@ -139,6 +151,30 @@ func (rf *Raft) readPersist(data []byte) {
 	//   rf.xxx = xxx
 	//   rf.yyy = yyy
 	// }
+	buffer := bytes.NewBuffer(data)
+	dec := labgob.NewDecoder(buffer)
+	var term int
+	var vote int
+	var logs []Log
+
+	if dec.Decode(&term) != nil {
+		Error("Decode term error.")
+		return
+	}
+
+	if dec.Decode(&vote) != nil {
+		Error("Decode vote error.")
+		return
+	}
+
+	if dec.Decode(&logs) != nil{
+		Error("Decode logs error.")
+		return
+	}
+
+	rf.term = term
+	rf.vote = vote
+	rf.logs = append([]Log{}, logs[0:]...)
 }
 
 //
@@ -199,6 +235,9 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	DPrintf("leader %v begin agree on index %v in term %v", rf.me, newLog.Index, rf.term)
 
 	rf.logs = append(rf.logs, newLog)
+
+	rf.persist()
+
 	rf.mu.Unlock()
 
 	go rf.agree(command)
@@ -380,6 +419,9 @@ func (rf *Raft) updateTerm(newTerm int) int {
 	}
 	DPrintf("%v 's term get updated from %v to %v", rf.me, rf.term, newTerm)
 	rf.term = newTerm
+	rf.vote = NONE_VOTE
+	rf.persist()
+
 	if rf.leaderId == rf.me {
 		rf.leaderId = NONE_LEADER
 		DPrintf("%v down to a follower in term %v", rf.me, rf.term)
@@ -389,7 +431,6 @@ func (rf *Raft) updateTerm(newTerm int) int {
 		DPrintf("%v has no leader in term %v", rf.me, rf.term)
 	}
 
-	rf.vote = NONE_VOTE
 
 	return GREATER_TERM
 }
@@ -412,10 +453,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.persister = persister
 	rf.me = me
 
-	rf.term = NONE_TERM
-	rf.vote = NONE_VOTE
-	rf.logs = []Log{}
-
 	rf.commitInd = 0
 	rf.lastApply = 0
 
@@ -430,6 +467,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.notifyMsg = make(chan struct{}, 5)
 
 	// initialize from state persisted before a crash
+	rf.persist()
 	rf.readPersist(persister.ReadRaftState())
 
 	// start ticker goroutine to start elections
