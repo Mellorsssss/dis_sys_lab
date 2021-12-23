@@ -15,6 +15,23 @@ type AppendEntriesReply struct {
 	// Your data here (2A).
 	Term    int
 	Success bool
+
+	// valid if there is conflict
+	CIndex	int // first index store for the conflicting term
+}
+
+// getCurrentTermFirstLog return the index of the ind of first log
+// in current term
+// must hold rf.mu.Lock
+func (rf *Raft)	getCurrentTermFirstLog(pos int) int{
+	i := pos
+	for ; i > 0; i--{
+		if rf.logs[i].Term != rf.logs[i-1].Term{
+			return rf.logs[i].Index
+		}
+	}
+
+	return rf.logs[i].Index
 }
 
 func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply) {
@@ -23,6 +40,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 
 	rf.NotifyMsg()
 	reply.Term = rf.term
+	reply.CIndex = NONE_IND
 
 	// update term(may change state of current node)
 	// deal with the leaderID
@@ -51,12 +69,14 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		indMatch = rf.GetLogWithIndex(args.PrevLogInd)
 		if indMatch == -1 {
 			reply.Success = false
-			DPrintf("%v has no log with index %v from leader %v in term %v", rf.me, args.PrevLogInd, args.ID, args.Term)
+			reply.CIndex = rf.GetLastLogIndex() + 1
+			DPrintf("%v has no log with index %v(last is %v) from leader %v in term %v", rf.me, args.PrevLogInd, reply.CIndex - 1, args.ID, args.Term)
 			return
 		}
 
 		if rf.logs[indMatch].Term != args.PrevLogTerm {
 			reply.Success = false
+			reply.CIndex = rf.getCurrentTermFirstLog(indMatch)
 			DPrintf("%v has with index %v diff from leader %v in term %v", rf.me, args.PrevLogInd, args.ID, args.Term)
 			return
 		}
@@ -70,6 +90,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if args.Logs[ind].Index != rf.logs[indMatch].Index {
 			Error("log mismatch between leader %v and %v in term %v", args.ID, rf.me, args.Term)
 			reply.Success = false
+			reply.CIndex = rf.getCurrentTermFirstLog(ind)
 			return
 		}
 
@@ -193,9 +214,19 @@ func (rf *Raft) agree(command interface{}) {
 			rf.commitInd,
 		}
 		go func(i int, _rf *Raft, _args *AppendEntriesArgs) {
+			// for every peer, make sure only one routine to sending AE
+			_rf.mu.Lock()
+			if _rf.sending[i] {
+				_rf.mu.Unlock()
+				return
+			}
+			_rf.sending[i] = true
+			_rf.mu.Unlock()
+
 			for !_rf.killed() {
 				_rf.mu.Lock()
 				if !_rf.IsStillLeader(_args.Term) {
+					_rf.sending[i] = false
 					_rf.mu.Unlock()
 					return
 				}
@@ -209,6 +240,7 @@ func (rf *Raft) agree(command interface{}) {
 
 				_rf.mu.Lock()
 				if !_rf.IsStillLeader(_args.Term) {
+					_rf.sending[i] = false
 					_rf.mu.Unlock()
 					return
 				}
@@ -219,6 +251,7 @@ func (rf *Raft) agree(command interface{}) {
 					DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", _rf.me, i, _rf.nextInd[i], _rf.matchInd[i])
 					// check if there is a chance to update the commit
 					_rf.updateCommitIndexOfLeader()
+					_rf.sending[i] = false
 					_rf.mu.Unlock()
 					return
 				}
@@ -230,15 +263,17 @@ func (rf *Raft) agree(command interface{}) {
 						continue
 					}
 
-					_rf.nextInd[i]--
+					_rf.nextInd[i] = MinInt(_reply.CIndex, _rf.nextInd[i])
 					if _rf.nextInd[i] <= 0 {
 						Error("%v has error in nextInd", _rf.me)
+						_rf.sending[i] = false
 						_rf.mu.Unlock()
 						return
 					}
 					// prepare the args again(since some information may changed)
 					_indToSend := _rf.GetLogWithIndex(_rf.nextInd[i])
 					if _indToSend == -1 {
+						_rf.sending[i] = false
 						_rf.mu.Unlock()
 						return
 					}
@@ -249,6 +284,7 @@ func (rf *Raft) agree(command interface{}) {
 						_args.PrevLogInd, _args.PrevLogTerm = _rf.logs[_indToSend-1].Index, _rf.logs[_indToSend-1].Term
 					}
 				} else {
+					_rf.sending[i] = false
 					_rf.mu.Unlock()
 					return
 				}

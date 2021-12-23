@@ -89,8 +89,10 @@ type Raft struct {
 	matchInd []int // match Indexes
 
 	leaderId int // id of current term's leader
+
 	/* notifyMsg for AE or RV */
 	notifyMsg chan struct{} // notify when recv RE/RV
+	sending []bool // indicating if try to replicate to server
 }
 
 // GetState return currentTerm and whether this server
@@ -174,7 +176,7 @@ func (rf *Raft) readPersist(data []byte) {
 
 	rf.term = term
 	rf.vote = vote
-	rf.logs = append([]Log{}, logs[0:]...)
+	rf.logs = logs
 }
 
 //
@@ -350,6 +352,8 @@ func (rf *Raft) heartbeat() {
 			return
 		}
 
+		rf.updateCommitIndexOfLeader()
+
 		for ind, _ := range rf.peers {
 			if ind == rf.me {
 				continue
@@ -466,8 +470,12 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	rf.notifyMsg = make(chan struct{}, 5)
 
+	rf.sending = make([]bool, len(peers))
+	for i := 0; i < len(rf.sending); i++{
+		rf.sending[i] = false
+	}
+
 	// initialize from state persisted before a crash
-	rf.persist()
 	rf.readPersist(persister.ReadRaftState())
 
 	// start ticker goroutine to start elections
