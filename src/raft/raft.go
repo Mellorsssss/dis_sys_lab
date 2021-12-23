@@ -91,10 +91,9 @@ type Raft struct {
 	notifyMsg chan struct{} // notify when recv RE/RV
 }
 
-// return currentTerm and whether this server
+// GetState return currentTerm and whether this server
 // believes it is the leader.
 func (rf *Raft) GetState() (int, bool) {
-	// @TODO: check killed
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 	if rf.killed() {
@@ -449,6 +448,7 @@ func (rf *Raft) NotifyMsg() {
 	}
 }
 
+// no lock should be held
 // return the term and index of last log
 func (rf *Raft) GetLastLogInfo() (int, int) {
 	rf.mu.Lock()
@@ -473,6 +473,7 @@ func (rf *Raft) GetLastLogIndex() int {
 // return the index in rf.logs of log with index
 // return -1 if not match
 func (rf *Raft) GetLogWithIndex(index int) int {
+	// @TODO: optimize the search algorithm
 	if len(rf.logs) == 0 {
 		return -1
 	}
@@ -496,11 +497,12 @@ func (rf *Raft) IsStillLeader(term int) bool {
 	return rf.leaderId == rf.me && rf.term == term
 }
 
-/*
-   must hold rf.mu.Lock()
-   only can be called from leader
-   return the index, prevLogInd, prevLogTerm
-*/
+//
+//   must hold rf.mu.Lock()
+//   only can be called from leader
+//	get the log info to send to server
+//   return the index, prevLogInd, prevLogTerm
+//
 func (rf *Raft) GetLogToSend(server int) (int, int, int) {
 	indToSend := rf.GetLogWithIndex(rf.nextInd[server])
 	if indToSend == -1 {
