@@ -93,7 +93,7 @@ func (rf *Raft) startNewElection() {
 		go func(sender *Raft, i int, ch chan<- RequestVoteReply, args *RequestVoteArgs, reply *RequestVoteReply, ind int) {
 			ok := sender.sendRequestVote(i, args, reply)
 			if !ok {
-				Error("RV from %v to %v fails", sender.me, i)
+				//Error("RV from %v to %v fails", sender.me, i)
 				ch <- RequestVoteReply{NONE_TERM, false}
 				return
 			}

@@ -70,7 +70,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if indMatch == -1 {
 			reply.Success = false
 			reply.CIndex = rf.GetLastLogIndex() + 1
-			DPrintf("%v has no log with index %v(last is %v) from leader %v in term %v", rf.me, args.PrevLogInd, reply.CIndex - 1, args.ID, args.Term)
+			Error("%v has no log with index %v(last is %v) from leader %v in term %v", rf.me, args.PrevLogInd, reply.CIndex - 1, args.ID, args.Term)
 			return
 		}
 
@@ -213,83 +213,107 @@ func (rf *Raft) agree(command interface{}) {
 			logsToSend,
 			rf.commitInd,
 		}
-		go func(i int, _rf *Raft, _args *AppendEntriesArgs) {
+		go func(i int, _args *AppendEntriesArgs) {
 			// for every peer, make sure only one routine to sending AE
-			_rf.mu.Lock()
-			if _rf.sending[i] {
-				_rf.mu.Unlock()
+			rf.mu.Lock()
+			if rf.sending[i] {
+				rf.mu.Unlock()
 				return
 			}
-			_rf.sending[i] = true
-			_rf.mu.Unlock()
+			rf.sending[i] = true
+			rf.mu.Unlock()
 
-			for !_rf.killed() {
-				_rf.mu.Lock()
-				if !_rf.IsStillLeader(_args.Term) {
-					_rf.sending[i] = false
-					_rf.mu.Unlock()
+			// send AE until success
+			for !rf.killed() {
+				// make sure there is only one thread sending AE
+				rf.mu.Lock()
+				if !rf.IsStillLeader(_args.Term) {
+					rf.sending[i] = false
+					rf.mu.Unlock()
 					return
 				}
-				_rf.mu.Unlock()
+				rf.mu.Unlock()
 
 				_reply := &AppendEntriesReply{}
-				ok := _rf.sendAppendEntries(i, _args, _reply)
+				ok := rf.sendAppendEntries(i, _args, _reply)
 				if !ok {
 					continue
 				}
 
-				_rf.mu.Lock()
-				if !_rf.IsStillLeader(_args.Term) {
-					_rf.sending[i] = false
-					_rf.mu.Unlock()
+				rf.mu.Lock()
+				if !rf.IsStillLeader(_args.Term) {
+					rf.sending[i] = false
+					rf.mu.Unlock()
 					return
 				}
 
 				if _reply.Success {
-					_rf.nextInd[i] = MaxInt(_args.Logs[len(_args.Logs)-1].Index+1, _rf.nextInd[i])
-					_rf.matchInd[i] = MaxInt(_args.Logs[len(_args.Logs)-1].Index, _rf.matchInd[i])
-					DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", _rf.me, i, _rf.nextInd[i], _rf.matchInd[i])
+					rf.nextInd[i] = MaxInt(_args.Logs[len(_args.Logs)-1].Index+1, rf.nextInd[i])
+					rf.matchInd[i] = MaxInt(_args.Logs[len(_args.Logs)-1].Index, rf.matchInd[i])
+					DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, i, rf.nextInd[i], rf.matchInd[i])
 					// check if there is a chance to update the commit
-					_rf.updateCommitIndexOfLeader()
-					_rf.sending[i] = false
-					_rf.mu.Unlock()
-					return
-				}
+					rf.updateCommitIndexOfLeader()
 
-				update := _rf.updateTerm(_reply.Term)
-				if update != GREATER_TERM { // decrease the nextInd and retry
-					if _rf.nextInd[i] != _args.Logs[0].Index{ // nextInd has changed
-						_rf.mu.Unlock()
+					// check if there are new logs to commit
+					if rf.logs[len(rf.logs)-1].Index > _args.Logs[len(_args.Logs)-1].Index{
+						Error("new logs to replicate")
+						_indToSend := rf.GetLogWithIndex(rf.nextInd[i])
+						if _indToSend == -1{
+							rf.mu.Unlock()
+							return
+						}
+						_args.Logs = append(_args.Logs[:0], rf.logs[_indToSend:len(rf.logs)]...)
+
+						if _indToSend == 0 {
+							_args.PrevLogInd, _args.PrevLogTerm = NONE_IND, NONE_TERM
+						} else {
+							_args.PrevLogInd, _args.PrevLogTerm = rf.logs[_indToSend-1].Index, rf.logs[_indToSend-1].Term
+						}
+
+						// continue the loop to replicate logs
+						rf.mu.Unlock()
 						continue
 					}
 
-					_rf.nextInd[i] = MinInt(_reply.CIndex, _rf.nextInd[i])
-					if _rf.nextInd[i] <= 0 {
-						Error("%v has error in nextInd", _rf.me)
-						_rf.sending[i] = false
-						_rf.mu.Unlock()
+					rf.sending[i] = false
+					rf.mu.Unlock()
+					return
+				}
+
+				Error("%v to %v AE fail", rf.me, i)
+				update := rf.updateTerm(_reply.Term)
+				if update != GREATER_TERM { // decrease the nextInd and retry
+					Error("leader %v nextInd[%v] updates from %v to %v", rf.me, i, rf.nextInd[i], MinInt(_reply.CIndex, rf.nextInd[i]))
+					rf.nextInd[i] = MinInt(_reply.CIndex, rf.nextInd[i])
+					if rf.nextInd[i] <= 0 {
+						Error("%v has error in nextInd", rf.me)
+						rf.sending[i] = false
+						rf.mu.Unlock()
 						return
 					}
-					// prepare the args again(since some information may changed)
-					_indToSend := _rf.GetLogWithIndex(_rf.nextInd[i])
+
+					// prepare the args again(since some information may change)
+					_indToSend := rf.GetLogWithIndex(rf.nextInd[i])
 					if _indToSend == -1 {
-						_rf.sending[i] = false
-						_rf.mu.Unlock()
+						rf.sending[i] = false
+						rf.mu.Unlock()
 						return
 					}
-					_args.Logs = append(_args.Logs[:0], _rf.logs[_indToSend:len(_rf.logs)]...)
+					_args.Logs = append(_args.Logs[:0], rf.logs[_indToSend:len(rf.logs)]...)
+
 					if _indToSend == 0 {
 						_args.PrevLogInd, _args.PrevLogTerm = NONE_IND, NONE_TERM
 					} else {
-						_args.PrevLogInd, _args.PrevLogTerm = _rf.logs[_indToSend-1].Index, _rf.logs[_indToSend-1].Term
+						_args.PrevLogInd, _args.PrevLogTerm = rf.logs[_indToSend-1].Index, rf.logs[_indToSend-1].Term
 					}
 				} else {
-					_rf.sending[i] = false
-					_rf.mu.Unlock()
+					rf.sending[i] = false
+					rf.mu.Unlock()
 					return
 				}
-				_rf.mu.Unlock()
+				rf.mu.Unlock()
 			}
-		}(_ind, rf, args)
+		}(_ind, args)
 	}
 }
+

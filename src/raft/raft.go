@@ -82,8 +82,9 @@ type Raft struct {
 	commitInd int // commitIndex
 	lastApply int // last applied
 
-	/* apply msg channel */
+	/* apply msg notify channel */
 	appCond sync.Cond
+
 
 	nextInd  []int // next Indexes
 	matchInd []int // match Indexes
@@ -113,14 +114,6 @@ func (rf *Raft) GetState() (int, bool) {
 // see paper's Figure 2 for a description of what should be persistent.
 //
 func (rf *Raft) persist() {
-	// Your code here (2C).
-	// Example:
-	// w := new(bytes.Buffer)
-	// e := labgob.NewEncoder(w)
-	// e.Encode(rf.xxx)
-	// e.Encode(rf.yyy)
-	// data := w.Bytes()
-	// rf.persister.SaveRaftState(data)
 	buffer := new(bytes.Buffer)
 	enc := labgob.NewEncoder(buffer)
 	enc.Encode(rf.term)
@@ -140,19 +133,6 @@ func (rf *Raft) readPersist(data []byte) {
 		rf.logs = []Log{}
 		return
 	}
-	// Your code here (2C).
-	// Example:
-	// r := bytes.NewBuffer(data)
-	// d := labgob.NewDecoder(r)
-	// var xxx
-	// var yyy
-	// if d.Decode(&xxx) != nil ||
-	//    d.Decode(&yyy) != nil {
-	//   error...
-	// } else {
-	//   rf.xxx = xxx
-	//   rf.yyy = yyy
-	// }
 	buffer := bytes.NewBuffer(data)
 	dec := labgob.NewDecoder(buffer)
 	var term int
@@ -299,8 +279,8 @@ func (rf *Raft) ticker() {
 	}
 }
 
-// The applyer will apply the command to the applyCh
-func (rf *Raft) applyer(appCh chan ApplyMsg) {
+// The applier will apply the command to the applyCh
+func (rf *Raft) applier(appCh chan ApplyMsg) {
 	rf.appCond.L.Lock()
 	for !rf.killed() {
 		// wait until should apply new msg
@@ -371,6 +351,13 @@ func (rf *Raft) heartbeat() {
 			}
 			reply := &AppendEntriesReply{}
 			go func(i int, _args *AppendEntriesArgs, _reply *AppendEntriesReply) {
+				rf.mu.Lock()
+				if !rf.IsStillLeader(_args.Term){
+					rf.mu.Unlock()
+					return
+				}
+				rf.mu.Unlock()
+
 				ok := rf.sendAppendEntries(i, _args, _reply)
 				if !ok {
 					return
@@ -378,8 +365,12 @@ func (rf *Raft) heartbeat() {
 
 				// use the reply to check if there are new terms
 				rf.mu.Lock()
+				if !rf.IsStillLeader(_args.Term){
+					rf.mu.Unlock()
+					return
+				}
 
-				if _reply.Success { // there could be a update
+				if _reply.Success { // there could be an update
 					rf.matchInd[i] = MaxInt(_args.PrevLogInd, rf.matchInd[i])
 					rf.updateCommitIndexOfLeader()
 					DPrintf("heartbeat: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, i, rf.nextInd[i], rf.matchInd[i])
@@ -391,13 +382,15 @@ func (rf *Raft) heartbeat() {
 				// or retry with new nextInd
 				update := rf.updateTerm(_reply.Term)
 				if update != GREATER_TERM {
-					if rf.nextInd[i] != _args.PrevLogInd + 1{
+					if rf.nextInd[i] != _args.PrevLogInd + 1{ // nextInd is not the same value in the context(must be less)
 						rf.mu.Unlock()
 						return
 					}
-					rf.nextInd[i]--
+
+					Error("leader %v update nextInd[%v] from %v to  %v", rf.me, i, rf.nextInd[i], MinInt(_reply.CIndex, rf.nextInd[i]))
+					rf.nextInd[i] = MinInt(_reply.CIndex, rf.nextInd[i])
 					if rf.nextInd[i] <= 0 {
-						Error("heart: %v has error in nextInd", rf.me)
+						Error("heart: %v has error in nextInd as %v", rf.me, rf.nextInd[i])
 					}
 				}
 				rf.mu.Unlock()
@@ -480,7 +473,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// start ticker goroutine to start elections
 	go rf.ticker()
-	go rf.applyer(applyCh)
+	go rf.applier(applyCh)
 	return rf
 }
 
@@ -540,7 +533,7 @@ must hold the rf.mu.Lock()
 check if rf is still the leader and in the same term
 */
 func (rf *Raft) IsStillLeader(term int) bool {
-	return rf.leaderId == rf.me && rf.term == term
+	return rf.leaderId == rf.me && rf.term == term && !rf.killed()
 }
 
 //
