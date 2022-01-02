@@ -1024,6 +1024,7 @@ func snapcommon(t *testing.T, name string, disconnect bool, reliable bool, crash
 	leader1 := cfg.checkOneLeader()
 
 	for i := 0; i < iters; i++ {
+		DPrintf("iter %v begins.", i)
 		victim := (leader1 + 1) % servers
 		sender := leader1
 		if i%3 == 1 {

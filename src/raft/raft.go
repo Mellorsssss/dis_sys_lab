@@ -134,7 +134,7 @@ func (rf *Raft) persist() {
 	sbuffer := new(bytes.Buffer)
 	senc := labgob.NewEncoder(sbuffer)
 	senc.Encode(rf.snapshots)
-	sdata := buffer.Bytes()
+	sdata := sbuffer.Bytes()
 
 	rf.persister.SaveStateAndSnapshot(data, sdata)
 }
@@ -143,10 +143,15 @@ func (rf *Raft) persist() {
 // restore previously persisted state.
 //
 func (rf *Raft) readPersist(data []byte, sdata []byte) {
-	if data == nil || len(data) < 1 { // bootstrap without any state?
+	if data == nil || len(data) < 1 || sdata == nil { // bootstrap without any state?
 		rf.term = NONE_TERM
 		rf.vote = NONE_VOTE
 		rf.logs = []Log{}
+		rf.snapshots = SnapShotData{
+			LastIncludedIndex: NONE_IND,
+			LastIncludedTerm:  NONE_TERM,
+			Data:              []byte{},
+		}
 		return
 	}
 	buffer := bytes.NewBuffer(data)
@@ -190,6 +195,7 @@ func (rf *Raft) readPersist(data []byte, sdata []byte) {
 // have more recent info since it communicate the snapshot on applyCh.
 //
 func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int, snapshot []byte) bool {
+	Error("CondInstallSnapshot is called")
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
@@ -222,8 +228,9 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 // service no longer needs the log through (and including)
 // that index. Raft should now trim its log as much as possible.
 func (rf *Raft) Snapshot(index int, snapshot []byte) {
-	Error("snapshot is called")
+	DPrintf("snapshot is called %v to %v", index, rf.me)
 	rf.mu.Lock()
+	DPrintf("%v get lock in snapshot", rf.me)
 	defer rf.mu.Unlock()
 	if len(rf.logs) == 0 || rf.logs[len(rf.logs)-1].Index < index {
 		Error("No index match when installing snapshot.")
@@ -238,16 +245,19 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	ind := rf.GetLogWithIndex(index)
 	if ind == -1 {
 		Error("Install an old snapshot")
-		// @TODO: deal with the panic
 	}
 	rf.snapshots = SnapShotData{
 		LastIncludedIndex: index,
 		LastIncludedTerm:  rf.logs[ind].Term,
+		Data:              snapshot,
 	}
+	DPrintf("%v install snapshot[index:%v, term:%v]", rf.me, index, rf.snapshots.LastIncludedTerm)
 
 	if ind+1 != len(rf.logs) {
 		rf.logs = rf.logs[ind+1:] // trim logs
 	}
+	rf.commitInd = MaxInt(rf.commitInd, index)
+	rf.lastApply = MaxInt(rf.lastApply, index)
 }
 
 //
@@ -274,6 +284,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	}
 
 	rf.mu.Lock()
+	DPrintf("%v start %v", rf.me, command)
 	// append command to leader's own logs
 	newLog := Log{}
 	if len(rf.logs) == 0 {
@@ -284,8 +295,6 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	newLog.Index = index
 	newLog.Command = command
 	newLog.Term = term
-
-	DPrintf("leader %v begin agree on index %v in term %v", rf.me, newLog.Index, rf.term)
 
 	rf.logs = append(rf.logs, newLog)
 
@@ -365,6 +374,7 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 
 		// apply new msg
 		rf.mu.Lock()
+		DPrintf("%v begin apply new msgs.", rf.me)
 		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
 		if indToCommit == -1 {
 			Error("Log should be commited is None in %v in term %v", rf.me, rf.term)
@@ -539,11 +549,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 		rf.sending[i] = false
 	}
 
-	rf.snapshots = SnapShotData{
-		LastIncludedIndex: NONE_IND,
-		LastIncludedTerm:  NONE_TERM,
-		Data:              []byte{},
-	}
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState(), persister.ReadSnapshot())
 

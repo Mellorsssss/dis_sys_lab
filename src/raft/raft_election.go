@@ -70,7 +70,6 @@ func (rf *Raft) startNewElection() {
 	leaderThresh := len(rf.peers)/2 + 1 // more than half
 
 	rf.mu.Lock()
-	DPrintf("peer %v start election in term %v", rf.me, rf.term)
 	rf.mu.Unlock()
 
 	// send RV to all the peers
@@ -129,13 +128,11 @@ func (rf *Raft) startNewElection() {
 				Error("nextInd's size should be the same as matchInd or wrong size")
 			}
 
-			DPrintf("leader %v init nextInd to %v", rf.me, lastLogInd+1)
 			for i, _ := range rf.nextInd {
 				rf.nextInd[i] = lastLogInd + 1
 				rf.matchInd[i] = 0
 			}
 			go rf.heartbeat() // heartbeat
-			DPrintf("%v is leader in term %v", rf.me, term)
 			rf.mu.Unlock()
 			return
 		}

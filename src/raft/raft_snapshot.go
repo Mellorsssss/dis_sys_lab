@@ -55,6 +55,8 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 
 	// apply the snap shot
 	rf.applySnapShot(args.Data, args.LastLogInd, args.LastLogTerm)
+	rf.lastApply = MaxInt(rf.lastApply, args.LastLogInd)
+	rf.commitInd = MaxInt(rf.commitInd, args.LastLogInd)
 }
 
 // must hold rf.mu.Lock()
@@ -73,4 +75,55 @@ func (rf *Raft) applySnapShot(SnapShotData []byte, SnapShotIndex int, SnapShotTe
 func (rf *Raft) sendInstallSnapShotRPC(server int, args *InstallSnapShotArgs, reply *InstallSnapShotReply) bool {
 	ok := rf.peers[server].Call("Raft.InstallSnapShotRPC", args, reply)
 	return ok
+}
+
+func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
+	for !rf.killed() {
+		rf.mu.Lock()
+		Error("%v install snapshot[ind:%v, term:%v] in term %v to %v", rf.me, lastInd, lastTerm, term, server)
+		if !rf.IsStillLeader(term) {
+			rf.mu.Unlock()
+			return
+		}
+
+		if rf.snapshots.LastIncludedIndex != lastInd || rf.snapshots.LastIncludedTerm != lastTerm {
+			rf.mu.Unlock()
+			return
+		}
+
+		args := InstallSnapShotArgs{
+			rf.term,
+			rf.me,
+			rf.snapshots.LastIncludedIndex,
+			rf.snapshots.LastIncludedTerm,
+			rf.snapshots.Data,
+		}
+		reply := InstallSnapShotReply{}
+		rf.mu.Unlock()
+
+		ok := rf.sendInstallSnapShotRPC(server, &args, &reply)
+		if !ok {
+			return
+		}
+
+		rf.mu.Lock()
+
+		// check if still leader
+		if !rf.IsStillLeader(args.Term) {
+			rf.mu.Unlock()
+			return
+		}
+
+		update := rf.updateTerm(reply.Term)
+		if update != GREATER_TERM { // send snapshot successful
+			rf.nextInd[server] = MaxInt(rf.nextInd[server], args.LastLogInd+1)
+			rf.matchInd[server] = MaxInt(rf.matchInd[server], args.LastLogInd)
+			rf.updateCommitIndexOfLeader()
+			rf.mu.Unlock()
+			return
+		}
+
+		rf.mu.Unlock()
+	}
+
 }

@@ -115,6 +115,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 			rf.commitInd = MinInt(rf.commitInd, args.Logs[len(args.Logs)-1].Index)
 		}
 
+		DPrintf("follower %v change commitId to %v", rf.me, args.CommitInd)
 		rf.appCond.Signal() // check if should apply msg
 	}
 	reply.Success = true
@@ -172,7 +173,7 @@ func (rf *Raft) agree(command interface{}) {
 
 	// send AE to all peers until all of them are sync to the leader
 	// use goroutine to send AE until success
-	for ind, _ := range rf.peers {
+	for ind := range rf.peers {
 		_ind := ind
 		if _ind == rf.me {
 			continue
@@ -183,15 +184,27 @@ func (rf *Raft) agree(command interface{}) {
 		}
 
 		// check if there are logs to send
-		if len(rf.logs) == 0 || rf.logs[len(rf.logs)-1].Index < rf.nextInd[_ind] {
-			Error("%v has no log to send to %v", rf.me, _ind)
+		if len(rf.logs) != 0 && rf.logs[len(rf.logs)-1].Index < rf.nextInd[_ind] {
+			DPrintf("%v has no log to send to %v", rf.me, _ind)
+			continue
+		}
+
+		// follower is lagging, send the snapshot
+		if rf.snapshots.LastIncludedIndex >= rf.nextInd[_ind] {
+			DPrintf("%v sending snapshot to %v", rf.me, _ind)
+			rf.InstallSnapShot(_ind, rf.term, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
+			continue
+		}
+
+		if len(rf.logs) == 0 {
+			DPrintf("%v has no log to send to %v", rf.me, _ind)
 			continue
 		}
 
 		// get the logs to send
 		indToSend := rf.GetLogWithIndex(rf.nextInd[_ind])
 		if indToSend == -1 {
-			return
+			continue
 		}
 		logsToSend := append([]Log{}, rf.logs[indToSend:len(rf.logs)]...)
 
@@ -199,8 +212,8 @@ func (rf *Raft) agree(command interface{}) {
 		var prevLogInd int
 		var prevLogTerm int
 		if indToSend == 0 {
-			prevLogInd = NONE_IND
-			prevLogTerm = NONE_TERM
+			prevLogInd = rf.snapshots.LastIncludedIndex
+			prevLogTerm = rf.snapshots.LastIncludedTerm
 		} else {
 			prevLogInd, prevLogTerm = rf.logs[indToSend-1].Index, rf.logs[indToSend-1].Term
 		}
@@ -256,6 +269,7 @@ func (rf *Raft) agree(command interface{}) {
 
 					// check if there are new logs to commit
 					if rf.logs[len(rf.logs)-1].Index > _args.Logs[len(_args.Logs)-1].Index {
+						DPrintf("new log to continue replicate")
 						_indToSend := rf.GetLogWithIndex(rf.nextInd[i])
 						if _indToSend == -1 {
 							rf.mu.Unlock()
@@ -268,6 +282,8 @@ func (rf *Raft) agree(command interface{}) {
 						} else {
 							_args.PrevLogInd, _args.PrevLogTerm = rf.logs[_indToSend-1].Index, rf.logs[_indToSend-1].Term
 						}
+
+						_args.CommitInd = rf.commitInd
 
 						// continue the loop to replicate logs
 						rf.mu.Unlock()
@@ -304,6 +320,7 @@ func (rf *Raft) agree(command interface{}) {
 					} else {
 						_args.PrevLogInd, _args.PrevLogTerm = rf.logs[_indToSend-1].Index, rf.logs[_indToSend-1].Term
 					}
+					_args.CommitInd = rf.commitInd
 				} else {
 					rf.sending[i] = false
 					rf.mu.Unlock()
