@@ -36,12 +36,11 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 		rf.leaderId = args.ID
 	}
 
-	if rf.snapshots != nil && rf.snapshots.LastIncludedIndex >= args.LastLogInd {
+	if rf.snapshots.LastIncludedIndex >= args.LastLogInd {
 		return
 	}
 
-	rf.snapshots = nil
-	rf.snapshots = &SnapShotData{
+	rf.snapshots = SnapShotData{
 		LastIncludedIndex: args.LastLogInd,
 		LastIncludedTerm:  args.LastLogTerm,
 		Data:              args.Data,

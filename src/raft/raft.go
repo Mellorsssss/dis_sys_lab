@@ -103,7 +103,7 @@ type Raft struct {
 	notifyMsg chan struct{} // notify when recv RE/RV
 	sending   []bool        // indicating if try to replicate to server
 
-	snapshots *SnapShotData // snapshot data
+	snapshots SnapShotData // snapshot data
 }
 
 // GetState return currentTerm and whether this server
@@ -133,9 +133,7 @@ func (rf *Raft) persist() {
 
 	sbuffer := new(bytes.Buffer)
 	senc := labgob.NewEncoder(sbuffer)
-	if rf.snapshots != nil {
-		senc.Encode(*rf.snapshots)
-	}
+	senc.Encode(rf.snapshots)
 	sdata := buffer.Bytes()
 
 	rf.persister.SaveStateAndSnapshot(data, sdata)
@@ -184,7 +182,7 @@ func (rf *Raft) readPersist(data []byte, sdata []byte) {
 		return
 	}
 
-	rf.snapshots = &snapshot
+	rf.snapshots = snapshot
 }
 
 //
@@ -195,18 +193,15 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	if rf.snapshots != nil {
-		if rf.snapshots.LastIncludedIndex >= lastIncludedIndex { // has newer snapshot
-			return false
-		}
+	if rf.snapshots.LastIncludedIndex >= lastIncludedIndex { // has newer snapshot
+		return false
 	}
 
 	if rf.lastApply > lastIncludedIndex { // apply new msg
 		return false
 	}
 
-	rf.snapshots = nil
-	rf.snapshots = &SnapShotData{
+	rf.snapshots = SnapShotData{
 		LastIncludedIndex: lastIncludedIndex,
 		LastIncludedTerm:  lastIncludedTerm,
 		Data:              snapshot,
@@ -231,8 +226,7 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	defer rf.mu.Unlock()
 	if len(rf.logs) == 0 || rf.logs[len(rf.logs)-1].Index < index {
 		Error("No index match when installing snapshot.")
-		rf.snapshots = nil // for gc
-		rf.snapshots = &SnapShotData{
+		rf.snapshots = SnapShotData{
 			LastIncludedIndex: index,
 			LastIncludedTerm:  0,
 			Data:              snapshot,
@@ -240,13 +234,12 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 		return
 	}
 
-	rf.snapshots = nil
 	ind := rf.GetLogWithIndex(index)
 	if ind == -1 {
 		Error("Install an old snapshot")
 		// @TODO: deal with the panic
 	}
-	rf.snapshots = &SnapShotData{
+	rf.snapshots = SnapShotData{
 		LastIncludedIndex: index,
 		LastIncludedTerm:  rf.logs[ind].Term,
 	}
@@ -545,8 +538,11 @@ func Make(peers []*labrpc.ClientEnd, me int,
 		rf.sending[i] = false
 	}
 
-	rf.snapshots = nil
-
+	rf.snapshots = SnapShotData{
+		LastIncludedIndex: NONE_IND,
+		LastIncludedTerm:  NONE_TERM,
+		Data:              []byte{},
+	}
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState(), persister.ReadSnapshot())
 
