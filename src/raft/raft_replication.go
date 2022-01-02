@@ -112,10 +112,10 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if len(args.Logs) == 0 { // TODO: may be should prove it?
 			rf.commitInd = MaxInt(rf.commitInd, MinInt(args.CommitInd, args.PrevLogInd))
 		} else {
-			rf.commitInd = MinInt(rf.commitInd, args.Logs[len(args.Logs)-1].Index)
+			rf.commitInd = MaxInt(rf.commitInd, MinInt(args.Logs[len(args.Logs)-1].Index, args.CommitInd))
 		}
 
-		DPrintf("follower %v change commitId to %v", rf.me, args.CommitInd)
+		DPrintf("follower %v change commitId to %v", rf.me, rf.commitInd)
 		rf.appCond.Signal() // check if should apply msg
 	}
 	reply.Success = true
@@ -157,8 +157,8 @@ func (rf *Raft) updateCommitIndexOfLeader() {
 			if rf.logs[ind].Index > rf.commitInd {
 				DPrintf("leader %v commit change from %v to %v", rf.me, rf.commitInd, rf.logs[ind].Index)
 				rf.commitInd = rf.logs[ind].Index
+				rf.appCond.Signal()
 			}
-			rf.appCond.Signal()
 			return
 		}
 	}

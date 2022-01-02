@@ -258,6 +258,7 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	}
 	rf.commitInd = MaxInt(rf.commitInd, index)
 	rf.lastApply = MaxInt(rf.lastApply, index)
+	rf.appCond.Signal() // to send the blocked msgs
 }
 
 //
@@ -347,11 +348,6 @@ func (rf *Raft) ticker() {
 
 		select {
 		case <-rf.notifyMsg: // got msg during timer
-			rf.mu.Lock()
-			if rf.leaderId != NONE_LEADER {
-				Info("%v follows to %v in term %v", rf.me, rf.leaderId, rf.term)
-			}
-			rf.mu.Unlock()
 			continue
 		default: // start new election
 			go rf.startNewElection()
@@ -361,20 +357,22 @@ func (rf *Raft) ticker() {
 
 // The applier will apply the command to the applyCh
 func (rf *Raft) applier(appCh chan ApplyMsg) {
+	applyInterval := 10
 	rf.appCond.L.Lock()
 	for !rf.killed() {
 		// wait until should apply new msg
 		rf.mu.Lock()
+		DPrintf("get lock to at the begining of applier")
 		for rf.commitInd == rf.lastApply {
+			DPrintf("%v commit Ind %v same as lastapply", rf.me, rf.commitInd)
 			rf.mu.Unlock()
 			rf.appCond.Wait()
 			DPrintf("%v wake up to apply", rf.me)
 			rf.mu.Lock()
+			DPrintf("%v wake up and get lock", rf.me)
 		}
-		rf.mu.Unlock()
 
 		// apply new msg
-		rf.mu.Lock()
 		DPrintf("%v begin apply new msgs.", rf.me)
 		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
 		if indToCommit == -1 {
@@ -384,8 +382,9 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 		}
 		for rf.commitInd > rf.lastApply {
 			rf.lastApply++
-			DPrintf("%v apply msg %v[%v] %v in term %v", rf.me, rf.lastApply, indToCommit, rf.logs[indToCommit].Command, rf.term)
-			rf.appCh <- ApplyMsg{
+			DPrintf("%v try to apply msg %v", rf.me, rf.lastApply)
+			select {
+			case rf.appCh <- ApplyMsg{
 				true,
 				rf.logs[indToCommit].Command,
 				rf.logs[indToCommit].Index,
@@ -393,8 +392,16 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 				[]byte{},
 				0,
 				0,
+			}:
+				DPrintf("%v apply msg %v[%v] %v in term %v", rf.me, rf.lastApply, indToCommit, rf.logs[indToCommit].Command, rf.term)
+				indToCommit++
+			case <-time.After(time.Duration(applyInterval) * time.Millisecond):
+				rf.lastApply--
+				rf.mu.Unlock() // appch is blocked for installing snapshot
+				DPrintf("appch of %v is blocked for snapshot", rf.me)
+				return
 			}
-			indToCommit++
+
 		}
 		rf.mu.Unlock()
 	}
