@@ -130,13 +130,21 @@ func (rf *Raft) persist() {
 	enc.Encode(rf.vote)
 	enc.Encode(rf.logs)
 	data := buffer.Bytes()
-	rf.persister.SaveRaftState(data)
+
+	sbuffer := new(bytes.Buffer)
+	senc := labgob.NewEncoder(sbuffer)
+	if rf.snapshots != nil {
+		senc.Encode(*rf.snapshots)
+	}
+	sdata := buffer.Bytes()
+
+	rf.persister.SaveStateAndSnapshot(data, sdata)
 }
 
 //
 // restore previously persisted state.
 //
-func (rf *Raft) readPersist(data []byte) {
+func (rf *Raft) readPersist(data []byte, sdata []byte) {
 	if data == nil || len(data) < 1 { // bootstrap without any state?
 		rf.term = NONE_TERM
 		rf.vote = NONE_VOTE
@@ -167,6 +175,16 @@ func (rf *Raft) readPersist(data []byte) {
 	rf.term = term
 	rf.vote = vote
 	rf.logs = logs
+
+	sbuffer := bytes.NewBuffer(sdata)
+	var snapshot SnapShotData
+	sdec := labgob.NewDecoder(sbuffer)
+	if sdec.Decode(&snapshot) != nil {
+		Error("Decode snapshot error")
+		return
+	}
+
+	rf.snapshots = &snapshot
 }
 
 //
@@ -183,7 +201,7 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		}
 	}
 
-	if rf.commitInd > lastIncludedIndex { // apply new msg
+	if rf.lastApply > lastIncludedIndex { // apply new msg
 		return false
 	}
 
@@ -530,7 +548,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.snapshots = nil
 
 	// initialize from state persisted before a crash
-	rf.readPersist(persister.ReadRaftState())
+	rf.readPersist(persister.ReadRaftState(), persister.ReadSnapshot())
 
 	// start ticker goroutine to start elections
 	go rf.ticker()
