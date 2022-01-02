@@ -222,6 +222,7 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 // service no longer needs the log through (and including)
 // that index. Raft should now trim its log as much as possible.
 func (rf *Raft) Snapshot(index int, snapshot []byte) {
+	Error("snapshot is called")
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 	if len(rf.logs) == 0 || rf.logs[len(rf.logs)-1].Index < index {
@@ -276,7 +277,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	// append command to leader's own logs
 	newLog := Log{}
 	if len(rf.logs) == 0 {
-		index = 1
+		index = rf.snapshots.LastIncludedIndex + 1
 	} else {
 		index = rf.logs[len(rf.logs)-1].Index + 1
 	}
@@ -568,7 +569,7 @@ func (rf *Raft) GetLastLogInfo() (int, int) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 	if len(rf.logs) == 0 {
-		return NONE_TERM, NONE_IND
+		return rf.snapshots.LastIncludedTerm, rf.snapshots.LastIncludedIndex
 	}
 
 	return rf.logs[len(rf.logs)-1].Term, rf.logs[len(rf.logs)-1].Index
@@ -577,7 +578,7 @@ func (rf *Raft) GetLastLogInfo() (int, int) {
 // **must hold the rf.mu.Lock() ***
 func (rf *Raft) GetLastLogIndex() int {
 	if len(rf.logs) == 0 {
-		return NONE_IND
+		return rf.snapshots.LastIncludedIndex
 	}
 
 	return rf.logs[len(rf.logs)-1].Index
@@ -623,15 +624,15 @@ func (rf *Raft) GetLogToSend(server int) (int, int, int) {
 		if len(rf.logs) != 0 {
 			return -1, rf.logs[len(rf.logs)-1].Index, rf.logs[len(rf.logs)-1].Term
 		} else {
-			return -1, 0, 0
+			return -1, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm
 		}
 	}
 	// get the prevLog info
 	var prevLogInd int
 	var prevLogTerm int
 	if indToSend == 0 {
-		prevLogInd = NONE_IND
-		prevLogTerm = NONE_TERM
+		prevLogInd = rf.snapshots.LastIncludedIndex
+		prevLogTerm = rf.snapshots.LastIncludedTerm
 	} else {
 		prevLogInd, prevLogTerm = rf.logs[indToSend-1].Index, rf.logs[indToSend-1].Term
 	}

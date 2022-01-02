@@ -32,8 +32,8 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		var LastLogInd int
 		var LastLogTerm int
 		if len(rf.logs) == 0 {
-			LastLogInd = NONE_IND
-			LastLogTerm = NONE_VOTE
+			LastLogInd = rf.snapshots.LastIncludedIndex
+			LastLogTerm = rf.snapshots.LastIncludedTerm
 		} else {
 			LastLogInd = rf.logs[len(rf.logs)-1].Index
 			LastLogTerm = rf.logs[len(rf.logs)-1].Term

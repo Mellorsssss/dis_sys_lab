@@ -17,16 +17,16 @@ type AppendEntriesReply struct {
 	Success bool
 
 	// valid if there is conflict
-	CIndex	int // first index store for the conflicting term
+	CIndex int // first index store for the conflicting term
 }
 
 // getCurrentTermFirstLog return the index of the ind of first log
 // in current term
 // must hold rf.mu.Lock
-func (rf *Raft)	getCurrentTermFirstLog(pos int) int{
+func (rf *Raft) getCurrentTermFirstLog(pos int) int {
 	i := pos
-	for ; i > 0; i--{
-		if rf.logs[i].Term != rf.logs[i-1].Term{
+	for ; i > 0; i-- {
+		if rf.logs[i].Term != rf.logs[i-1].Term {
 			return rf.logs[i].Index
 		}
 	}
@@ -70,7 +70,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if indMatch == -1 {
 			reply.Success = false
 			reply.CIndex = rf.GetLastLogIndex() + 1
-			Error("%v has no log with index %v(last is %v) from leader %v in term %v", rf.me, args.PrevLogInd, reply.CIndex - 1, args.ID, args.Term)
+			Error("%v has no log with index %v(last is %v) from leader %v in term %v", rf.me, args.PrevLogInd, reply.CIndex-1, args.ID, args.Term)
 			return
 		}
 
@@ -255,10 +255,9 @@ func (rf *Raft) agree(command interface{}) {
 					rf.updateCommitIndexOfLeader()
 
 					// check if there are new logs to commit
-					if rf.logs[len(rf.logs)-1].Index > _args.Logs[len(_args.Logs)-1].Index{
-						Error("new logs to replicate")
+					if rf.logs[len(rf.logs)-1].Index > _args.Logs[len(_args.Logs)-1].Index {
 						_indToSend := rf.GetLogWithIndex(rf.nextInd[i])
-						if _indToSend == -1{
+						if _indToSend == -1 {
 							rf.mu.Unlock()
 							return
 						}
@@ -280,7 +279,6 @@ func (rf *Raft) agree(command interface{}) {
 					return
 				}
 
-				Error("%v to %v AE fail", rf.me, i)
 				update := rf.updateTerm(_reply.Term)
 				if update != GREATER_TERM { // decrease the nextInd and retry
 					Error("leader %v nextInd[%v] updates from %v to %v", rf.me, i, rf.nextInd[i], MinInt(_reply.CIndex, rf.nextInd[i]))
@@ -316,4 +314,3 @@ func (rf *Raft) agree(command interface{}) {
 		}(_ind, args)
 	}
 }
-
