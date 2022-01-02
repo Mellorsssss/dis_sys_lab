@@ -18,8 +18,10 @@ package raft
 //
 
 import (
-	"6.824/labgob"
 	"bytes"
+
+	"6.824/labgob"
+
 	//	"bytes"
 	"math/rand"
 	"sync"
@@ -59,6 +61,12 @@ type Log struct {
 	Command interface{} // command content
 }
 
+type SnapShotData struct {
+	LastIncludedIndex int
+	LastIncludedTerm  int
+	Data              []byte
+}
+
 //
 // A Go object implementing a single Raft peer.
 //
@@ -84,7 +92,7 @@ type Raft struct {
 
 	/* apply msg notify channel */
 	appCond sync.Cond
-
+	appCh   chan ApplyMsg
 
 	nextInd  []int // next Indexes
 	matchInd []int // match Indexes
@@ -93,7 +101,9 @@ type Raft struct {
 
 	/* notifyMsg for AE or RV */
 	notifyMsg chan struct{} // notify when recv RE/RV
-	sending []bool // indicating if try to replicate to server
+	sending   []bool        // indicating if try to replicate to server
+
+	snapshots *SnapShotData // snapshot data
 }
 
 // GetState return currentTerm and whether this server
@@ -149,7 +159,7 @@ func (rf *Raft) readPersist(data []byte) {
 		return
 	}
 
-	if dec.Decode(&logs) != nil{
+	if dec.Decode(&logs) != nil {
 		Error("Decode logs error.")
 		return
 	}
@@ -164,8 +174,32 @@ func (rf *Raft) readPersist(data []byte) {
 // have more recent info since it communicate the snapshot on applyCh.
 //
 func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int, snapshot []byte) bool {
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
 
-	// Your code here (2D).
+	if rf.snapshots != nil {
+		if rf.snapshots.LastIncludedIndex >= lastIncludedIndex { // has newer snapshot
+			return false
+		}
+	}
+
+	if rf.commitInd > lastIncludedIndex { // apply new msg
+		return false
+	}
+
+	rf.snapshots = nil
+	rf.snapshots = &SnapShotData{
+		LastIncludedIndex: lastIncludedIndex,
+		LastIncludedTerm:  lastIncludedTerm,
+		Data:              snapshot,
+	}
+
+	ind := rf.GetLogWithIndex(lastIncludedIndex)
+	if ind == -1 || ind+1 == len(rf.logs) {
+		rf.logs = []Log{}
+	} else {
+		rf.logs = rf.logs[ind+1:]
+	}
 
 	return true
 }
@@ -175,8 +209,33 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 // service no longer needs the log through (and including)
 // that index. Raft should now trim its log as much as possible.
 func (rf *Raft) Snapshot(index int, snapshot []byte) {
-	// Your code here (2D).
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	if len(rf.logs) == 0 || rf.logs[len(rf.logs)-1].Index < index {
+		Error("No index match when installing snapshot.")
+		rf.snapshots = nil // for gc
+		rf.snapshots = &SnapShotData{
+			LastIncludedIndex: index,
+			LastIncludedTerm:  0,
+			Data:              snapshot,
+		}
+		return
+	}
 
+	rf.snapshots = nil
+	ind := rf.GetLogWithIndex(index)
+	if ind == -1 {
+		Error("Install an old snapshot")
+		// @TODO: deal with the panic
+	}
+	rf.snapshots = &SnapShotData{
+		LastIncludedIndex: index,
+		LastIncludedTerm:  rf.logs[ind].Term,
+	}
+
+	if ind+1 != len(rf.logs) {
+		rf.logs = rf.logs[ind+1:] // trim logs
+	}
 }
 
 //
@@ -303,7 +362,7 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 		for rf.commitInd > rf.lastApply {
 			rf.lastApply++
 			DPrintf("%v apply msg %v[%v] %v in term %v", rf.me, rf.lastApply, indToCommit, rf.logs[indToCommit].Command, rf.term)
-			appCh <- ApplyMsg{
+			rf.appCh <- ApplyMsg{
 				true,
 				rf.logs[indToCommit].Command,
 				rf.logs[indToCommit].Index,
@@ -352,7 +411,7 @@ func (rf *Raft) heartbeat() {
 			reply := &AppendEntriesReply{}
 			go func(i int, _args *AppendEntriesArgs, _reply *AppendEntriesReply) {
 				rf.mu.Lock()
-				if !rf.IsStillLeader(_args.Term){
+				if !rf.IsStillLeader(_args.Term) {
 					rf.mu.Unlock()
 					return
 				}
@@ -365,7 +424,7 @@ func (rf *Raft) heartbeat() {
 
 				// use the reply to check if there are new terms
 				rf.mu.Lock()
-				if !rf.IsStillLeader(_args.Term){
+				if !rf.IsStillLeader(_args.Term) {
 					rf.mu.Unlock()
 					return
 				}
@@ -382,7 +441,7 @@ func (rf *Raft) heartbeat() {
 				// or retry with new nextInd
 				update := rf.updateTerm(_reply.Term)
 				if update != GREATER_TERM {
-					if rf.nextInd[i] != _args.PrevLogInd + 1{ // nextInd is not the same value in the context(must be less)
+					if rf.nextInd[i] != _args.PrevLogInd+1 { // nextInd is not the same value in the context(must be less)
 						rf.mu.Unlock()
 						return
 					}
@@ -428,7 +487,6 @@ func (rf *Raft) updateTerm(newTerm int) int {
 		DPrintf("%v has no leader in term %v", rf.me, rf.term)
 	}
 
-
 	return GREATER_TERM
 }
 
@@ -454,6 +512,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.lastApply = 0
 
 	rf.appCond = *sync.NewCond(&sync.Mutex{})
+	rf.appCh = applyCh
 
 	// re-init after election
 	rf.nextInd = make([]int, len(peers))
@@ -464,9 +523,11 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.notifyMsg = make(chan struct{}, 5)
 
 	rf.sending = make([]bool, len(peers))
-	for i := 0; i < len(rf.sending); i++{
+	for i := 0; i < len(rf.sending); i++ {
 		rf.sending[i] = false
 	}
+
+	rf.snapshots = nil
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
