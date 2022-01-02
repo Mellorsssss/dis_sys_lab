@@ -368,6 +368,7 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 		for rf.commitInd == rf.lastApply {
 			rf.mu.Unlock()
 			rf.appCond.Wait()
+			DPrintf("%v wake up to apply", rf.me)
 			rf.mu.Lock()
 		}
 		rf.mu.Unlock()
