@@ -40,11 +40,11 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 		return
 	}
 
-	rf.snapshots = SnapShotData{
-		LastIncludedIndex: args.LastLogInd,
-		LastIncludedTerm:  args.LastLogTerm,
-		Data:              args.Data,
-	}
+	// rf.snapshots = SnapShotData{
+	// 	LastIncludedIndex: args.LastLogInd,
+	// 	LastIncludedTerm:  args.LastLogTerm,
+	// 	Data:              args.Data,
+	// }
 
 	ind := rf.GetLogWithIndex(args.LastLogInd)
 	if ind == -1 || ind+1 == len(rf.logs) {
@@ -55,8 +55,8 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 
 	// apply the snap shot
 	rf.applySnapShot(args.Data, args.LastLogInd, args.LastLogTerm)
-	rf.lastApply = MaxInt(rf.lastApply, args.LastLogInd)
-	rf.commitInd = MaxInt(rf.commitInd, args.LastLogInd)
+	// rf.lastApply = MaxInt(rf.lastApply, args.LastLogInd)
+	// rf.commitInd = MaxInt(rf.commitInd, args.LastLogInd)
 }
 
 // must hold rf.mu.Lock()
@@ -67,8 +67,8 @@ func (rf *Raft) applySnapShot(SnapShotData []byte, SnapShotIndex int, SnapShotTe
 		NONE_IND,
 		true,
 		SnapShotData,
-		SnapShotIndex,
 		SnapShotTerm,
+		SnapShotIndex,
 	}
 }
 
@@ -80,13 +80,13 @@ func (rf *Raft) sendInstallSnapShotRPC(server int, args *InstallSnapShotArgs, re
 func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
 	for !rf.killed() {
 		rf.mu.Lock()
-		Error("%v install snapshot[ind:%v, term:%v] in term %v to %v", rf.me, lastInd, lastTerm, term, server)
 		if !rf.IsStillLeader(term) {
 			rf.mu.Unlock()
 			return
 		}
 
 		if rf.snapshots.LastIncludedIndex != lastInd || rf.snapshots.LastIncludedTerm != lastTerm {
+			Error("%v's snapshot has been updated from [index:%v, term:%v] to [index:%v, term:%v]", rf.me, lastInd, lastTerm, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
 			rf.mu.Unlock()
 			return
 		}
@@ -101,9 +101,10 @@ func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
 		reply := InstallSnapShotReply{}
 		rf.mu.Unlock()
 
+		DPrintf("%v install snapshot[ind:%v, term:%v] in term %v to %v", rf.me, lastInd, lastTerm, term, server)
 		ok := rf.sendInstallSnapShotRPC(server, &args, &reply)
 		if !ok {
-			return
+			continue
 		}
 
 		rf.mu.Lock()
@@ -116,9 +117,6 @@ func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
 
 		update := rf.updateTerm(reply.Term)
 		if update != GREATER_TERM { // send snapshot successful
-			rf.nextInd[server] = MaxInt(rf.nextInd[server], args.LastLogInd+1)
-			rf.matchInd[server] = MaxInt(rf.matchInd[server], args.LastLogInd)
-			rf.updateCommitIndexOfLeader()
 			rf.mu.Unlock()
 			return
 		}

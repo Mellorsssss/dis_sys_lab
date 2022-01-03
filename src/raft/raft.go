@@ -212,6 +212,8 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		LastIncludedTerm:  lastIncludedTerm,
 		Data:              snapshot,
 	}
+	rf.commitInd = MaxInt(rf.commitInd, rf.snapshots.LastIncludedIndex)
+	rf.lastApply = MaxInt(rf.lastApply, rf.snapshots.LastIncludedIndex)
 
 	ind := rf.GetLogWithIndex(lastIncludedIndex)
 	if ind == -1 || ind+1 == len(rf.logs) {
@@ -220,6 +222,10 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		rf.logs = rf.logs[ind+1:]
 	}
 
+	DPrintf("CondInstall snapshot to %v succ.", rf.me)
+	if len(rf.logs) != 0 {
+		DPrintf("%v's first log is %v after installing snapshot", rf.me, rf.logs[0])
+	}
 	return true
 }
 
@@ -243,6 +249,7 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	}
 
 	ind := rf.GetLogWithIndex(index)
+	DPrintf("%v try to trim logs %v len:%v, ind:%v, index:%v", rf.me, rf.logs, len(rf.logs), ind, rf.logs[ind].Index)
 	if ind == -1 {
 		Error("Install an old snapshot")
 	}
@@ -253,8 +260,11 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	}
 	DPrintf("%v install snapshot[index:%v, term:%v]", rf.me, index, rf.snapshots.LastIncludedTerm)
 
-	if ind+1 != len(rf.logs) {
+	if ind+1 <= len(rf.logs) {
 		rf.logs = rf.logs[ind+1:] // trim logs
+	}
+	if len(rf.logs) != 0 {
+		DPrintf("%v's log is %v after installing snapshot", rf.me, rf.logs)
 	}
 	rf.commitInd = MaxInt(rf.commitInd, index)
 	rf.lastApply = MaxInt(rf.lastApply, index)
@@ -285,7 +295,6 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	}
 
 	rf.mu.Lock()
-	DPrintf("%v start %v", rf.me, command)
 	// append command to leader's own logs
 	newLog := Log{}
 	if len(rf.logs) == 0 {
@@ -296,6 +305,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	newLog.Index = index
 	newLog.Command = command
 	newLog.Term = term
+	DPrintf("%v start %v[%v] at term %v", rf.me, newLog.Index, newLog.Command, newLog.Term)
 
 	rf.logs = append(rf.logs, newLog)
 
@@ -362,14 +372,10 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 	for !rf.killed() {
 		// wait until should apply new msg
 		rf.mu.Lock()
-		DPrintf("get lock to at the begining of applier")
 		for rf.commitInd == rf.lastApply {
-			DPrintf("%v commit Ind %v same as lastapply", rf.me, rf.commitInd)
 			rf.mu.Unlock()
 			rf.appCond.Wait()
-			DPrintf("%v wake up to apply", rf.me)
 			rf.mu.Lock()
-			DPrintf("%v wake up and get lock", rf.me)
 		}
 
 		// apply new msg
@@ -462,6 +468,7 @@ func (rf *Raft) heartbeat() {
 
 				if _reply.Success { // there could be an update
 					rf.matchInd[i] = MaxInt(_args.PrevLogInd, rf.matchInd[i])
+					rf.nextInd[i] = MaxInt(_args.PrevLogInd+1, rf.nextInd[i])
 					rf.updateCommitIndexOfLeader()
 					DPrintf("heartbeat: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, i, rf.nextInd[i], rf.matchInd[i])
 					rf.mu.Unlock()
