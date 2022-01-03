@@ -60,6 +60,7 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 	rf.applySnapShot(args.Data, args.LastLogInd, args.LastLogTerm)
 	rf.mu.Unlock()
 	<-rf.snapshotCh
+	DPrintf("%v install snapshot success", rf.me)
 }
 
 // must hold rf.mu.Lock()
@@ -73,7 +74,6 @@ func (rf *Raft) applySnapShot(SnapShotData []byte, SnapShotIndex int, SnapShotTe
 		SnapShotTerm,
 		SnapShotIndex,
 	}
-
 }
 
 func (rf *Raft) sendInstallSnapShotRPC(server int, args *InstallSnapShotArgs, reply *InstallSnapShotReply) bool {

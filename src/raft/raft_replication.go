@@ -377,6 +377,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 	rf.mu.Lock()
 	logLen := len(rf.logs)
 	ssLastInd := rf.snapshots.LastIncludedIndex
+	ssLastTerm := rf.snapshots.LastIncludedTerm
 	rf.mu.Unlock()
 
 	// only one thread sends log to prevent redunant rpcs
@@ -400,7 +401,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 		if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
 			DPrintf("%v sends snapshot to %v, because sp lastInd:%v, nextInd[%v] = %v", rf.me, server, rf.snapshots.LastIncludedIndex, server, rf.nextInd[server])
 			rf.mu.Unlock()
-			rf.InstallSnapShot(server, rf.term, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
+			rf.InstallSnapShot(server, term, ssLastInd, ssLastTerm)
 			// @TODO: improve the performance? time.sleep is not so elegant
 			continue
 		}

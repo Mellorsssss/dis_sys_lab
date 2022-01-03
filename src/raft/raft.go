@@ -196,11 +196,12 @@ func (rf *Raft) readPersist(data []byte, sdata []byte) {
 // have more recent info since it communicate the snapshot on applyCh.
 //
 func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int, snapshot []byte) bool {
-	Error("CondInstallSnapshot is called")
+	Error("CondInstallSnapshot to %v is called", rf.me)
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 	defer func() {
 		rf.snapshotCh <- struct{}{}
+		DPrintf("%v send msg to snapshotCh", rf.me)
 	}()
 
 	if rf.snapshots.LastIncludedIndex >= lastIncludedIndex { // has newer snapshot
@@ -232,7 +233,9 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	if len(rf.logs) != 0 {
 		DPrintf("%v's log is %v after installing snapshot(%v)", rf.me, rf.logs, lastIncludedIndex)
 	}
+	rf.persist()
 
+	rf.appCond.Signal() // to send the blocked msgs
 	return true
 }
 
@@ -275,6 +278,7 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	rf.commitInd = MaxInt(rf.commitInd, index)
 	rf.lastApply = MaxInt(rf.lastApply, index)
 	rf.appCond.Signal() // to send the blocked msgs
+	rf.persist()
 }
 
 //
@@ -381,8 +385,11 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 		for rf.commitInd == rf.lastApply {
 			rf.mu.Unlock()
 			rf.appCond.Wait()
+			DPrintf("%v wake up", rf.me)
 			rf.mu.Lock()
 		}
+
+		DPrintf("%v begins to apply msg %v", rf.me, rf.lastApply+1)
 
 		// apply new msg
 		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
@@ -491,7 +498,7 @@ func (rf *Raft) heartbeat() {
 						return
 					}
 
-					DPrintf("heartbeat: leader %v update nextInd[%v] from %v to  %v", rf.me, i, rf.nextInd[i], MinInt(_reply.CIndex, rf.nextInd[i]))
+					DPrintf("heartbeat fail: leader %v update nextInd[%v] from %v to  %v", rf.me, i, rf.nextInd[i], MinInt(_reply.CIndex, rf.nextInd[i]))
 					rf.nextInd[i] = MinInt(_reply.CIndex, rf.nextInd[i])
 					if rf.nextInd[i] <= 0 {
 						Error("heart: %v has error in nextInd as %v", rf.me, rf.nextInd[i])
@@ -566,6 +573,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.leaderId = NONE_LEADER
 
 	rf.notifyMsg = make(chan struct{}, 5)
+
+	rf.snapshotCh = make(chan struct{}, 5)
 
 	rf.sending = make([]bool, len(peers))
 	for i := 0; i < len(rf.sending); i++ {
