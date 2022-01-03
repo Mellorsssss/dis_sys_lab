@@ -103,7 +103,8 @@ type Raft struct {
 	notifyMsg chan struct{} // notify when recv RE/RV
 	sending   []bool        // indicating if try to replicate to server
 
-	snapshots SnapShotData // snapshot data
+	snapshots  SnapShotData  // snapshot data
+	snapshotCh chan struct{} // notify when cond install snapshot success
 }
 
 // GetState return currentTerm and whether this server
@@ -198,12 +199,17 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	Error("CondInstallSnapshot is called")
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
+	defer func() {
+		rf.snapshotCh <- struct{}{}
+	}()
 
 	if rf.snapshots.LastIncludedIndex >= lastIncludedIndex { // has newer snapshot
+		DPrintf("%v get old snapshot, refuse condinstall", rf.me)
 		return false
 	}
 
 	if rf.lastApply > lastIncludedIndex { // apply new msg
+		DPrintf("%v apply newer(%v) than condsnapshot(%v)", rf.me, rf.lastApply, lastIncludedIndex)
 		return false
 	}
 
@@ -224,8 +230,9 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 
 	DPrintf("CondInstall snapshot to %v succ.", rf.me)
 	if len(rf.logs) != 0 {
-		DPrintf("%v's first log is %v after installing snapshot", rf.me, rf.logs[0])
+		DPrintf("%v's log is %v after installing snapshot(%v)", rf.me, rf.logs, lastIncludedIndex)
 	}
+
 	return true
 }
 
@@ -249,7 +256,6 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	}
 
 	ind := rf.GetLogWithIndex(index)
-	DPrintf("%v try to trim logs %v len:%v, ind:%v, index:%v", rf.me, rf.logs, len(rf.logs), ind, rf.logs[ind].Index)
 	if ind == -1 {
 		Error("Install an old snapshot")
 	}
@@ -379,7 +385,6 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 		}
 
 		// apply new msg
-		DPrintf("%v begin apply new msgs.", rf.me)
 		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
 		if indToCommit == -1 {
 			Error("Log should be commited is None in %v in term %v", rf.me, rf.term)
@@ -390,7 +395,6 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 		blocked := false
 		for rf.commitInd > rf.lastApply && !blocked {
 			rf.lastApply++
-			DPrintf("%v try to apply msg %v", rf.me, rf.lastApply)
 			select {
 			case rf.appCh <- ApplyMsg{
 				true,
@@ -430,13 +434,14 @@ func (rf *Raft) heartbeat() {
 
 		rf.updateCommitIndexOfLeader()
 
-		for ind, _ := range rf.peers {
+		for ind := range rf.peers {
 			if ind == rf.me {
 				continue
 			}
 
 			_ind := ind
 			_, prevLogInd, prevLogTerm := rf.GetLogToSend(ind)
+
 			args := &AppendEntriesArgs{
 				term,
 				rf.me,
@@ -456,6 +461,7 @@ func (rf *Raft) heartbeat() {
 
 				ok := rf.sendAppendEntries(i, _args, _reply)
 				if !ok {
+					DPrintf("heartbeat: leader %v to follower %v fails", rf.me, _ind)
 					return
 				}
 
@@ -480,11 +486,12 @@ func (rf *Raft) heartbeat() {
 				update := rf.updateTerm(_reply.Term)
 				if update != GREATER_TERM {
 					if rf.nextInd[i] != _args.PrevLogInd+1 { // nextInd is not the same value in the context(must be less)
+						DPrintf("heartbeat: nextInd[%v] %v mismatch prevLogInd %v", _ind, rf.nextInd[_ind], _args.PrevLogInd+1)
 						rf.mu.Unlock()
 						return
 					}
 
-					Error("leader %v update nextInd[%v] from %v to  %v", rf.me, i, rf.nextInd[i], MinInt(_reply.CIndex, rf.nextInd[i]))
+					DPrintf("heartbeat: leader %v update nextInd[%v] from %v to  %v", rf.me, i, rf.nextInd[i], MinInt(_reply.CIndex, rf.nextInd[i]))
 					rf.nextInd[i] = MinInt(_reply.CIndex, rf.nextInd[i])
 					if rf.nextInd[i] <= 0 {
 						Error("heart: %v has error in nextInd as %v", rf.me, rf.nextInd[i])
@@ -643,6 +650,10 @@ func (rf *Raft) GetLogToSend(server int) (int, int, int) {
 	indToSend := rf.GetLogWithIndex(rf.nextInd[server])
 	if indToSend == -1 {
 		if len(rf.logs) != 0 {
+			// check if log to send has been covered by the snapshot
+			if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
+				return -1, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm
+			}
 			return -1, rf.logs[len(rf.logs)-1].Index, rf.logs[len(rf.logs)-1].Term
 		} else {
 			return -1, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm

@@ -133,6 +133,7 @@ func (rf *Raft) startNewElection() {
 				rf.matchInd[i] = 0
 			}
 			go rf.heartbeat() // heartbeat
+			go rf.agree(nil)  // in case some haven't been replicated
 			rf.mu.Unlock()
 			return
 		}

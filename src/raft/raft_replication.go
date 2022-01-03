@@ -40,7 +40,9 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	DPrintf("leader %v send AE to follower %v [prevInd: %v, prevTerm: %v, commitID:%v]", args.ID, rf.me, args.PrevLogInd, args.PrevLogTerm, args.CommitInd)
+	if len(args.Logs) != 0 { // filter heartbeat
+		DPrintf("leader %v send AE to follower %v [prevInd: %v, prevTerm: %v, commitID:%v]", args.ID, rf.me, args.PrevLogInd, args.PrevLogTerm, args.CommitInd)
+	}
 	rf.NotifyMsg()
 	reply.Term = rf.term
 	reply.CIndex = NONE_IND
@@ -139,7 +141,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 			rf.commitInd = MaxInt(rf.commitInd, MinInt(args.Logs[len(args.Logs)-1].Index, args.CommitInd))
 		}
 
-		DPrintf("follower %v change commitId to %v", rf.me, rf.commitInd)
+		DPrintf("follower %v change commitId to %v(compared to %v)", rf.me, rf.commitInd, args.CommitInd)
 		rf.appCond.Signal() // check if should apply msg
 	}
 	reply.Success = true
@@ -363,20 +365,24 @@ func (rf *Raft) agree(command interface{}) {
 // precondition: sending[server] == false
 // postcondition: sending[server] == false
 func (rf *Raft) replicateOnCommand(server, term int) {
-	snapshotInstallTime := 30
+	// rf.mu.Lock()
+	// if rf.sending[server] {
+	// 	rf.mu.Unlock()
+	// 	return
+	// }
+	// rf.sending[server] = true
+	// rf.mu.Unlock()
 
-	// only one thread sends log to prevent redunant rpcs
+	// unique context of this goroutine
 	rf.mu.Lock()
-	if rf.sending[server] {
-		rf.mu.Unlock()
-		return
-	}
-	rf.sending[server] = true
+	logLen := len(rf.logs)
+	ssLastInd := rf.snapshots.LastIncludedIndex
 	rf.mu.Unlock()
 
+	// only one thread sends log to prevent redunant rpcs
 	for !rf.killed() {
 		rf.mu.Lock()
-		if !rf.IsStillLeader(term) {
+		if !rf.IsStillLeader(term) || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd {
 			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
@@ -392,11 +398,10 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 		// follower is lagging, send the snapshot
 		if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
-			DPrintf("%v sends snapshot to %v", rf.me, server)
-			go rf.InstallSnapShot(server, rf.term, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
+			DPrintf("%v sends snapshot to %v, because sp lastInd:%v, nextInd[%v] = %v", rf.me, server, rf.snapshots.LastIncludedIndex, server, rf.nextInd[server])
 			rf.mu.Unlock()
+			rf.InstallSnapShot(server, rf.term, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
 			// @TODO: improve the performance? time.sleep is not so elegant
-			time.Sleep(time.Duration(snapshotInstallTime) * time.Millisecond) // wait and re-send msg(or snapshot)
 			continue
 		}
 
@@ -439,13 +444,16 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 		reply := &AppendEntriesReply{}
 		rf.mu.Unlock()
 
+		DPrintf("leader %v try to send AE to %v", rf.me, server)
+
 		ok := rf.sendAppendEntries(server, args, reply)
 		if !ok { // re-try in next iter
+			Error("leader %v sends AE to %v fail, re try", rf.me, server)
 			continue
 		}
 
 		rf.mu.Lock()
-		if !rf.IsStillLeader(term) {
+		if !rf.IsStillLeader(term) /* || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
 			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
@@ -461,17 +469,17 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 			rf.updateCommitIndexOfLeader()
 
 			// check if there are new logs to commit
-			if len(rf.logs) == 0 {
-				if rf.snapshots.LastIncludedIndex > args.Logs[len(args.Logs)-1].Index {
-					rf.mu.Unlock()
-					continue
-				}
-			} else {
-				if rf.logs[len(rf.logs)-1].Index > args.Logs[len(args.Logs)-1].Index {
-					rf.mu.Unlock()
-					continue
-				}
-			}
+			// if len(rf.logs) == 0 {
+			// 	if rf.snapshots.LastIncludedIndex > args.Logs[len(args.Logs)-1].Index {
+			// 		rf.mu.Unlock()
+			// 		continue
+			// 	}
+			// } else {
+			// 	if rf.logs[len(rf.logs)-1].Index > args.Logs[len(args.Logs)-1].Index {
+			// 		rf.mu.Unlock()
+			// 		continue
+			// 	}
+			// }
 
 			// finish send log, just return
 			rf.sending[server] = false
@@ -492,6 +500,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 			// re-try in next iter
 			rf.mu.Unlock()
+			time.Sleep(time.Duration(RPLICATE_DUR) * time.Millisecond)
 			continue
 		} else {
 			rf.sending[server] = false
