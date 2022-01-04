@@ -3,7 +3,6 @@ package raft
 // leader election
 
 type RequestVoteArgs struct {
-	// Your data here (2A, 2B).
 	Term        int
 	ID          int
 	LastLogInd  int
@@ -11,11 +10,11 @@ type RequestVoteArgs struct {
 }
 
 type RequestVoteReply struct {
-	// Your data here (2A).
 	Term        int
 	VoteGranted bool
 }
 
+// RequestVote rpc handler
 func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here (2A, 2B).
 	rf.mu.Lock()
@@ -82,7 +81,7 @@ func (rf *Raft) startNewElection() {
 		lastInd,
 		lastTerm,
 	}
-	for ind, _ := range rf.peers {
+	for ind := range rf.peers {
 		if ind == rf.me {
 			continue
 		}
@@ -142,5 +141,15 @@ func (rf *Raft) startNewElection() {
 		if voteTot <= 0 { // alreday get all votes
 			break
 		}
+	}
+}
+
+// NotifyMsg call when grant vote or get AE
+func (rf *Raft) NotifyMsg() {
+	select {
+	case rf.notifyMsg <- struct{}{}:
+		return
+	default:
+		return
 	}
 }
