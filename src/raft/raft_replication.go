@@ -229,14 +229,14 @@ func (rf *Raft) agree(command interface{}) {
 			continue
 		}
 
-		go rf.replicateOnCommand(_ind, term)
+		go rf.replicateOnCommand(_ind, term, true)
 		continue
 	}
 }
 
 // precondition: sending[server] == false
 // postcondition: sending[server] == false
-func (rf *Raft) replicateOnCommand(server, term int) {
+func (rf *Raft) replicateOnCommand(server, term int, retry bool) {
 	//rf.mu.Lock()
 	//if rf.sending[server] {
 	//	rf.mu.Unlock()
@@ -253,7 +253,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 	rf.mu.Unlock()
 
 	// only one thread sends log to prevent redundant rpcs
-	for !rf.killed() {
+	for !rf.killed() && retry{
 		rf.mu.Lock()
 		if !rf.IsStillLeader(term) || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd {
 			rf.sending[server] = false
@@ -369,8 +369,13 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 			// re-try in next iter
 			rf.mu.Unlock()
-			time.Sleep(time.Duration(RPLICATE_DUR) * time.Millisecond)
-			continue
+			// time.Sleep(time.Duration(RPLICATE_DUR) * time.Millisecond)
+			select {
+			case rf.AEChs[server] <- struct{}{}:
+				continue
+			default:
+				continue
+			}
 		} else {
 			rf.sending[server] = false
 			rf.mu.Unlock()

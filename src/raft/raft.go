@@ -103,6 +103,8 @@ type Raft struct {
 	notifyMsg chan struct{} // notify when recv RE/RV
 	sending   []bool        // indicating if try to replicate to server
 
+	AEChs []chan struct{} // notify when retry on peer is needed
+
 	snapshots  SnapShotData  // snapshot data
 	snapshotCh chan struct{} // notify when cond install snapshot success
 }
@@ -319,7 +321,19 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 
 	rf.mu.Unlock()
 
-	go rf.agree(command)
+	// go rf.agree(command)
+
+	for ind := range rf.peers{
+		if ind == rf.me {
+			continue
+		}
+		select {
+		case rf.AEChs[ind] <- struct{}{}:
+			continue
+		default:
+			continue
+		}
+	}
 
 	return index, term, isLeader
 }
@@ -508,6 +522,42 @@ func (rf *Raft) heartbeat() {
 	}
 }
 
+func (rf *Raft) startHeartbeat() {
+	rf.mu.Lock()
+	term := rf.term
+	rf.mu.Unlock()
+
+	for ind := range rf.peers {
+		if ind == rf.me{
+			continue
+		}
+
+		go rf.heartbeatWorker(ind, term)
+	}
+}
+
+// heartbeat worker for every single peer
+func (rf *Raft) heartbeatWorker(server, term int) {
+	rand.Seed(time.Now().UnixNano())
+	// heartbeat at the beginning
+	go rf.replicateOnCommand(server, term, false)
+	for !rf.killed() {
+		// leader doesn't need timer
+
+		rf.mu.Lock()
+		if !rf.IsStillLeader(term) {
+			rf.mu.Unlock()
+			return
+		}
+		rf.mu.Unlock()
+		select {
+		case <-rf.AEChs[server]:
+			go rf.replicateOnCommand(server, term, false)
+		case <-time.After(time.Duration(HEARTBEAT_DUR)*time.Millisecond): // heartbeat
+			go rf.replicateOnCommand(server, term, false)
+		}
+	}
+}
 // Make a raft server.the service or tester wants to create a Raft server. the ports
 // of all the Raft servers (including this one) are in peers[]. this
 // server's port is peers[me]. all the servers' peers[] arrays
@@ -540,6 +590,15 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.sending = make([]bool, len(peers))
 	for i := 0; i < len(rf.sending); i++ {
 		rf.sending[i] = false
+	}
+
+	rf.AEChs = make([]chan struct{}, len(peers))
+	for i := 0; i < len(rf.AEChs); i++ {
+		if i == rf.me{
+			continue
+		}
+
+		rf.AEChs[i] = make(chan struct{}, AEBUFFER_LEN)
 	}
 
 	// initialize from state persisted before a crash

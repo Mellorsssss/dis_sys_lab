@@ -11,6 +11,7 @@ const (
 	NONE_LEADER      = -1
 	SNAPSHOTINTERVAL = 100
 	RPLICATE_DUR     = 100
+	AEBUFFER_LEN = 10
 )
 
 const (
