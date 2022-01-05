@@ -12,6 +12,7 @@ const (
 	SNAPSHOTINTERVAL = 100
 	RPLICATE_DUR     = 100
 	AEBUFFER_LEN     = 1
+	AEBATCH_SIZE     = 3
 )
 
 const (

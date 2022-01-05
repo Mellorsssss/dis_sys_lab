@@ -54,6 +54,10 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 		return false
 	}
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
+
+	if !PROFILE {
+		return ok
+	}
 	rf.mu.Lock()
 	rf.RVCount++
 	rf.mu.Unlock()

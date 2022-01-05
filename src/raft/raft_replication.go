@@ -176,6 +176,9 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 		return false
 	}
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
+	if !PROFILE {
+		return ok
+	}
 	rf.mu.Lock()
 	rf.AECount++
 	rf.mu.Unlock()
@@ -255,7 +258,6 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 		DPrintf("%v sends snapshot to %v, because sp lastInd:%v, nextInd[%v] = %v", rf.me, server, rf.snapshots.LastIncludedIndex, server, rf.nextInd[server])
 		rf.mu.Unlock()
 		rf.InstallSnapShot(server, term)
-		rf.TriggerAppend(server) // send AE to check if nextInd has changed
 		return
 	}
 

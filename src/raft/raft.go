@@ -324,17 +324,16 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 
 	rf.persist()
 
-	rf.mu.Unlock()
-
-	// go rf.agree(command)
-
 	for ind := range rf.peers {
 		if ind == rf.me {
 			continue
 		}
 
-		rf.TriggerAppend(ind)
+		if rf.nextInd[ind] == newLog.Index || newLog.Index <= rf.nextInd[ind]+AEBATCH_SIZE {
+			rf.TriggerAppend(ind)
+		}
 	}
+	rf.mu.Unlock()
 
 	return index, term, isLeader
 }

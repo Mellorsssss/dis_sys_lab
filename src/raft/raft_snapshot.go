@@ -75,6 +75,9 @@ func (rf *Raft) sendInstallSnapShotRPC(server int, args *InstallSnapShotArgs, re
 		return false
 	}
 	ok := rf.peers[server].Call("Raft.InstallSnapShotRPC", args, reply)
+	if !PROFILE {
+		return ok
+	}
 	rf.mu.Lock()
 	rf.ISCount++
 	rf.mu.Unlock()
