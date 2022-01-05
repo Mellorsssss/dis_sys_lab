@@ -107,6 +107,11 @@ type Raft struct {
 
 	snapshots  SnapShotData  // snapshot data
 	snapshotCh chan struct{} // notify when cond install snapshot success
+
+	/* profile info */
+	AECount int
+	RVCount int
+	ISCount int
 }
 
 // GetState return currentTerm and whether this server
@@ -323,16 +328,12 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 
 	// go rf.agree(command)
 
-	for ind := range rf.peers{
+	for ind := range rf.peers {
 		if ind == rf.me {
 			continue
 		}
-		select {
-		case rf.AEChs[ind] <- struct{}{}:
-			continue
-		default:
-			continue
-		}
+
+		rf.TriggerAppend(ind)
 	}
 
 	return index, term, isLeader
@@ -353,6 +354,9 @@ func (rf *Raft) Kill() {
 	atomic.StoreInt32(&rf.dead, 1)
 	Info("%v is killed", rf.me)
 	// Your code here, if desired.
+	rf.mu.Lock()
+	Profile("%v profile: RV:%v, AE:%v, IS:%v", rf.me, rf.RVCount, rf.AECount, rf.ISCount)
+	rf.mu.Unlock()
 }
 
 func (rf *Raft) killed() bool {
@@ -528,7 +532,7 @@ func (rf *Raft) startHeartbeat() {
 	rf.mu.Unlock()
 
 	for ind := range rf.peers {
-		if ind == rf.me{
+		if ind == rf.me {
 			continue
 		}
 
@@ -540,7 +544,7 @@ func (rf *Raft) startHeartbeat() {
 func (rf *Raft) heartbeatWorker(server, term int) {
 	rand.Seed(time.Now().UnixNano())
 	// heartbeat at the beginning
-	go rf.replicateOnCommand(server, term, false)
+	go rf.replicateOnCommand(server, term)
 	for !rf.killed() {
 		// leader doesn't need timer
 
@@ -552,12 +556,14 @@ func (rf *Raft) heartbeatWorker(server, term int) {
 		rf.mu.Unlock()
 		select {
 		case <-rf.AEChs[server]:
-			go rf.replicateOnCommand(server, term, false)
-		case <-time.After(time.Duration(HEARTBEAT_DUR)*time.Millisecond): // heartbeat
-			go rf.replicateOnCommand(server, term, false)
+			go rf.replicateOnCommand(server, term)
+		case <-time.After(time.Duration(HEARTBEAT_DUR) * time.Millisecond): // heartbeat
+			DPrintf("heartbeat: leader %v send to follower %v", rf.me, server)
+			go rf.replicateOnCommand(server, term)
 		}
 	}
 }
+
 // Make a raft server.the service or tester wants to create a Raft server. the ports
 // of all the Raft servers (including this one) are in peers[]. this
 // server's port is peers[me]. all the servers' peers[] arrays
@@ -594,7 +600,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	rf.AEChs = make([]chan struct{}, len(peers))
 	for i := 0; i < len(rf.AEChs); i++ {
-		if i == rf.me{
+		if i == rf.me {
 			continue
 		}
 
@@ -604,10 +610,13 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState(), persister.ReadSnapshot())
 
+	// initialize profile info
+	rf.AECount = 0
+	rf.RVCount = 0
+	rf.ISCount = 0
+
 	// start ticker goroutine to start elections
 	go rf.ticker()
 	go rf.applier(applyCh)
 	return rf
 }
-
-

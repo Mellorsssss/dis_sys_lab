@@ -1,9 +1,8 @@
 package raft
 
 // GetLastLogInfo return the term and index of last log
+// must hold rf.mu.Lock()
 func (rf *Raft) GetLastLogInfo() (int, int) {
-	rf.mu.Lock()
-	defer rf.mu.Unlock()
 	if len(rf.logs) == 0 {
 		return rf.snapshots.LastIncludedTerm, rf.snapshots.LastIncludedIndex
 	}

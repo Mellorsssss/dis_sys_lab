@@ -50,7 +50,13 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 }
 
 func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *RequestVoteReply) bool {
+	if rf.killed() {
+		return false
+	}
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
+	rf.mu.Lock()
+	rf.RVCount++
+	rf.mu.Unlock()
 	return ok
 }
 
@@ -68,13 +74,12 @@ func (rf *Raft) startNewElection() {
 	voteTot := len(rf.peers) - 1
 	leaderThresh := len(rf.peers)/2 + 1 // more than half
 
-	rf.mu.Lock()
-	rf.mu.Unlock()
-
 	// send RV to all the peers
 	notifyVote := make(chan RequestVoteReply, len(rf.peers)-1) // let GC close it
 
+	rf.mu.Lock()
 	lastTerm, lastInd := rf.GetLastLogInfo() // shouldn't receive any new log
+	rf.mu.Unlock()
 	args := &RequestVoteArgs{
 		term,
 		rf.me,

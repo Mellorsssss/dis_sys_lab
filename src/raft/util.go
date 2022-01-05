@@ -7,6 +7,7 @@ import "log"
 const Debug = false
 const INFO = false
 const ERROR = false
+const PROFILE = true
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug {
@@ -25,6 +26,13 @@ func Info(format string, a ...interface{}) (n int, err error) {
 func Error(format string, a ...interface{}) (n int, err error) {
 	if ERROR {
 		log.Printf("[ERROR] "+format, a...)
+	}
+	return
+}
+
+func Profile(format string, a ...interface{}) (n int, err error) {
+	if PROFILE {
+		log.Printf("[PROFILE] "+format, a...)
 	}
 	return
 }

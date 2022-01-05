@@ -71,20 +71,20 @@ func (rf *Raft) applySnapShot(SnapShotData []byte, SnapShotIndex int, SnapShotTe
 }
 
 func (rf *Raft) sendInstallSnapShotRPC(server int, args *InstallSnapShotArgs, reply *InstallSnapShotReply) bool {
+	if rf.killed() {
+		return false
+	}
 	ok := rf.peers[server].Call("Raft.InstallSnapShotRPC", args, reply)
+	rf.mu.Lock()
+	rf.ISCount++
+	rf.mu.Unlock()
 	return ok
 }
 
-func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
+func (rf *Raft) InstallSnapShot(server, term int) {
 	for !rf.killed() {
 		rf.mu.Lock()
 		if !rf.IsStillLeader(term) {
-			rf.mu.Unlock()
-			return
-		}
-
-		if rf.snapshots.LastIncludedIndex != lastInd || rf.snapshots.LastIncludedTerm != lastTerm {
-			Error("%v's snapshot has been updated from [index:%v, term:%v] to [index:%v, term:%v]", rf.me, lastInd, lastTerm, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
 			rf.mu.Unlock()
 			return
 		}
@@ -99,24 +99,17 @@ func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
 		reply := InstallSnapShotReply{}
 		rf.mu.Unlock()
 
-		DPrintf("%v install snapshot[ind:%v, term:%v] in term %v to %v", rf.me, lastInd, lastTerm, term, server)
 		ok := rf.sendInstallSnapShotRPC(server, &args, &reply)
 		if !ok {
 			DPrintf("%v send installsnapshot rpc fail, re try", rf.me)
 			continue
 		}
+		DPrintf("succ: %v install snapshot in term %v to %v", rf.me, term, server)
 
-		DPrintf("succ: %v install snapshot[ind:%v, term:%v] in term %v to %v", rf.me, lastInd, lastTerm, term, server)
 		rf.mu.Lock()
 
 		// check if still leader
 		if !rf.IsStillLeader(args.Term) {
-			rf.mu.Unlock()
-			return
-		}
-
-		if rf.snapshots.LastIncludedIndex != lastInd || rf.snapshots.LastIncludedTerm != lastTerm {
-			Error("%v's snapshot has been updated from [index:%v, term:%v] to [index:%v, term:%v]", rf.me, lastInd, lastTerm, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
 			rf.mu.Unlock()
 			return
 		}

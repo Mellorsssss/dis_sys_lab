@@ -1,7 +1,5 @@
 package raft
 
-import "time"
-
 // log replication
 
 type AppendEntriesArgs struct {
@@ -40,7 +38,7 @@ func (rf *Raft) getCurrentTermFirstLog(pos int) int {
 // return -1 if there isn't such a log
 // must hold rf.mu.Lock()
 func (rf *Raft) getFirstLogAfterTerm(term int) int {
-	if rf.snapshots.LastIncludedTerm > term{
+	if rf.snapshots.LastIncludedTerm > term {
 		return -1
 	}
 
@@ -50,7 +48,7 @@ func (rf *Raft) getFirstLogAfterTerm(term int) int {
 	}
 
 	for ind := 1; ind < len(rf.logs); ind++ {
-		if rf.logs[ind-1].Term == term && rf.logs[ind].Term != term{
+		if rf.logs[ind-1].Term == term && rf.logs[ind].Term != term {
 			return ind
 		}
 	}
@@ -88,6 +86,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 	// only notify when rf makes sure leader sends AE
 	rf.NotifyMsg()
+	DPrintf("AE: leader %v to follower %v", args.ID, rf.me)
 
 	// 2. check if rf has the log with PrevLogInd & PrevLogTerm
 	var indMatch int
@@ -173,7 +172,13 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 }
 
 func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *AppendEntriesReply) bool {
+	if rf.killed() {
+		return false
+	}
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
+	rf.mu.Lock()
+	rf.AECount++
+	rf.mu.Unlock()
 	return ok
 }
 
@@ -229,157 +234,141 @@ func (rf *Raft) agree(command interface{}) {
 			continue
 		}
 
-		go rf.replicateOnCommand(_ind, term, true)
+		go rf.replicateOnCommand(_ind, term)
 		continue
 	}
 }
 
 // precondition: sending[server] == false
 // postcondition: sending[server] == false
-func (rf *Raft) replicateOnCommand(server, term int, retry bool) {
-	//rf.mu.Lock()
-	//if rf.sending[server] {
-	//	rf.mu.Unlock()
-	//	return
-	//}
-	//rf.sending[server] = true
-	//rf.mu.Unlock()
-
-	// unique context of this goroutine
-	rf.mu.Lock()
-	logLen := len(rf.logs)
-	ssLastInd := rf.snapshots.LastIncludedIndex
-	ssLastTerm := rf.snapshots.LastIncludedTerm
-	rf.mu.Unlock()
-
+func (rf *Raft) replicateOnCommand(server, term int) {
 	// only one thread sends log to prevent redundant rpcs
-	for !rf.killed() && retry{
-		rf.mu.Lock()
-		if !rf.IsStillLeader(term) || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd {
-			rf.sending[server] = false
-			rf.mu.Unlock()
-			return
-		}
+	rf.mu.Lock()
+	if !rf.IsStillLeader(term) /*|| len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
+		rf.sending[server] = false
+		rf.mu.Unlock()
+		return
+	}
 
-		// check if there are logs to send
-		if len(rf.logs) != 0 && rf.logs[len(rf.logs)-1].Index < rf.nextInd[server] {
-			DPrintf("%v has no log to send to %v", rf.me, server)
-			rf.sending[server] = false
-			rf.mu.Unlock()
-			return
-		}
+	// follower is lagging, send the snapshot
+	if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
+		DPrintf("%v sends snapshot to %v, because sp lastInd:%v, nextInd[%v] = %v", rf.me, server, rf.snapshots.LastIncludedIndex, server, rf.nextInd[server])
+		rf.mu.Unlock()
+		rf.InstallSnapShot(server, term)
+		rf.TriggerAppend(server) // send AE to check if nextInd has changed
+		return
+	}
 
-		// follower is lagging, send the snapshot
-		if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
-			DPrintf("%v sends snapshot to %v, because sp lastInd:%v, nextInd[%v] = %v", rf.me, server, rf.snapshots.LastIncludedIndex, server, rf.nextInd[server])
-			rf.mu.Unlock()
-			rf.InstallSnapShot(server, term, ssLastInd, ssLastTerm)
-			// @TODO: improve the performance? time.sleep is not so elegant
-			continue
-		}
+	var prevLogInd int
+	var prevLogTerm int
+	logsToSend := []Log{}
 
-		// no logs to send
-		if len(rf.logs) == 0 {
-			DPrintf("%v has no log to send to %v", rf.me, server)
-			rf.sending[server] = false
-			rf.mu.Unlock()
-			return
-		}
-
-		// get the logs to send
+	// check if there are logs to send
+	if len(rf.logs) != 0 && rf.logs[len(rf.logs)-1].Index < rf.nextInd[server] || len(rf.logs) == 0 {
+		DPrintf("%v has no log to send to %v", rf.me, server)
+		prevLogTerm, prevLogInd = rf.GetLastLogInfo()
+	} else { // may be some log to send
 		indToSend := rf.GetLogWithIndex(rf.nextInd[server])
 		if indToSend == -1 { // no log to send now
-			rf.sending[server] = false
-			rf.mu.Unlock()
-			return
-		}
-		logsToSend := append([]Log{}, rf.logs[indToSend:len(rf.logs)]...)
-
-		// get the prevLog info
-		var prevLogInd int
-		var prevLogTerm int
-		if indToSend == 0 {
-			prevLogInd = rf.snapshots.LastIncludedIndex
-			prevLogTerm = rf.snapshots.LastIncludedTerm
+			prevLogInd, prevLogTerm = rf.GetLastLogInfo()
 		} else {
-			prevLogInd, prevLogTerm = rf.logs[indToSend-1].Index, rf.logs[indToSend-1].Term
+			logsToSend = append([]Log{}, rf.logs[indToSend:len(rf.logs)]...)
+
+			// get the prevLog info
+			if indToSend == 0 {
+				prevLogInd = rf.snapshots.LastIncludedIndex
+				prevLogTerm = rf.snapshots.LastIncludedTerm
+			} else {
+				prevLogInd, prevLogTerm = rf.logs[indToSend-1].Index, rf.logs[indToSend-1].Term
+			}
 		}
 
-		args := &AppendEntriesArgs{
-			term,
-			rf.me,
-			prevLogInd,
-			prevLogTerm,
-			logsToSend,
-			rf.commitInd,
-		}
+	}
 
-		reply := &AppendEntriesReply{}
+	args := &AppendEntriesArgs{
+		term,
+		rf.me,
+		prevLogInd,
+		prevLogTerm,
+		logsToSend,
+		rf.commitInd,
+	}
+
+	reply := &AppendEntriesReply{}
+	rf.mu.Unlock()
+
+	DPrintf("leader %v try to send AE to %v", rf.me, server)
+
+	ok := rf.sendAppendEntries(server, args, reply)
+	if !ok { // re-try in next iter
+		Error("leader %v sends AE to %v fail, re try", rf.me, server)
+		rf.TriggerAppend(server) // re try
+		return
+	}
+
+	rf.mu.Lock()
+	if !rf.IsStillLeader(term) /* || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
+		rf.sending[server] = false
 		rf.mu.Unlock()
+		return
+	}
 
-		DPrintf("leader %v try to send AE to %v", rf.me, server)
-
-		ok := rf.sendAppendEntries(server, args, reply)
-		if !ok { // re-try in next iter
-			Error("leader %v sends AE to %v fail, re try", rf.me, server)
-			time.Sleep(time.Duration(RPLICATE_DUR) * time.Millisecond)
-			continue
-		}
-
-		rf.mu.Lock()
-		if !rf.IsStillLeader(term) /* || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
-			rf.sending[server] = false
-			rf.mu.Unlock()
-			return
-		}
-
-		if reply.Success {
-			// update nextInd and maxInd to the biggest possible one
+	if reply.Success {
+		// update nextInd and maxInd to the biggest possible one
+		if len(args.Logs) > 0 {
 			rf.nextInd[server] = MaxInt(args.Logs[len(args.Logs)-1].Index+1, rf.nextInd[server])
 			rf.matchInd[server] = MaxInt(args.Logs[len(args.Logs)-1].Index, rf.matchInd[server])
-			DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, server, rf.nextInd[server], rf.matchInd[server])
-
-			// check if there is a chance to update the commit
-			rf.updateCommitIndexOfLeader()
-
-			// finish send log, just return
-			rf.sending[server] = false
-			rf.mu.Unlock()
-			return
-		}
-
-		update := rf.updateTerm(reply.Term)
-		if update != GREATER_TERM { // decrease the nextInd and retry
-			if reply.CTerm == NONE_TERM { // no conflicting term
-				rf.nextInd[server] = MinInt(reply.CIndex, rf.nextInd[server])
-			} else {
-				logInd := rf.getFirstLogAfterTerm(reply.CTerm)
-				if logInd != -1 {
-					rf.nextInd[server] = MinInt(logInd, rf.nextInd[server])
-				} else {
-					rf.nextInd[server] = MinInt(reply.CIndex, rf.nextInd[server])
-				}
-			}
-			if rf.nextInd[server] <= 0 {
-				Error("%v has error in nextInd", rf.me)
-				rf.sending[server] = false
-				rf.mu.Unlock()
-				return
-			}
-
-			// re-try in next iter
-			rf.mu.Unlock()
-			// time.Sleep(time.Duration(RPLICATE_DUR) * time.Millisecond)
-			select {
-			case rf.AEChs[server] <- struct{}{}:
-				continue
-			default:
-				continue
-			}
 		} else {
+			rf.matchInd[server] = MaxInt(args.PrevLogInd, rf.matchInd[server])
+			rf.nextInd[server] = MaxInt(args.PrevLogInd+1, rf.nextInd[server])
+		}
+
+		DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, server, rf.nextInd[server], rf.matchInd[server])
+
+		// check if there is a chance to update the commit
+		rf.updateCommitIndexOfLeader()
+
+		// finish send log, just return
+		rf.sending[server] = false
+		rf.mu.Unlock()
+		return
+	}
+
+	update := rf.updateTerm(reply.Term)
+	if update != GREATER_TERM { // decrease the nextInd and retry
+		if reply.CTerm == NONE_TERM { // no conflicting term
+			rf.nextInd[server] = MinInt(reply.CIndex, rf.nextInd[server])
+		} else {
+			logInd := rf.getFirstLogAfterTerm(reply.CTerm)
+			if logInd != -1 {
+				rf.nextInd[server] = MinInt(logInd, rf.nextInd[server])
+			} else {
+				rf.nextInd[server] = MinInt(reply.CIndex, rf.nextInd[server])
+			}
+		}
+		if rf.nextInd[server] <= 0 {
+			Error("%v has error in nextInd", rf.me)
 			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
 		}
+
+		// re-try in next iter
+		rf.mu.Unlock()
+		// time.Sleep(time.Duration(RPLICATE_DUR) * time.Millisecond)
+		rf.TriggerAppend(server) // re try
+	} else {
+		rf.sending[server] = false
+		rf.mu.Unlock()
+		return
+	}
+}
+
+func (rf *Raft) TriggerAppend(server int) {
+	select {
+	case rf.AEChs[server] <- struct{}{}:
+		return
+	default:
+		return
 	}
 }
