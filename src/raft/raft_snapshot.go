@@ -44,7 +44,7 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 	}
 
 	ind := rf.GetLogWithIndex(args.LastLogInd)
-	if ind == -1 || ind+1 == len(rf.logs) {
+	if ind == -1 {
 		rf.logs = []Log{}
 	} else {
 		rf.logs = rf.logs[ind+1:]
@@ -111,6 +111,12 @@ func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
 
 		// check if still leader
 		if !rf.IsStillLeader(args.Term) {
+			rf.mu.Unlock()
+			return
+		}
+
+		if rf.snapshots.LastIncludedIndex != lastInd || rf.snapshots.LastIncludedTerm != lastTerm {
+			Error("%v's snapshot has been updated from [index:%v, term:%v] to [index:%v, term:%v]", rf.me, lastInd, lastTerm, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
 			rf.mu.Unlock()
 			return
 		}

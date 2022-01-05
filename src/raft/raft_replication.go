@@ -19,6 +19,7 @@ type AppendEntriesReply struct {
 
 	// valid if there is conflict
 	CIndex int // first index store for the conflicting term
+	CTerm  int // conflicting term
 }
 
 // getCurrentTermFirstLog return the index of the ind of first log
@@ -35,6 +36,28 @@ func (rf *Raft) getCurrentTermFirstLog(pos int) int {
 	return rf.logs[i].Index
 }
 
+// getLastLogInTerm returns the position of the first log entry after term
+// return -1 if there isn't such a log
+// must hold rf.mu.Lock()
+func (rf *Raft) getFirstLogAfterTerm(term int) int {
+	if rf.snapshots.LastIncludedTerm > term{
+		return -1
+	}
+
+	// corner case of snapshot
+	if rf.snapshots.LastIncludedIndex == term && len(rf.logs) != 0 && rf.logs[0].Term != term {
+		return 0
+	}
+
+	for ind := 1; ind < len(rf.logs); ind++ {
+		if rf.logs[ind-1].Term == term && rf.logs[ind].Term != term{
+			return ind
+		}
+	}
+
+	return -1
+}
+
 func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
@@ -42,9 +65,9 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	if len(args.Logs) != 0 { // filter heartbeat
 		DPrintf("leader %v send AE to follower %v [prevInd: %v, prevTerm: %v, commitID:%v]", args.ID, rf.me, args.PrevLogInd, args.PrevLogTerm, args.CommitInd)
 	}
-	rf.NotifyMsg()
 	reply.Term = rf.term
 	reply.CIndex = NONE_IND
+	reply.CTerm = NONE_TERM
 
 	// 1. update term(may change state of current node)
 	// deal with the leaderID
@@ -57,11 +80,14 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 			rf.leaderId = args.ID
 		} else if rf.leaderId != args.ID {
 			Error("%v has another leader in term %v diff from %v", rf.me, rf.term, args.ID)
+			reply.Success = false
 			return
 		}
 	} else {
 		rf.leaderId = args.ID
 	}
+	// only notify when rf makes sure leader sends AE
+	rf.NotifyMsg()
 
 	// 2. check if rf has the log with PrevLogInd & PrevLogTerm
 	var indMatch int
@@ -100,6 +126,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if rf.logs[indMatch].Term != args.PrevLogTerm {
 			reply.Success = false
 			reply.CIndex = rf.getCurrentTermFirstLog(indMatch)
+			reply.CTerm = rf.logs[indMatch].Term
 			DPrintf("%v has with index %v diff from leader %v in term %v", rf.me, args.PrevLogInd, args.ID, args.Term)
 			return
 		}
@@ -114,6 +141,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 			DPrintf("log mismatch between leader %v(%v) and %v(%v) in term %v", args.ID, args.Logs[ind].Index, rf.me, rf.logs[indMatch].Index, args.Term)
 			reply.Success = false
 			reply.CIndex = rf.getCurrentTermFirstLog(ind)
+			reply.CTerm = rf.logs[indMatch].Term
 			return
 		}
 
@@ -209,13 +237,13 @@ func (rf *Raft) agree(command interface{}) {
 // precondition: sending[server] == false
 // postcondition: sending[server] == false
 func (rf *Raft) replicateOnCommand(server, term int) {
-	// rf.mu.Lock()
-	// if rf.sending[server] {
-	// 	rf.mu.Unlock()
-	// 	return
-	// }
-	// rf.sending[server] = true
-	// rf.mu.Unlock()
+	//rf.mu.Lock()
+	//if rf.sending[server] {
+	//	rf.mu.Unlock()
+	//	return
+	//}
+	//rf.sending[server] = true
+	//rf.mu.Unlock()
 
 	// unique context of this goroutine
 	rf.mu.Lock()
@@ -224,7 +252,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 	ssLastTerm := rf.snapshots.LastIncludedTerm
 	rf.mu.Unlock()
 
-	// only one thread sends log to prevent redunant rpcs
+	// only one thread sends log to prevent redundant rpcs
 	for !rf.killed() {
 		rf.mu.Lock()
 		if !rf.IsStillLeader(term) || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd {
@@ -306,7 +334,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 		}
 
 		if reply.Success {
-			// update nextInd and maxtInd to the biggest possible one
+			// update nextInd and maxInd to the biggest possible one
 			rf.nextInd[server] = MaxInt(args.Logs[len(args.Logs)-1].Index+1, rf.nextInd[server])
 			rf.matchInd[server] = MaxInt(args.Logs[len(args.Logs)-1].Index, rf.matchInd[server])
 			DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, server, rf.nextInd[server], rf.matchInd[server])
@@ -322,8 +350,16 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 		update := rf.updateTerm(reply.Term)
 		if update != GREATER_TERM { // decrease the nextInd and retry
-			Error("AE fail: leader %v nextInd[%v] updates from %v to %v", rf.me, server, rf.nextInd[server], MinInt(reply.CIndex, rf.nextInd[server]))
-			rf.nextInd[server] = MinInt(reply.CIndex, rf.nextInd[server])
+			if reply.CTerm == NONE_TERM { // no conflicting term
+				rf.nextInd[server] = MinInt(reply.CIndex, rf.nextInd[server])
+			} else {
+				logInd := rf.getFirstLogAfterTerm(reply.CTerm)
+				if logInd != -1 {
+					rf.nextInd[server] = MinInt(logInd, rf.nextInd[server])
+				} else {
+					rf.nextInd[server] = MinInt(reply.CIndex, rf.nextInd[server])
+				}
+			}
 			if rf.nextInd[server] <= 0 {
 				Error("%v has error in nextInd", rf.me)
 				rf.sending[server] = false

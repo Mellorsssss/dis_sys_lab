@@ -3,6 +3,7 @@ package raft
 import "log"
 
 // Debugging
+
 const Debug = false
 const INFO = false
 const ERROR = false

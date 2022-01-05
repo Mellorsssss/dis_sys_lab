@@ -347,7 +347,7 @@ func (rf *Raft) killed() bool {
 }
 
 // ticker starts a new election if this peer hasn't received
-// heartsbeats recently.
+// heartbeats recently.
 // when leader becomes a follower, it needs to call ticker() manually
 func (rf *Raft) ticker() {
 	rand.Seed(time.Now().UnixNano())
@@ -415,7 +415,6 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 				DPrintf("appch of %v is blocked for snapshot", rf.me)
 				blocked = true
 			}
-
 		}
 		rf.mu.Unlock()
 	}
