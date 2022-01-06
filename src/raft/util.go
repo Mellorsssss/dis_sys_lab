@@ -4,10 +4,10 @@ import "log"
 
 // Debugging
 
-const Debug = false
-const INFO = false
-const ERROR = false
-const PROFILE = false
+const Debug = true
+const INFO = true
+const ERROR = true
+const PROFILE = true
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug {

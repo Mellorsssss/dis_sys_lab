@@ -351,11 +351,14 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 //
 func (rf *Raft) Kill() {
 	atomic.StoreInt32(&rf.dead, 1)
+	rf.appCond.Signal() // release applier
 	Info("%v is killed", rf.me)
-	// Your code here, if desired.
-	rf.mu.Lock()
-	Profile("%v profile: RV:%v, AE:%v, IS:%v", rf.me, rf.RVCount, rf.AECount, rf.ISCount)
-	rf.mu.Unlock()
+
+	if PROFILE {
+		rf.mu.Lock()
+		Profile("%v profile: RV:%v, AE:%v, IS:%v", rf.me, rf.RVCount, rf.AECount, rf.ISCount)
+		rf.mu.Unlock()
+	}
 }
 
 func (rf *Raft) killed() bool {
@@ -399,6 +402,9 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 		for rf.commitInd == rf.lastApply {
 			rf.mu.Unlock()
 			rf.appCond.Wait()
+			if rf.killed() { // make sure not stall here
+				return
+			}
 			rf.mu.Lock()
 		}
 
@@ -546,7 +552,6 @@ func (rf *Raft) heartbeatWorker(server, term int) {
 	go rf.replicateOnCommand(server, term)
 	for !rf.killed() {
 		// leader doesn't need timer
-
 		rf.mu.Lock()
 		if !rf.IsStillLeader(term) {
 			rf.mu.Unlock()
