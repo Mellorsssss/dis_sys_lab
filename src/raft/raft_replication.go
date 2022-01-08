@@ -217,6 +217,7 @@ func (rf *Raft) updateCommitIndexOfLeader() {
 				DPrintf("leader %v commit change from %v to %v", rf.me, rf.commitInd, rf.logs[ind].Index)
 				rf.commitInd = rf.logs[ind].Index
 				rf.appCond.Signal()
+				rf.TriggerAppendToAll() // commit udpate info
 			}
 			return
 		}
@@ -242,22 +243,18 @@ func (rf *Raft) agree(command interface{}) {
 	}
 }
 
-// precondition: sending[server] == false
-// postcondition: sending[server] == false
 func (rf *Raft) replicateOnCommand(server, term int) {
 	// only one thread sends log to prevent redundant rpcs
 	rf.mu.Lock()
 	if !rf.IsStillLeader(term) /*|| len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
-		rf.sending[server] = false
 		rf.mu.Unlock()
 		return
 	}
 
 	// follower is lagging, send the snapshot
 	if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
-		DPrintf("%v sends snapshot to %v, because sp lastInd:%v, nextInd[%v] = %v", rf.me, server, rf.snapshots.LastIncludedIndex, server, rf.nextInd[server])
+		go rf.InstallSnapShot(server, term)
 		rf.mu.Unlock()
-		rf.InstallSnapShot(server, term)
 		return
 	}
 
@@ -310,7 +307,6 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 	rf.mu.Lock()
 	if !rf.IsStillLeader(term) /* || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
-		rf.sending[server] = false
 		rf.mu.Unlock()
 		return
 	}
@@ -331,7 +327,6 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 		rf.updateCommitIndexOfLeader()
 
 		// finish send log, just return
-		rf.sending[server] = false
 		rf.mu.Unlock()
 		return
 	}
@@ -350,7 +345,6 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 		}
 		if rf.nextInd[server] <= 0 {
 			Error("%v has error in nextInd", rf.me)
-			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
 		}
@@ -360,7 +354,6 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 		// time.Sleep(time.Duration(RPLICATE_DUR) * time.Millisecond)
 		rf.TriggerAppend(server) // re try
 	} else {
-		rf.sending[server] = false
 		rf.mu.Unlock()
 		return
 	}
@@ -372,5 +365,15 @@ func (rf *Raft) TriggerAppend(server int) {
 		return
 	default:
 		return
+	}
+}
+
+func (rf *Raft) TriggerAppendToAll() {
+	for ind := range rf.peers {
+		if ind == rf.me {
+			continue
+		}
+
+		rf.TriggerAppend(ind)
 	}
 }

@@ -50,9 +50,9 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 		rf.logs = rf.logs[ind+1:]
 	}
 
+	rf.mu.Unlock()
 	// apply the snapshot
 	rf.applySnapShot(args.Data, args.LastLogInd, args.LastLogTerm)
-	rf.mu.Unlock()
 	<-rf.snapshotCh
 	DPrintf("%v install snapshot success", rf.me)
 }
@@ -84,10 +84,22 @@ func (rf *Raft) sendInstallSnapShotRPC(server int, args *InstallSnapShotArgs, re
 	return ok
 }
 
+// InstallSnapShot sends install snapshot to server
+// make sure only one goroutine is installing snapshot
+// to prevent deadlock
 func (rf *Raft) InstallSnapShot(server, term int) {
+	rf.mu.Lock()
+	if !rf.IsStillLeader(term) || rf.sending[server] {
+		rf.mu.Unlock()
+		return
+	}
+	rf.sending[server] = true
+	rf.mu.Unlock()
+
 	for !rf.killed() {
 		rf.mu.Lock()
 		if !rf.IsStillLeader(term) {
+			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
 		}
@@ -113,20 +125,20 @@ func (rf *Raft) InstallSnapShot(server, term int) {
 
 		// check if still leader
 		if !rf.IsStillLeader(args.Term) {
+			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
 		}
 
 		update := rf.updateTerm(reply.Term)
 		if update != GREATER_TERM { // send snapshot successful
-			rf.nextInd[server] = MaxInt(rf.nextInd[server], rf.snapshots.LastIncludedIndex)
-			rf.matchInd[server] = MaxInt(rf.matchInd[server], rf.snapshots.LastIncludedTerm)
+			rf.nextInd[server] = MaxInt(rf.nextInd[server], rf.snapshots.LastIncludedIndex+1)
+			rf.matchInd[server] = MaxInt(rf.matchInd[server], rf.snapshots.LastIncludedIndex)
+			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
 		}
 
 		rf.mu.Unlock()
-		return
 	}
-
 }
