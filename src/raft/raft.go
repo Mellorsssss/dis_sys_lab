@@ -206,16 +206,15 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	defer rf.mu.Unlock()
 	defer func() {
 		rf.snapshotCh <- struct{}{}
-		DPrintf("%v send msg to snapshotCh", rf.me)
 	}()
 
 	if rf.snapshots.LastIncludedIndex > lastIncludedIndex { // has newer snapshot
-		DPrintf("%v get old snapshot, refuse condinstall", rf.me)
+		DPrintf("CondInstallSnapshot: %v get old snapshot, refuse condinstall", rf.me)
 		return false
 	}
 
 	if rf.lastApply > lastIncludedIndex { // apply new msg
-		DPrintf("%v apply newer(%v) than condsnapshot(%v)", rf.me, rf.lastApply, lastIncludedIndex)
+		DPrintf("CondInstallSnapshot: %v apply newer(%v) than condsnapshot(%v)", rf.me, rf.lastApply, lastIncludedIndex)
 		return false
 	}
 
@@ -227,7 +226,7 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	rf.commitInd = MaxInt(rf.commitInd, rf.snapshots.LastIncludedIndex)
 	rf.lastApply = MaxInt(rf.lastApply, rf.snapshots.LastIncludedIndex)
 
-	DPrintf("CondInstallSnapshot: commitInd -> %v, lastApply -> %v", rf.commitInd, rf.lastApply)
+	DPrintf("CondInstallSnapshot: to %v, commitInd -> %v, lastApply -> %v", rf.me, rf.commitInd, rf.lastApply)
 	ind := rf.GetLogWithIndex(lastIncludedIndex)
 	if ind == -1 || ind+1 == len(rf.logs) {
 		rf.logs = []Log{}
@@ -235,9 +234,8 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		rf.logs = rf.logs[ind+1:]
 	}
 
-	Info("CondInstall snapshot to %v succ.", rf.me)
 	if len(rf.logs) != 0 {
-		DPrintf("%v's log is %v after installing snapshot(%v)", rf.me, rf.logs, lastIncludedIndex)
+		DPrintf("CondInstallSnapshot: %v's log is %v after installing snapshot(%v)", rf.me, rf.logs, lastIncludedIndex)
 	}
 	rf.persist()
 
@@ -410,8 +408,6 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 			rf.mu.Lock()
 		}
 
-		DPrintf("applier: %v begins to apply msg %v", rf.me, rf.lastApply+1)
-
 		// apply new msg
 		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
 		if indToCommit == -1 {
@@ -437,7 +433,7 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 				indToCommit++
 			case <-time.After(time.Duration(applyInterval) * time.Millisecond):
 				rf.lastApply--
-				DPrintf("applie: appch of %v is blocked for snapshot", rf.me)
+				DPrintf("applie: appch of %v is blocked to send %v in term %v", rf.me, rf.lastApply, rf.term)
 				block = true
 			}
 		}

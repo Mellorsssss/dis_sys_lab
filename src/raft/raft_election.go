@@ -140,9 +140,8 @@ func (rf *Raft) startNewElection() {
 				rf.nextInd[i] = lastLogInd + 1
 				rf.matchInd[i] = 0
 			}
-			//go rf.heartbeat() // heartbeat
-			//go rf.agree(nil)  // in case some haven't been replicated
 			go rf.startHeartbeat()
+			DPrintf("RV: %v become leader of term %v", rf.me, rf.term)
 			rf.mu.Unlock()
 			return
 		}

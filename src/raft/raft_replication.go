@@ -61,7 +61,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	defer rf.mu.Unlock()
 
 	if len(args.Logs) != 0 { // filter heartbeat
-		DPrintf("leader %v send AE to follower %v [prevInd: %v, prevTerm: %v, commitID:%v]", args.ID, rf.me, args.PrevLogInd, args.PrevLogTerm, args.CommitInd)
+		DPrintf("AE: leader %v to follower %v [prevInd: %v, prevTerm: %v, commitID:%v]", args.ID, rf.me, args.PrevLogInd, args.PrevLogTerm, args.CommitInd)
 	}
 	reply.Term = rf.term
 	reply.CIndex = NONE_IND
@@ -77,7 +77,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if rf.leaderId == NONE_LEADER { // follow new leader
 			rf.leaderId = args.ID
 		} else if rf.leaderId != args.ID {
-			Error("%v has another leader in term %v diff from %v", rf.me, rf.term, args.ID)
+			Error("AE: %v has another leader in term %v diff from %v", rf.me, rf.term, args.ID)
 			reply.Success = false
 			return
 		}
@@ -96,7 +96,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		ind = 0
 	} else if args.PrevLogInd < rf.snapshots.LastIncludedIndex {
 		// find the first log match
-		DPrintf("prefix in the %v's snapshot[index:%v]", rf.me, rf.snapshots.LastIncludedIndex)
+		DPrintf("AE: prefix in the %v's snapshot[index:%v]", rf.me, rf.snapshots.LastIncludedIndex)
 		indMatch = 0
 		ind = -1
 
@@ -109,7 +109,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		}
 
 		if ind == -1 { // snapshot already have all the logs
-			DPrintf("%v's snapshot already has all the logs from %v", rf.me, args.ID)
+			DPrintf("AE: %v's snapshot already has all the logs from %v", rf.me, args.ID)
 			reply.Success = true
 			return
 		}
@@ -118,7 +118,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if indMatch == -1 {
 			reply.Success = false
 			reply.CIndex = rf.GetLastLogIndex() + 1
-			Error("%v has no log with index %v(last is %v) from leader %v in term %v", rf.me, args.PrevLogInd, reply.CIndex-1, args.ID, args.Term)
+			Error("AE: %v has no log with index %v(last is %v) from leader %v in term %v", rf.me, args.PrevLogInd, reply.CIndex-1, args.ID, args.Term)
 			return
 		}
 
@@ -126,7 +126,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 			reply.Success = false
 			reply.CIndex = rf.getCurrentTermFirstLog(indMatch)
 			reply.CTerm = rf.logs[indMatch].Term
-			DPrintf("%v has with index %v diff from leader %v in term %v", rf.me, args.PrevLogInd, args.ID, args.Term)
+			DPrintf("AE: %v has with index %v diff from leader %v in term %v", rf.me, args.PrevLogInd, args.ID, args.Term)
 			return
 		}
 
@@ -137,7 +137,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	// 3. append the logs and remove the conflict logs
 	for ; ind < len(args.Logs) && indMatch < len(rf.logs); ind++ {
 		if args.Logs[ind].Index != rf.logs[indMatch].Index {
-			DPrintf("log mismatch between leader %v(%v) and %v(%v) in term %v", args.ID, args.Logs[ind].Index, rf.me, rf.logs[indMatch].Index, args.Term)
+			DPrintf("AE: log mismatch between leader %v(%v) and %v(%v) in term %v", args.ID, args.Logs[ind].Index, rf.me, rf.logs[indMatch].Index, args.Term)
 			reply.Success = false
 			reply.CIndex = rf.getCurrentTermFirstLog(ind)
 			reply.CTerm = rf.logs[indMatch].Term
@@ -165,7 +165,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 			rf.commitInd = MaxInt(rf.commitInd, MinInt(args.Logs[len(args.Logs)-1].Index, args.CommitInd))
 		}
 
-		DPrintf("follower %v change commitId to %v(compared to %v)", rf.me, rf.commitInd, args.CommitInd)
+		DPrintf("AE: follower %v change commitId to %v(compared to %v)", rf.me, rf.commitInd, args.CommitInd)
 		rf.appCond.Signal() // check if should apply msg
 	}
 	reply.Success = true
@@ -264,7 +264,6 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 	// check if there are logs to send
 	if len(rf.logs) != 0 && rf.logs[len(rf.logs)-1].Index < rf.nextInd[server] || len(rf.logs) == 0 {
-		DPrintf("%v has no log to send to %v", rf.me, server)
 		prevLogTerm, prevLogInd = rf.GetLastLogInfo()
 	} else { // may be some log to send
 		indToSend := rf.GetLogWithIndex(rf.nextInd[server])
@@ -296,11 +295,11 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 	reply := &AppendEntriesReply{}
 	rf.mu.Unlock()
 
-	DPrintf("leader %v try to send AE to %v", rf.me, server)
+	DPrintf("AE: leader %v begin to send AE to %v in term %v", rf.me, server, term)
 
 	ok := rf.sendAppendEntries(server, args, reply)
 	if !ok { // re-try in next iter
-		Error("leader %v sends AE to %v fail, re try", rf.me, server)
+		Error("AE: leader %v sends AE to %v fail, re try", rf.me, server)
 		rf.TriggerAppend(server) // re try
 		return
 	}
@@ -321,7 +320,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 			rf.nextInd[server] = MaxInt(args.PrevLogInd+1, rf.nextInd[server])
 		}
 
-		DPrintf("agree: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, server, rf.nextInd[server], rf.matchInd[server])
+		DPrintf("AE: leader %v update %v's nextInd, matchInd to [%v, %v]", rf.me, server, rf.nextInd[server], rf.matchInd[server])
 
 		// check if there is a chance to update the commit
 		rf.updateCommitIndexOfLeader()

@@ -17,7 +17,6 @@ type InstallSnapShotReply struct {
 func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnapShotReply) {
 	rf.mu.Lock()
 
-	DPrintf("%v receive installsnapshot rpc from leader %v", rf.me, args.ID)
 	reply.Term = rf.term
 
 	// update term(may change state of current node)
@@ -38,6 +37,9 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 		rf.leaderId = args.ID
 	}
 
+	DPrintf("IS: %v receive from leader %v in term %v", rf.me, args.ID, args.Term)
+	rf.NotifyMsg()
+
 	if rf.snapshots.LastIncludedIndex >= args.LastLogInd {
 		rf.mu.Unlock()
 		return
@@ -47,7 +49,7 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 	// apply the snapshot
 	rf.applySnapShot(args.Data, args.LastLogInd, args.LastLogTerm)
 	<-rf.snapshotCh
-	DPrintf("%v install snapshot success", rf.me)
+	DPrintf("IS: %v install snapshot success", rf.me)
 }
 
 // must hold rf.mu.Lock()
@@ -109,10 +111,10 @@ func (rf *Raft) InstallSnapShot(server, term int) {
 
 		ok := rf.sendInstallSnapShotRPC(server, &args, &reply)
 		if !ok {
-			DPrintf("%v send installsnapshot rpc fail, re try", rf.me)
+			DPrintf("IS: %v send installsnapshot rpc fail, re try", rf.me)
 			continue
 		}
-		DPrintf("succ: %v install snapshot in term %v to %v", rf.me, term, server)
+		DPrintf("IS: %v install snapshot in term %v to %v", rf.me, term, server)
 
 		rf.mu.Lock()
 
