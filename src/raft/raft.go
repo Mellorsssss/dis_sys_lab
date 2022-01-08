@@ -209,7 +209,7 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		DPrintf("%v send msg to snapshotCh", rf.me)
 	}()
 
-	if rf.snapshots.LastIncludedIndex >= lastIncludedIndex { // has newer snapshot
+	if rf.snapshots.LastIncludedIndex > lastIncludedIndex { // has newer snapshot
 		DPrintf("%v get old snapshot, refuse condinstall", rf.me)
 		return false
 	}
@@ -227,6 +227,7 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	rf.commitInd = MaxInt(rf.commitInd, rf.snapshots.LastIncludedIndex)
 	rf.lastApply = MaxInt(rf.lastApply, rf.snapshots.LastIncludedIndex)
 
+	DPrintf("CondInstallSnapshot: commitInd -> %v, lastApply -> %v", rf.commitInd, rf.lastApply)
 	ind := rf.GetLogWithIndex(lastIncludedIndex)
 	if ind == -1 || ind+1 == len(rf.logs) {
 		rf.logs = []Log{}
@@ -281,6 +282,7 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	}
 	rf.commitInd = MaxInt(rf.commitInd, index)
 	rf.lastApply = MaxInt(rf.lastApply, index)
+	DPrintf("Snapshot: comitInd -> %v, lastApply -> %v", rf.commitInd, rf.lastApply)
 	rf.appCond.Signal() // to send the blocked msgs
 	rf.persist()
 }
@@ -408,18 +410,18 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 			rf.mu.Lock()
 		}
 
-		DPrintf("%v begins to apply msg %v", rf.me, rf.lastApply+1)
+		DPrintf("applier: %v begins to apply msg %v", rf.me, rf.lastApply+1)
 
 		// apply new msg
 		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
 		if indToCommit == -1 {
-			Error("Log should be commited is None in %v in term %v", rf.me, rf.term)
+			Error("applier: Log should be commited is None in %v in term %v", rf.me, rf.term)
 			rf.mu.Unlock()
 			return
 		}
 
-		blocked := false
-		for rf.commitInd > rf.lastApply && !blocked {
+		block := false
+		for rf.commitInd > rf.lastApply && !block {
 			rf.lastApply++
 			select {
 			case rf.appCh <- ApplyMsg{
@@ -431,15 +433,20 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 				0,
 				0,
 			}:
-				DPrintf("%v apply msg %v[%v]  in term %v", rf.me, rf.lastApply, indToCommit, rf.term)
+				DPrintf("applier: %v apply msg %v[%v]  in term %v", rf.me, rf.lastApply, indToCommit, rf.term)
 				indToCommit++
 			case <-time.After(time.Duration(applyInterval) * time.Millisecond):
 				rf.lastApply--
-				DPrintf("appch of %v is blocked for snapshot", rf.me)
-				blocked = true
+				DPrintf("applie: appch of %v is blocked for snapshot", rf.me)
+				block = true
 			}
 		}
+
 		rf.mu.Unlock()
+		if block { // hang-up applier until next apply(or endless loop)
+			rf.appCond.Wait()
+			DPrintf("applier: blocked appch of %v turn to normal", rf.me)
+		}
 	}
 }
 
