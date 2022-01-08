@@ -43,13 +43,6 @@ func (rf *Raft) InstallSnapShotRPC(args *InstallSnapShotArgs, reply *InstallSnap
 		return
 	}
 
-	ind := rf.GetLogWithIndex(args.LastLogInd)
-	if ind == -1 {
-		rf.logs = []Log{}
-	} else {
-		rf.logs = rf.logs[ind+1:]
-	}
-
 	rf.mu.Unlock()
 	// apply the snapshot
 	rf.applySnapShot(args.Data, args.LastLogInd, args.LastLogTerm)

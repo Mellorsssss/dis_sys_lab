@@ -28,6 +28,7 @@ func (rf *Raft) GetLastLogIndex() int {
 func (rf *Raft) GetLogWithIndex(index int) int {
 	// @TODO: optimize the search algorithm
 	if len(rf.logs) == 0 {
+		Error("%v has no logs", rf.me)
 		return -1
 	}
 
@@ -39,6 +40,7 @@ func (rf *Raft) GetLogWithIndex(index int) int {
 		}
 	}
 
+	Error("%v doesn't have %v log", rf.me, index)
 	return -1
 }
 
