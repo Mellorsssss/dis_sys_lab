@@ -226,24 +226,6 @@ func (rf *Raft) updateCommitIndexOfLeader() {
 
 }
 
-func (rf *Raft) agree(command interface{}) {
-	rf.mu.Lock()
-	term := rf.term
-	rf.mu.Unlock()
-
-	// send AE to all peers until all of them are sync to the leader
-	// use goroutine to send AE until success
-	for ind := range rf.peers {
-		_ind := ind
-		if _ind == rf.me {
-			continue
-		}
-
-		go rf.replicateOnCommand(_ind, term)
-		continue
-	}
-}
-
 func (rf *Raft) replicateOnCommand(server, term int) {
 	// only one thread sends log to prevent redundant rpcs
 	rf.mu.Lock()
@@ -256,7 +238,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 	// follower is lagging, send the snapshot
 	if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
-		go rf.InstallSnapShot(server, term)
+		go rf.InstallSnapShot(server, term, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
 		rf.mu.Unlock()
 		return
 	}

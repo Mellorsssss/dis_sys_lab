@@ -82,9 +82,9 @@ func (rf *Raft) sendInstallSnapShotRPC(server int, args *InstallSnapShotArgs, re
 // InstallSnapShot sends install snapshot to server
 // make sure only one goroutine is installing snapshot
 // to prevent deadlock
-func (rf *Raft) InstallSnapShot(server, term int) {
+func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
 	rf.mu.Lock()
-	if !rf.IsStillLeader(term) || rf.sending[server] {
+	if !rf.IsStillLeader(term) /*|| rf.sending[server]*/ {
 		rf.mu.Unlock()
 		return
 	}
@@ -93,7 +93,7 @@ func (rf *Raft) InstallSnapShot(server, term int) {
 
 	for !rf.killed() {
 		rf.mu.Lock()
-		if !rf.IsStillLeader(term) {
+		if !rf.IsStillLeader(term) || rf.snapshots.LastIncludedIndex != lastInd || lastTerm != rf.snapshots.LastIncludedTerm {
 			rf.sending[server] = false
 			rf.mu.Unlock()
 			return
@@ -102,8 +102,8 @@ func (rf *Raft) InstallSnapShot(server, term int) {
 		args := InstallSnapShotArgs{
 			rf.term,
 			rf.me,
-			rf.snapshots.LastIncludedIndex,
-			rf.snapshots.LastIncludedTerm,
+			lastInd,
+			lastTerm,
 			rf.snapshots.Data,
 		}
 		reply := InstallSnapShotReply{}
@@ -119,7 +119,7 @@ func (rf *Raft) InstallSnapShot(server, term int) {
 		rf.mu.Lock()
 
 		// check if still leader
-		if !rf.IsStillLeader(args.Term) {
+		if !rf.IsStillLeader(term) || rf.snapshots.LastIncludedIndex != lastInd || lastTerm != rf.snapshots.LastIncludedTerm {
 			rf.sending[server] = false
 			rf.mu.Unlock()
 			return

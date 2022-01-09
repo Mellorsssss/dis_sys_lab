@@ -11,8 +11,8 @@ const (
 	NONE_LEADER      = -1
 	SNAPSHOTINTERVAL = 100
 	RPLICATE_DUR     = 100
-	AEBUFFER_LEN     = 20
-	AEBATCH_SIZE     = 20
+	AEBUFFER_LEN     = 10
+	AEBATCH_SIZE     = 3
 )
 
 const (
