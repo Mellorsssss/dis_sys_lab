@@ -86,7 +86,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 	// only notify when rf makes sure leader sends AE
 	rf.NotifyMsg()
-	DPrintf("AE: leader %v to follower %v", args.ID, rf.me)
+	DPrintf("AE: follower %v get from leader %v", rf.me, args.ID)
 
 	// 2. check if rf has the log with PrevLogInd & PrevLogTerm
 	var indMatch int
@@ -159,13 +159,14 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 
 	// 4. update the commitInd
 	if args.CommitInd > rf.commitInd {
+		oldCommitInd := rf.commitInd
 		if len(args.Logs) == 0 { // TODO: may be should prove it?
 			rf.commitInd = MaxInt(rf.commitInd, MinInt(args.CommitInd, args.PrevLogInd))
 		} else {
 			rf.commitInd = MaxInt(rf.commitInd, MinInt(args.Logs[len(args.Logs)-1].Index, args.CommitInd))
 		}
 
-		DPrintf("AE: follower %v change commitId to %v(compared to %v)", rf.me, rf.commitInd, args.CommitInd)
+		DPrintf("AE: follower %v change commitId from %v to %v(compared to %v)", rf.me, oldCommitInd, rf.commitInd, args.CommitInd)
 		rf.appCond.Signal() // check if should apply msg
 	}
 	reply.Success = true
@@ -246,6 +247,8 @@ func (rf *Raft) agree(command interface{}) {
 func (rf *Raft) replicateOnCommand(server, term int) {
 	// only one thread sends log to prevent redundant rpcs
 	rf.mu.Lock()
+	logLen := len(rf.logs)
+	ssLastInd := rf.snapshots.LastIncludedIndex
 	if !rf.IsStillLeader(term) /*|| len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
 		rf.mu.Unlock()
 		return
@@ -305,7 +308,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 	}
 
 	rf.mu.Lock()
-	if !rf.IsStillLeader(term) /* || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd */ {
+	if !rf.IsStillLeader(term) || len(rf.logs) != logLen || rf.snapshots.LastIncludedIndex != ssLastInd {
 		rf.mu.Unlock()
 		return
 	}
