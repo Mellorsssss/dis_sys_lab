@@ -6,6 +6,20 @@ const (
 	ErrWrongLeader = "ErrWrongLeader"
 )
 
+const (
+	RpcTimeout       = 100
+	NoLeader         = -1
+	NoneSerialNumber = -1
+	MsgChanLen       = 20
+	RequestInterval  = 50
+)
+
+const (
+	GET    = 0
+	PUT    = 1
+	APPEND = 2
+)
+
 type Err string
 
 // Put or Append
@@ -16,6 +30,8 @@ type PutAppendArgs struct {
 	// You'll have to add definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
+	SerialNumber int64
+	Id           string // client id
 }
 
 type PutAppendReply struct {
@@ -25,6 +41,8 @@ type PutAppendReply struct {
 type GetArgs struct {
 	Key string
 	// You'll have to add definitions here.
+	SerialNumber int64
+	Id           string // client id
 }
 
 type GetReply struct {
