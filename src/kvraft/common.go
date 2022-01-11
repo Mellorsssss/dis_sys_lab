@@ -6,6 +6,11 @@ const (
 	ErrWrongLeader = "ErrWrongLeader"
 )
 
+const (
+	RpcTimeout = 30
+	NoLeader   = -1
+)
+
 type Err string
 
 // Put or Append
