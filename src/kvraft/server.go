@@ -10,7 +10,7 @@ import (
 	"6.824/raft"
 )
 
-const Debug = true
+const Debug = false
 const ERROR = true
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
@@ -104,11 +104,13 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 		return
 	}
 
-	_, isLeader := kv.rf.GetState()
+	term, isLeader := kv.rf.GetState()
 	if !isLeader {
 		reply.Err = ErrWrongLeader
 		return
 	}
+
+	DPrintf("leader %v Get in term %v", kv.me, term)
 
 	// start the agree
 	ch := make(chan raft.ApplyMsg, MsgChanLen)
@@ -152,12 +154,13 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		return
 	}
 
-	_, isLeader := kv.rf.GetState()
+	term, isLeader := kv.rf.GetState()
 	if !isLeader {
-		DPrintf("sever %v is not leader", kv.me)
+		DPrintf("sever %v is not leader in term %v", kv.me, term)
 		reply.Err = ErrWrongLeader
 		return
 	}
+	DPrintf("leader %v PutAppend in term %v", kv.me, term)
 
 	// start the agree
 	ch := make(chan raft.ApplyMsg, MsgChanLen)

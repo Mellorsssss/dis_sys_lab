@@ -44,7 +44,10 @@ func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 // arguments. and reply must be passed as a pointer.
 //
 func (ck *Clerk) Get(key string) string {
-	DPrintf("clerk try to get %v", key)
+	defer func() {
+		DPrintf("ck get %v succ", key)
+	}()
+
 	curLeader := NoLeader
 	ck.mu.Lock()
 	if ck.prevLeader != NoLeader {
@@ -56,6 +59,7 @@ func (ck *Clerk) Get(key string) string {
 	if curLeader != NoLeader {
 		ok, value := ck.tryGet(key, curLeader)
 		if ok {
+			DPrintf("ck use cached server info")
 			ck.mu.Lock()
 			ck.prevLeader = curLeader
 			ck.mu.Unlock()
@@ -85,10 +89,6 @@ func (ck *Clerk) Get(key string) string {
 // return true if server is leader(and the value get)
 // or return false(value must be "") if timeout or server isn't leader
 func (ck *Clerk) tryGet(key string, server int) (bool, string) {
-	DPrintf("try get begin")
-	defer func() {
-		DPrintf("try get end")
-	}()
 	args := &GetArgs{
 		Key: key,
 	}
@@ -127,6 +127,10 @@ func (ck *Clerk) tryGet(key string, server int) (bool, string) {
 // arguments. and reply must be passed as a pointer.
 //
 func (ck *Clerk) PutAppend(key string, value string, op string) {
+	defer func() {
+		DPrintf("ck %v (%v, %v) succ", op, key, value)
+	}()
+
 	curLeader := NoLeader
 	ck.mu.Lock()
 	if ck.prevLeader != NoLeader {
@@ -149,10 +153,8 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	succ := false
 	for !succ {
 		for ind := range ck.servers {
-			DPrintf("send to server %v", ind)
 			ok := ck.tryPutAppend(key, value, op, ind)
 			if ok {
-				DPrintf("send to server %v succ", ind)
 				ck.mu.Lock()
 				ck.prevLeader = ind
 				ck.mu.Unlock()

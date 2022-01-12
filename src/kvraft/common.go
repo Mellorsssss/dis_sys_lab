@@ -7,7 +7,7 @@ const (
 )
 
 const (
-	RpcTimeout = 300
+	RpcTimeout = 100
 	NoLeader   = -1
 	MsgChanLen = 20
 )
