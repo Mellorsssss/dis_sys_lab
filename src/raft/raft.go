@@ -137,20 +137,54 @@ func (rf *Raft) persist() {
 	enc.Encode(rf.logs)
 	data := buffer.Bytes()
 
-	snapshotbuffer := new(bytes.Buffer)
-	senc := labgob.NewEncoder(snapshotbuffer)
-	senc.Encode(rf.snapshots)
-	sdata := snapshotbuffer.Bytes()
+	var sdata []byte
+	if rf.snapshots.LastIncludedIndex == NONE_IND && rf.snapshots.LastIncludedTerm == NONE_TERM {
+		sdata = nil
+	} else {
+		snapshotbuffer := new(bytes.Buffer)
+		senc := labgob.NewEncoder(snapshotbuffer)
+		senc.Encode(rf.snapshots)
+		sdata = snapshotbuffer.Bytes()
+	}
 
 	rf.persister.SaveStateAndSnapshot(data, sdata)
 }
 
 // readPersist restore previously persisted state.
 func (rf *Raft) readPersist(data []byte, sdata []byte) {
-	if data == nil || len(data) < 1 || sdata == nil { // bootstrap without any state?
+	if data == nil || len(data) < 1 { // bootstrap without any state?
 		rf.term = NONE_TERM
 		rf.vote = NONE_VOTE
 		rf.logs = []Log{}
+	} else {
+		buffer := bytes.NewBuffer(data)
+		dec := labgob.NewDecoder(buffer)
+		var term int
+		var vote int
+		var logs []Log
+
+		if dec.Decode(&term) != nil {
+			Error("Decode term error.")
+			return
+		}
+
+		if dec.Decode(&vote) != nil {
+			Error("Decode vote error.")
+			return
+		}
+
+		if dec.Decode(&logs) != nil {
+			Error("Decode logs error.")
+			return
+		}
+
+		rf.term = term
+		rf.vote = vote
+		rf.logs = logs
+	}
+
+	if sdata == nil {
+		// use snapshot to redirect the beginning of the logs
 		rf.snapshots = SnapShotData{
 			LastIncludedIndex: NONE_IND,
 			LastIncludedTerm:  NONE_TERM,
@@ -158,44 +192,19 @@ func (rf *Raft) readPersist(data []byte, sdata []byte) {
 		}
 		rf.commitInd = 0
 		rf.lastApply = 0
-		return
+	} else {
+		sbuffer := bytes.NewBuffer(sdata)
+		var snapshot SnapShotData
+		sdec := labgob.NewDecoder(sbuffer)
+		if sdec.Decode(&snapshot) != nil {
+			Error("Decode snapshot error")
+			return
+		}
+
+		rf.snapshots = snapshot
+		rf.commitInd = snapshot.LastIncludedIndex
+		rf.lastApply = snapshot.LastIncludedIndex
 	}
-	buffer := bytes.NewBuffer(data)
-	dec := labgob.NewDecoder(buffer)
-	var term int
-	var vote int
-	var logs []Log
-
-	if dec.Decode(&term) != nil {
-		Error("Decode term error.")
-		return
-	}
-
-	if dec.Decode(&vote) != nil {
-		Error("Decode vote error.")
-		return
-	}
-
-	if dec.Decode(&logs) != nil {
-		Error("Decode logs error.")
-		return
-	}
-
-	rf.term = term
-	rf.vote = vote
-	rf.logs = logs
-
-	sbuffer := bytes.NewBuffer(sdata)
-	var snapshot SnapShotData
-	sdec := labgob.NewDecoder(sbuffer)
-	if sdec.Decode(&snapshot) != nil {
-		Error("Decode snapshot error")
-		return
-	}
-
-	rf.snapshots = snapshot
-	rf.commitInd = snapshot.LastIncludedIndex
-	rf.lastApply = snapshot.LastIncludedIndex
 }
 
 // CondInstallSnapshot get called when A service wants to switch to snapshot.  Only do so if Raft hasn't

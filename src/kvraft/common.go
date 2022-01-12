@@ -7,8 +7,15 @@ const (
 )
 
 const (
-	RpcTimeout = 30
+	RpcTimeout = 300
 	NoLeader   = -1
+	MsgChanLen = 20
+)
+
+const (
+	GET    = 0
+	PUT    = 1
+	APPEND = 2
 )
 
 type Err string

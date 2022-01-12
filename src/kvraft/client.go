@@ -44,6 +44,7 @@ func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 // arguments. and reply must be passed as a pointer.
 //
 func (ck *Clerk) Get(key string) string {
+	DPrintf("clerk try to get %v", key)
 	curLeader := NoLeader
 	ck.mu.Lock()
 	if ck.prevLeader != NoLeader {
@@ -84,6 +85,10 @@ func (ck *Clerk) Get(key string) string {
 // return true if server is leader(and the value get)
 // or return false(value must be "") if timeout or server isn't leader
 func (ck *Clerk) tryGet(key string, server int) (bool, string) {
+	DPrintf("try get begin")
+	defer func() {
+		DPrintf("try get end")
+	}()
 	args := &GetArgs{
 		Key: key,
 	}
@@ -136,6 +141,7 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 			ck.mu.Lock()
 			ck.prevLeader = curLeader
 			ck.mu.Unlock()
+			return
 		}
 	}
 
@@ -143,11 +149,14 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	succ := false
 	for !succ {
 		for ind := range ck.servers {
+			DPrintf("send to server %v", ind)
 			ok := ck.tryPutAppend(key, value, op, ind)
 			if ok {
+				DPrintf("send to server %v succ", ind)
 				ck.mu.Lock()
 				ck.prevLeader = ind
 				ck.mu.Unlock()
+				return
 			}
 		}
 	}
@@ -169,7 +178,12 @@ func (ck *Clerk) tryPutAppend(key, value, op string, server int) bool {
 
 	select {
 	case succ := <-reach:
-		if !succ || reply.Err == ErrWrongLeader {
+		if !succ {
+			DPrintf("not succ")
+			return false
+		}
+		if reply.Err == ErrWrongLeader {
+			DPrintf("wrong leader")
 			return false
 		}
 
@@ -181,13 +195,18 @@ func (ck *Clerk) tryPutAppend(key, value, op string, server int) bool {
 		return true
 
 	case <-time.After(time.Duration(RpcTimeout) * time.Millisecond):
+		DPrintf("timeout")
 		return false
 	}
 }
 
 func (ck *Clerk) Put(key string, value string) {
+	DPrintf("clerk put (%v, %v)", key, value)
 	ck.PutAppend(key, value, "Put")
+	DPrintf("clerk put (%v, %v) succ", key, value)
 }
 func (ck *Clerk) Append(key string, value string) {
+	DPrintf("clerk append (%v, %v)", key, value)
 	ck.PutAppend(key, value, "Append")
+	DPrintf("clerk append (%v, %v) succ", key, value)
 }

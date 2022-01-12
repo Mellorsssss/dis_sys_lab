@@ -10,7 +10,7 @@ import (
 	"6.824/raft"
 )
 
-const Debug = false
+const Debug = true
 const ERROR = true
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
@@ -31,6 +31,16 @@ type Op struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
+	OpType int
+	Key    string
+	Value  string
+}
+
+type KVStore interface {
+	Get(string) string
+	Put(string, string)
+	Append(string, string)
+	Data() []byte
 }
 
 type KVServer struct {
@@ -43,14 +53,168 @@ type KVServer struct {
 	maxraftstate int // snapshot if log grows this big
 
 	// Your definitions here.
+	store KVStore
+	sub   map[chan<- raft.ApplyMsg]bool
+}
+
+func (kv *KVServer) registerMsgListener(ch chan<- raft.ApplyMsg) {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	if _, ok := kv.sub[ch]; ok {
+		Error("chan has been registered")
+		panic("chan has been registered")
+	}
+
+	kv.sub[ch] = true
+}
+
+func (kv *KVServer) cancelMsgListener(ch chan<- raft.ApplyMsg) {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	if _, ok := kv.sub[ch]; !ok {
+		Error("chan has no sub")
+		panic("chan has no sub")
+	}
+
+	close(ch)
+	delete(kv.sub, ch)
+}
+
+func (kv *KVServer) broadcastMsg() {
+	for appmsg := range kv.applyCh {
+		if appmsg.CommandValid {
+			kv.mu.Lock()
+			for ch := range kv.sub {
+				select {
+				case ch <- appmsg:
+					continue
+				default:
+					continue
+				}
+			}
+			kv.mu.Unlock()
+		}
+		// TODO: deal with snapshot msg
+	}
 }
 
 func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
-	// Your code here.
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	_, isLeader := kv.rf.GetState()
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	// start the agree
+	ch := make(chan raft.ApplyMsg, MsgChanLen)
+	cmd := Op{
+		OpType: GET,
+		Key:    args.Key,
+	}
+	kv.registerMsgListener(ch)
+	index, term, ok := kv.rf.Start(cmd)
+	if !ok {
+		reply.Err = ErrWrongLeader
+		kv.cancelMsgListener(ch)
+		return
+	}
+
+	// check if cmd is commited
+	for msg := range ch {
+		if msg.CommandIndex == index {
+			newTerm, isStillLeader := kv.rf.GetState()
+			if !isStillLeader || newTerm != term || msg.Command != cmd {
+				reply.Err = ErrWrongLeader
+				kv.cancelMsgListener(ch)
+				return
+			}
+
+			reply.Value = kv.store.Get(args.Key)
+			reply.Err = OK
+			kv.cancelMsgListener(ch)
+			return
+		} else if msg.CommandIndex > index {
+			Error("server %v miss the msg", kv.me)
+			panic("server miss the msg")
+		}
+	}
 }
 
 func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
-	// Your code here.
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		DPrintf("server %v is killed", kv.me)
+		return
+	}
+
+	_, isLeader := kv.rf.GetState()
+	if !isLeader {
+		DPrintf("sever %v is not leader", kv.me)
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	// start the agree
+	ch := make(chan raft.ApplyMsg, MsgChanLen)
+	var optype int
+	if args.Op == "Put" {
+		optype = PUT
+	} else if args.Op == "Append" {
+		optype = APPEND
+	} else {
+		panic("unkown op type")
+	}
+	cmd := Op{
+		OpType: optype,
+		Key:    args.Key,
+		Value:  args.Value,
+	}
+	kv.registerMsgListener(ch)
+	index, term, ok := kv.rf.Start(cmd)
+	if !ok {
+		reply.Err = ErrWrongLeader
+		DPrintf("server %v fail to start the cmd", kv.me)
+		kv.cancelMsgListener(ch)
+		return
+	}
+
+	// check if cmd is commited
+	for msg := range ch {
+		if msg.CommandIndex == index {
+			newTerm, isStillLeader := kv.rf.GetState()
+			if !isStillLeader || newTerm != term {
+				DPrintf("server %v is not leader any more", kv.me)
+				reply.Err = ErrWrongLeader
+				kv.cancelMsgListener(ch)
+				return
+			}
+
+			if msg.Command != cmd {
+				DPrintf("server %v get wrong cmd %v compared with cmd %v ", kv.me, msg.Command, cmd)
+				reply.Err = ErrWrongLeader
+				kv.cancelMsgListener(ch)
+				return
+			}
+			if optype == PUT {
+				kv.store.Put(args.Key, args.Value)
+			} else if optype == APPEND {
+				kv.store.Append(args.Key, args.Value)
+			} else {
+				panic("unknown op")
+			}
+			reply.Err = OK
+			kv.cancelMsgListener(ch)
+			return
+		} else if msg.CommandIndex > index {
+			Error("server %v miss the msg", kv.me)
+			panic("server miss the msg")
+		}
+	}
 }
 
 //
@@ -103,6 +267,10 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
 	// You may need initialization code here.
+	kv.store = MakeMapStore()
+	kv.sub = make(map[chan<- raft.ApplyMsg]bool)
 
+	// long-running goroutine
+	go kv.broadcastMsg()
 	return kv
 }
