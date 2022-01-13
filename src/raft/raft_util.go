@@ -94,7 +94,7 @@ func (rf *Raft) updateTerm(newTerm int) int {
 	if newTerm == rf.term {
 		return EQ_TERM
 	}
-	DPrintf("%v 's term get updated from %v to %v", rf.me, rf.term, newTerm)
+	DPrintf("%v 's term get updated from %v to %v by receiving rpc", rf.me, rf.term, newTerm)
 	rf.term = newTerm
 	rf.vote = NONE_VOTE
 	rf.persist()
@@ -105,7 +105,6 @@ func (rf *Raft) updateTerm(newTerm int) int {
 		go rf.ticker()
 	} else {
 		rf.leaderId = NONE_LEADER
-		DPrintf("%v has no leader in term %v", rf.me, rf.term)
 	}
 
 	return GREATER_TERM

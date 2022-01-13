@@ -7,12 +7,15 @@ import (
 	"time"
 
 	"6.824/labrpc"
+	"github.com/segmentio/ksuid"
 )
 
 type Clerk struct {
 	servers []*labrpc.ClientEnd
 	// You will have to modify this struct.
-	prevLeader int // last leader seen
+	prevLeader int    // last leader seen
+	prevSerNum int64  // last serial number
+	id         string // client unique id
 	mu         sync.Mutex
 }
 
@@ -23,11 +26,24 @@ func nrand() int64 {
 	return x
 }
 
+// gen unique id of clerk
+func genUUID() string {
+	id := ksuid.New()
+	return id.String()
+}
+
+func genSerialNumber() int64 {
+	return nrand()
+}
+
 func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 	ck := new(Clerk)
 	ck.servers = servers
 	// You'll have to add code here.
 	ck.prevLeader = NoLeader
+	ck.prevSerNum = genSerialNumber()
+	ck.id = genUUID()
+	Info("start %v client", ck.id)
 	return ck
 }
 
@@ -45,41 +61,42 @@ func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 //
 func (ck *Clerk) Get(key string) string {
 	defer func() {
-		DPrintf("ck get %v succ", key)
+		DPrintf("ck %v Get succ.", ck.id)
 	}()
-
-	curLeader := NoLeader
 	ck.mu.Lock()
-	if ck.prevLeader != NoLeader {
-		curLeader = ck.prevLeader
-	}
+	curLeader := ck.prevLeader
+	sn := ck.prevSerNum + 1
+	ck.prevSerNum = sn // serial number increase
 	ck.mu.Unlock()
 
-	// use the known possible leader to send rpc first
+	// try to connect to known possible leader first
 	if curLeader != NoLeader {
-		ok, value := ck.tryGet(key, curLeader)
+		ok, value := ck.tryGet(key, curLeader, sn)
 		if ok {
-			DPrintf("ck use cached server info")
+			DPrintf("ck %v use cached server info %v", ck.id, curLeader)
 			ck.mu.Lock()
 			ck.prevLeader = curLeader
 			ck.mu.Unlock()
-
 			return value
 		}
+
+		ck.mu.Lock()
+		ck.prevLeader = NoLeader
+		ck.mu.Unlock()
 	}
 
 	// send rpc until success
 	succ := false
 	for !succ {
 		for ind := range ck.servers {
-			ok, value := ck.tryGet(key, ind)
+			ok, value := ck.tryGet(key, ind, sn)
 			if ok {
 				ck.mu.Lock()
 				ck.prevLeader = ind
 				ck.mu.Unlock()
-
 				return value
 			}
+			time.Sleep(time.Duration(RequestInterval) * time.Millisecond)
 		}
 	}
 	return ""
@@ -88,17 +105,19 @@ func (ck *Clerk) Get(key string) string {
 // tryGet sends Get rpc to server with timeout
 // return true if server is leader(and the value get)
 // or return false(value must be "") if timeout or server isn't leader
-func (ck *Clerk) tryGet(key string, server int) (bool, string) {
+func (ck *Clerk) tryGet(key string, server int, serialnumber int64) (bool, string) {
 	args := &GetArgs{
-		Key: key,
+		Key:          key,
+		SerialNumber: serialnumber,
+		Id:           ck.id,
 	}
 	reply := &GetReply{}
 
-	reach := make(chan bool)
-	go func() {
+	reach := make(chan bool, 1)
+	go func(ch chan<- bool) {
 		ok := ck.servers[server].Call("KVServer.Get", args, reply)
-		reach <- ok
-	}()
+		ch <- ok
+	}(reach)
 
 	select {
 	case succ := <-reach:
@@ -127,20 +146,15 @@ func (ck *Clerk) tryGet(key string, server int) (bool, string) {
 // arguments. and reply must be passed as a pointer.
 //
 func (ck *Clerk) PutAppend(key string, value string, op string) {
-	defer func() {
-		DPrintf("ck %v (%v, %v) succ", op, key, value)
-	}()
-
-	curLeader := NoLeader
 	ck.mu.Lock()
-	if ck.prevLeader != NoLeader {
-		curLeader = ck.prevLeader
-	}
+	curLeader := ck.prevLeader
+	sn := ck.prevSerNum + 1
+	ck.prevSerNum = sn // serial number increase
 	ck.mu.Unlock()
 
 	// use the known possible leader to send rpc first
 	if curLeader != NoLeader {
-		ok := ck.tryPutAppend(key, value, op, curLeader)
+		ok := ck.tryPutAppend(key, value, op, curLeader, sn)
 		if ok {
 			ck.mu.Lock()
 			ck.prevLeader = curLeader
@@ -153,39 +167,40 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	succ := false
 	for !succ {
 		for ind := range ck.servers {
-			ok := ck.tryPutAppend(key, value, op, ind)
+			ok := ck.tryPutAppend(key, value, op, ind, sn)
 			if ok {
 				ck.mu.Lock()
 				ck.prevLeader = ind
 				ck.mu.Unlock()
 				return
 			}
+			time.Sleep(time.Duration(RequestInterval) * time.Millisecond)
 		}
 	}
 }
 
-func (ck *Clerk) tryPutAppend(key, value, op string, server int) bool {
+func (ck *Clerk) tryPutAppend(key, value, op string, server int, sn int64) bool {
 	args := &PutAppendArgs{
-		Key:   key,
-		Value: value,
-		Op:    op,
+		Key:          key,
+		Value:        value,
+		Op:           op,
+		SerialNumber: sn,
+		Id:           ck.id,
 	}
 	reply := &PutAppendReply{}
 
-	reach := make(chan bool)
-	go func() {
+	reach := make(chan bool, 1)
+	go func(ch chan<- bool) {
 		ok := ck.servers[server].Call("KVServer.PutAppend", args, reply)
-		reach <- ok
-	}()
+		ch <- ok
+	}(reach)
 
 	select {
 	case succ := <-reach:
 		if !succ {
-			DPrintf("not succ")
 			return false
 		}
 		if reply.Err == ErrWrongLeader {
-			DPrintf("wrong leader")
 			return false
 		}
 
@@ -197,18 +212,17 @@ func (ck *Clerk) tryPutAppend(key, value, op string, server int) bool {
 		return true
 
 	case <-time.After(time.Duration(RpcTimeout) * time.Millisecond):
-		DPrintf("timeout")
 		return false
 	}
 }
 
 func (ck *Clerk) Put(key string, value string) {
-	DPrintf("clerk put (%v, %v)", key, value)
+	DPrintf("ck %v put (%v, %v)", ck.id, key, value)
 	ck.PutAppend(key, value, "Put")
-	DPrintf("clerk put (%v, %v) succ", key, value)
+	DPrintf("ck %v put (%v, %v) succ", ck.id, key, value)
 }
 func (ck *Clerk) Append(key string, value string) {
-	DPrintf("clerk append (%v, %v)", key, value)
+	DPrintf("ck %v append (%v, %v)", ck.id, key, value)
 	ck.PutAppend(key, value, "Append")
-	DPrintf("clerk append (%v, %v) succ", key, value)
+	DPrintf("ck %v append (%v, %v) succ", ck.id, key, value)
 }

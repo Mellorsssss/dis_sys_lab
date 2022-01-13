@@ -12,17 +12,25 @@ import (
 
 const Debug = false
 const ERROR = true
+const INFO = false
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug {
-		log.Printf(format, a...)
+		log.Printf("[DEBUG]"+format, a...)
+	}
+	return
+}
+
+func Info(format string, a ...interface{}) (n int, err error) {
+	if INFO {
+		log.Printf("[INFO]"+format, a...)
 	}
 	return
 }
 
 func Error(format string, a ...interface{}) (n int, err error) {
 	if ERROR {
-		log.Printf(format, a...)
+		log.Printf("[ERROR]"+format, a...)
 	}
 	return
 }
@@ -31,9 +39,17 @@ type Op struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
-	OpType int
-	Key    string
-	Value  string
+	OpType       int
+	Key          string
+	Value        string
+	SerialNumber int64
+	Id           string
+}
+
+type Response struct {
+	SerialNumber int64
+	Value        string
+	OpType       int
 }
 
 type KVStore interface {
@@ -53,8 +69,9 @@ type KVServer struct {
 	maxraftstate int // snapshot if log grows this big
 
 	// Your definitions here.
-	store KVStore
-	sub   map[chan<- raft.ApplyMsg]bool
+	store     KVStore
+	sub       map[chan<- raft.ApplyMsg]bool
+	clientMap map[string]Response
 }
 
 func (kv *KVServer) registerMsgListener(ch chan<- raft.ApplyMsg) {
@@ -80,9 +97,79 @@ func (kv *KVServer) cancelMsgListener(ch chan<- raft.ApplyMsg) {
 	delete(kv.sub, ch)
 }
 
+// isExecuted return true if op with sn has been executed before
+func (kv *KVServer) isExecuted(id string, sn int64) (bool, Response) {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	v, exist := kv.clientMap[id]
+	if !exist {
+		return false, Response{}
+	}
+
+	if v.SerialNumber < sn {
+		return false, Response{}
+	} else if v.SerialNumber == sn {
+		return true, v
+	} else {
+		return true, Response{} // for any before requests, just response anything
+		// client must have handled the correct reponse before
+	}
+}
+
+// memorizeOp latest op of client id
+func (kv *KVServer) memorizeOp(id string, sn int64, r Response) {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	v, exist := kv.clientMap[id]
+	if exist {
+		if v.SerialNumber != sn-1 {
+			Error("cilent %v send op out of order: before:%v, cur:%v ", id, v.SerialNumber, sn)
+			panic("client send op out of order")
+		}
+	}
+	kv.clientMap[id] = r
+}
+
+// execOp executes op in statemachine
+func (kv *KVServer) execOp(op Op) {
+	ok, _ := kv.isExecuted(op.Id, op.SerialNumber)
+	if ok {
+		return
+	}
+	kv.mu.Lock()
+	if op.OpType == GET {
+		value := kv.store.Get(op.Key)
+		kv.mu.Unlock()
+		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, value, op.OpType})
+		return
+	} else if op.OpType == PUT {
+		kv.store.Put(op.Key, op.Value)
+		kv.mu.Unlock()
+		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
+	} else if op.OpType == APPEND {
+		kv.store.Append(op.Key, op.Value)
+		kv.mu.Unlock()
+		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
+	} else {
+		kv.mu.Unlock()
+		panic("exec wrong type of op")
+	}
+}
+
+// broadcastMsg process msg from applyCh
+// and broadcast to subs
 func (kv *KVServer) broadcastMsg() {
 	for appmsg := range kv.applyCh {
+		if kv.killed() {
+			return
+		}
+
 		if appmsg.CommandValid {
+			// execute the cmd
+			op := appmsg.Command.(Op)
+			kv.execOp(op)
+
+			// broadcast to all the subscribers
 			kv.mu.Lock()
 			for ch := range kv.sub {
 				select {
@@ -94,6 +181,7 @@ func (kv *KVServer) broadcastMsg() {
 			}
 			kv.mu.Unlock()
 		}
+
 		// TODO: deal with snapshot msg
 	}
 }
@@ -112,11 +200,22 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 
 	DPrintf("leader %v Get in term %v", kv.me, term)
 
+	ok, r := kv.isExecuted(args.Id, args.SerialNumber)
+	if ok {
+		DPrintf("leader %v Get but commit before by %v", kv.me, args.Id)
+		reply.Err = OK
+		reply.Value = r.Value
+		return
+	}
+
 	// start the agree
 	ch := make(chan raft.ApplyMsg, MsgChanLen)
 	cmd := Op{
-		OpType: GET,
-		Key:    args.Key,
+		OpType:       GET,
+		Key:          args.Key,
+		Value:        "",
+		SerialNumber: args.SerialNumber,
+		Id:           args.Id,
 	}
 	kv.registerMsgListener(ch)
 	index, term, ok := kv.rf.Start(cmd)
@@ -162,6 +261,13 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	}
 	DPrintf("leader %v PutAppend in term %v", kv.me, term)
 
+	ok, _ := kv.isExecuted(args.Id, args.SerialNumber)
+	if ok {
+		DPrintf("leader %v Get but commit before by %v", kv.me, args.Id)
+		reply.Err = OK
+		return
+	}
+
 	// start the agree
 	ch := make(chan raft.ApplyMsg, MsgChanLen)
 	var optype int
@@ -173,9 +279,11 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		panic("unkown op type")
 	}
 	cmd := Op{
-		OpType: optype,
-		Key:    args.Key,
-		Value:  args.Value,
+		OpType:       optype,
+		Key:          args.Key,
+		Value:        args.Value,
+		SerialNumber: args.SerialNumber,
+		Id:           args.Id,
 	}
 	kv.registerMsgListener(ch)
 	index, term, ok := kv.rf.Start(cmd)
@@ -203,13 +311,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 				kv.cancelMsgListener(ch)
 				return
 			}
-			if optype == PUT {
-				kv.store.Put(args.Key, args.Value)
-			} else if optype == APPEND {
-				kv.store.Append(args.Key, args.Value)
-			} else {
-				panic("unknown op")
-			}
+
 			reply.Err = OK
 			kv.cancelMsgListener(ch)
 			return
@@ -272,6 +374,7 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	// You may need initialization code here.
 	kv.store = MakeMapStore()
 	kv.sub = make(map[chan<- raft.ApplyMsg]bool)
+	kv.clientMap = make(map[string]Response)
 
 	// long-running goroutine
 	go kv.broadcastMsg()

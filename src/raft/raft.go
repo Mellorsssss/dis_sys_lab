@@ -139,7 +139,7 @@ func (rf *Raft) persist() {
 
 	var sdata []byte
 	if rf.snapshots.LastIncludedIndex == NONE_IND && rf.snapshots.LastIncludedTerm == NONE_TERM {
-		sdata = nil
+		sdata = []byte{}
 	} else {
 		snapshotbuffer := new(bytes.Buffer)
 		senc := labgob.NewEncoder(snapshotbuffer)
@@ -183,7 +183,7 @@ func (rf *Raft) readPersist(data []byte, sdata []byte) {
 		rf.logs = logs
 	}
 
-	if sdata == nil {
+	if sdata == nil || len(sdata) < 1 {
 		// use snapshot to redirect the beginning of the logs
 		rf.snapshots = SnapShotData{
 			LastIncludedIndex: NONE_IND,
@@ -197,8 +197,7 @@ func (rf *Raft) readPersist(data []byte, sdata []byte) {
 		var snapshot SnapShotData
 		sdec := labgob.NewDecoder(sbuffer)
 		if sdec.Decode(&snapshot) != nil {
-			Error("Decode snapshot error")
-			return
+			panic("Decode snapshot error")
 		}
 
 		rf.snapshots = snapshot
