@@ -1,6 +1,7 @@
 package kvraft
 
 import (
+	"bytes"
 	"log"
 	"sync"
 	"sync/atomic"
@@ -57,14 +58,21 @@ type KVStore interface {
 	Put(string, string)
 	Append(string, string)
 	Data() []byte
+	Load([]byte)
+}
+
+type SnapShotData struct {
+	Data []byte
+	Mem  map[string]Response
 }
 
 type KVServer struct {
-	mu      sync.Mutex
-	me      int
-	rf      *raft.Raft
-	applyCh chan raft.ApplyMsg
-	dead    int32 // set by Kill()
+	mu        sync.Mutex
+	me        int
+	rf        *raft.Raft
+	applyCh   chan raft.ApplyMsg
+	dead      int32 // set by Kill()
+	persister *raft.Persister
 
 	maxraftstate int // snapshot if log grows this big
 
@@ -158,6 +166,49 @@ func (kv *KVServer) execOp(op Op) {
 	}
 }
 
+func (kv *KVServer) persist() []byte {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	ss := SnapShotData{
+		Data: kv.store.Data(),
+		Mem:  kv.clientMap,
+	}
+
+	sb := new(bytes.Buffer)
+	senc := labgob.NewEncoder(sb)
+	err := senc.Encode(ss)
+	if err != nil {
+		Error("server %v persist fails.", kv.me)
+		panic(err)
+	}
+	return sb.Bytes()
+}
+
+func (kv *KVServer) readPersist(data []byte) {
+	Error("server %v begins to read persist", kv.me)
+	kv.clientMap = make(map[string]Response)
+	if data == nil || len(data) < 1 {
+		return
+	} else {
+		sbuffer := bytes.NewBuffer(data)
+		var rfsnapshot raft.SnapShotData
+		var snapshot SnapShotData
+		rdec := labgob.NewDecoder(sbuffer)
+		if rdec.Decode(&rfsnapshot) != nil {
+			panic("Decode raft snapshot error")
+		}
+
+		sdec := labgob.NewDecoder(bytes.NewBuffer(rfsnapshot.Data))
+		if sdec.Decode(&snapshot) != nil {
+			Error("snapshot of %v decodes fail", kv.me)
+			panic("snapshot decodes fails.")
+		}
+
+		kv.store.Load(snapshot.Data)
+		kv.clientMap = snapshot.Mem
+	}
+}
+
 // broadcastMsg process msg from applyCh
 // and broadcast to subs
 func (kv *KVServer) broadcastMsg() {
@@ -179,9 +230,20 @@ func (kv *KVServer) broadcastMsg() {
 			if ok {
 				fn(appmsg) // execute the callback function
 			}
+			// raft state is too large, need to snapshot
+			if kv.maxraftstate != -1 && kv.persister.RaftStateSize() > int(float32(kv.maxraftstate)*RaftSizeThreshold) {
+				kv.rf.Snapshot(appmsg.CommandIndex, kv.persist())
+			}
+		} else if appmsg.SnapshotValid { // CondInstallSnapshot
+			if kv.rf.CondInstallSnapshot(appmsg.SnapshotTerm, appmsg.SnapshotIndex, appmsg.Snapshot) {
+				Error("server %v begins to switch to snapshot", kv.me)
+				kv.readPersist(kv.persister.ReadSnapshot())
+				Error("server %v succs to switch to snapshot", kv.me)
+			} else {
+				Error("server %v fails to switch to snapshot", kv.me)
+			}
 		}
 
-		// TODO: deal with snapshot msg
 	}
 }
 
@@ -351,6 +413,7 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	kv := new(KVServer)
 	kv.me = me
 	kv.maxraftstate = maxraftstate
+	kv.persister = persister
 
 	// You may need initialization code here.
 
@@ -360,7 +423,9 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	// You may need initialization code here.
 	kv.store = MakeMapStore()
 	kv.sub = make(map[Op]func(raft.ApplyMsg))
-	kv.clientMap = make(map[string]Response)
+	// kv.clientMap = make(map[string]Response)
+	Error("restart the server %v", kv.me)
+	kv.readPersist(persister.ReadSnapshot())
 
 	// long-running goroutine
 	go kv.broadcastMsg()
