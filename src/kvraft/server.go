@@ -100,8 +100,7 @@ func (kv *KVServer) cancelMsgListener(op Op) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	if _, ok := kv.sub[op]; !ok {
-		Error("chan has no sub")
-		panic("chan has no sub")
+		return
 	}
 
 	delete(kv.sub, op)
@@ -186,6 +185,8 @@ func (kv *KVServer) persist() []byte {
 
 func (kv *KVServer) readPersist(data []byte) {
 	Error("server %v begins to read persist", kv.me)
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
 	kv.clientMap = make(map[string]Response)
 	if data == nil || len(data) < 1 {
 		return
