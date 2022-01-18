@@ -66,6 +66,8 @@ type SnapShotData struct {
 	Mem  map[string]Response
 }
 
+type KVRPCHandler func(raft.ApplyMsg, string)
+
 type KVServer struct {
 	mu        sync.Mutex
 	me        int
@@ -80,30 +82,28 @@ type KVServer struct {
 	store KVStore
 	//sub       map[chan<- raft.ApplyMsg]bool
 
-	sub       map[Op]func(raft.ApplyMsg)
+	sub       map[int]KVRPCHandler
 	clientMap map[string]Response
 }
 
-func (kv *KVServer) registerMsgListener(op Op, fn func(raft.ApplyMsg)) bool {
-	kv.mu.Lock()
-	defer kv.mu.Unlock()
-	if _, ok := kv.sub[op]; ok {
+func (kv *KVServer) registerMsgListener(index int, fn KVRPCHandler) bool {
+	if _, ok := kv.sub[index]; ok {
 		Error("chan has been registered")
 		return false
 	}
 
-	kv.sub[op] = fn
+	kv.sub[index] = fn
 	return true
 }
 
-func (kv *KVServer) cancelMsgListener(op Op) {
+func (kv *KVServer) cancelMsgListener(index int) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
-	if _, ok := kv.sub[op]; !ok {
+	if _, ok := kv.sub[index]; !ok {
 		return
 	}
 
-	delete(kv.sub, op)
+	delete(kv.sub, index)
 }
 
 // isExecuted return true if op with sn has been executed before
@@ -140,25 +140,28 @@ func (kv *KVServer) memorizeOp(id string, sn int64, r Response) {
 }
 
 // execOp executes op in statemachine
-func (kv *KVServer) execOp(op Op) {
-	ok, _ := kv.isExecuted(op.Id, op.SerialNumber)
+func (kv *KVServer) execOp(op Op) string {
+	ok, v := kv.isExecuted(op.Id, op.SerialNumber)
 	if ok {
-		return
+		return v.Value
 	}
+
 	kv.mu.Lock()
 	if op.OpType == GET {
 		value := kv.store.Get(op.Key)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, value, op.OpType})
-		return
+		return value
 	} else if op.OpType == PUT {
 		kv.store.Put(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
+		return ""
 	} else if op.OpType == APPEND {
 		kv.store.Append(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
+		return ""
 	} else {
 		kv.mu.Unlock()
 		panic("exec wrong type of op")
@@ -210,9 +213,9 @@ func (kv *KVServer) readPersist(data []byte) {
 	}
 }
 
-// broadcastMsg process msg from applyCh
+// procApplyMsg process msg from applyCh
 // and broadcast to subs
-func (kv *KVServer) broadcastMsg() {
+func (kv *KVServer) procApplyMsg() {
 	for appmsg := range kv.applyCh {
 		if kv.killed() {
 			return
@@ -221,16 +224,20 @@ func (kv *KVServer) broadcastMsg() {
 		if appmsg.CommandValid {
 			// execute the cmd
 			op := appmsg.Command.(Op)
-			kv.execOp(op)
+			value := kv.execOp(op)
 
 			// broadcast to all the subscribers
-			kv.mu.Lock()
-			fn, ok := kv.sub[op]
-			kv.mu.Unlock()
+			// non-blocking
+			go func(appmsg raft.ApplyMsg, value string) {
+				kv.mu.Lock()
+				fn, ok := kv.sub[appmsg.CommandIndex]
+				kv.mu.Unlock()
 
-			if ok {
-				fn(appmsg) // execute the callback function
-			}
+				if ok {
+					go fn(appmsg, value)
+				}
+			}(appmsg, value)
+
 			// raft state is too large, need to snapshot
 			if kv.maxraftstate != -1 && kv.persister.RaftStateSize() > int(float32(kv.maxraftstate)*RaftSizeThreshold) {
 				kv.rf.Snapshot(appmsg.CommandIndex, kv.persist())
@@ -277,27 +284,30 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 		SerialNumber: args.SerialNumber,
 		Id:           args.Id,
 	}
-	kv.registerMsgListener(cmd, func(msg raft.ApplyMsg) {
+
+	kv.mu.Lock()
+	index, _, ok := kv.rf.Start(cmd)
+	if !ok {
+		reply.Err = ErrWrongLeader
+		kv.mu.Unlock()
+		return
+	}
+
+	kv.registerMsgListener(index, func(msg raft.ApplyMsg, value string) {
 		newTerm, isStillLeader := kv.rf.GetState()
 		if !isStillLeader || newTerm != term || msg.Command != cmd {
 			reply.Err = ErrWrongLeader
-			kv.cancelMsgListener(cmd)
+			kv.cancelMsgListener(index)
 			done <- struct{}{}
 			return
 		}
 
-		reply.Value = kv.store.Get(args.Key)
+		reply.Value = value
 		reply.Err = OK
-		kv.cancelMsgListener(cmd)
+		kv.cancelMsgListener(index)
 		done <- struct{}{}
 	})
-
-	_, _, ok = kv.rf.Start(cmd)
-	if !ok {
-		reply.Err = ErrWrongLeader
-		kv.cancelMsgListener(cmd)
-		return
-	}
+	kv.mu.Unlock()
 	// wait for the msg is applied
 
 	<-done
@@ -343,26 +353,29 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		SerialNumber: args.SerialNumber,
 		Id:           args.Id,
 	}
-	kv.registerMsgListener(cmd, func(msg raft.ApplyMsg) {
+
+	kv.mu.Lock()
+	index, _, ok := kv.rf.Start(cmd)
+	if !ok {
+		reply.Err = ErrWrongLeader
+		kv.mu.Unlock()
+		return
+	}
+
+	kv.registerMsgListener(index, func(msg raft.ApplyMsg, _ string) {
 		newTerm, isStillLeader := kv.rf.GetState()
 		if !isStillLeader || newTerm != term || msg.Command != cmd {
 			reply.Err = ErrWrongLeader
-			kv.cancelMsgListener(cmd)
+			kv.cancelMsgListener(index)
 			done <- struct{}{}
 			return
 		}
 
 		reply.Err = OK
-		kv.cancelMsgListener(cmd)
+		kv.cancelMsgListener(index)
 		done <- struct{}{}
 	})
-
-	_, _, ok = kv.rf.Start(cmd)
-	if !ok {
-		reply.Err = ErrWrongLeader
-		kv.cancelMsgListener(cmd)
-		return
-	}
+	kv.mu.Unlock()
 	// wait for the msg is applied
 
 	<-done
@@ -421,12 +434,12 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 
 	// You may need initialization code here.
 	kv.store = MakeMapStore()
-	kv.sub = make(map[Op]func(raft.ApplyMsg))
+	kv.sub = make(map[int]KVRPCHandler)
 	// kv.clientMap = make(map[string]Response)
 	Error("restart the server %v", kv.me)
 	kv.readPersist(persister.ReadSnapshot())
 
 	// long-running goroutine
-	go kv.broadcastMsg()
+	go kv.procApplyMsg()
 	return kv
 }
