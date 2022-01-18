@@ -10,9 +10,8 @@ const (
 	RpcTimeout        = 100
 	NoLeader          = -1
 	NoneSerialNumber  = -1
-	MsgChanLen        = 20
 	RequestInterval   = 50
-	RaftSizeThreshold = 0.8
+	RaftSizeThreshold = 0.95
 )
 
 const (

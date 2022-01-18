@@ -269,7 +269,7 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	}
 
 	// start the agree
-	done := make(chan struct{})
+	done := make(chan struct{}, 1)
 	cmd := Op{
 		OpType:       GET,
 		Key:          args.Key,
@@ -290,7 +290,6 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 		reply.Err = OK
 		kv.cancelMsgListener(cmd)
 		done <- struct{}{}
-		return
 	})
 
 	_, _, ok = kv.rf.Start(cmd)
@@ -328,7 +327,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	}
 
 	// start the agree
-	done := make(chan struct{})
+	done := make(chan struct{}, 1)
 	var optype int
 	if args.Op == "Put" {
 		optype = PUT
@@ -356,7 +355,6 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		reply.Err = OK
 		kv.cancelMsgListener(cmd)
 		done <- struct{}{}
-		return
 	})
 
 	_, _, ok = kv.rf.Start(cmd)
