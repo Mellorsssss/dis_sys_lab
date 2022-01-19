@@ -1,0 +1,5008 @@
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6669  843
+ 149 goroutines now
+PASS
+ok  	6.824/kvraft	20.124s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6639  857
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	19.971s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6584  858
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.380s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6711  823
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.562s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6572  804
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.294s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6645  765
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.764s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6637  861
+ 109 goroutines now
+PASS
+ok  	6.824/kvraft	19.948s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6545  851
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.017s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6835  871
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.394s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6694  851
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.286s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6534  833
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	19.914s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6646  911
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.135s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6615  776
+ 164 goroutines now
+PASS
+ok  	6.824/kvraft	20.361s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6699  831
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.698s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6474  735
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.417s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6742  827
+ 113 goroutines now
+PASS
+ok  	6.824/kvraft	20.066s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6955  852
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.285s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6673  778
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.458s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6573  750
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.213s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6760  820
+ 174 goroutines now
+PASS
+ok  	6.824/kvraft	20.778s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6606  854
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.192s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6671  839
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.600s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6807  915
+ 107 goroutines now
+PASS
+ok  	6.824/kvraft	19.985s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  26.5  5  7861  875
+ 96 goroutines now
+PASS
+ok  	6.824/kvraft	26.523s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6728  885
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.300s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6680  787
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	19.911s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6647  821
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.251s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6555  810
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.096s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6631  849
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.766s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6795  886
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.189s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6689  844
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.293s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6762  847
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.649s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6877  820
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	21.161s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6395  867
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.335s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6584  850
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.266s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6555  836
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.287s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  24.9  5  7527  860
+ 166 goroutines now
+PASS
+ok  	6.824/kvraft	24.963s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6593  843
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	19.882s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6849  864
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.086s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6618  835
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.399s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6717  833
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.693s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  6999  930
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	21.285s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6524  824
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.233s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6679  813
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.543s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6695  766
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.902s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6574  741
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.782s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6702  787
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.360s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6651  828
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.679s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6862  861
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.345s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6844  837
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.663s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6492  777
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.164s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6625  834
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.156s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6596  842
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.361s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6759  790
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.974s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6573  750
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.713s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6527  837
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	20.001s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6718  847
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.288s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6714  847
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.294s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6644  861
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.196s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6810  799
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	21.018s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6640  902
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.190s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6872  801
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.785s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6739  794
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.628s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6716  798
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.872s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6898  910
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.501s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6566  828
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	20.651s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6764  876
+ 137 goroutines now
+PASS
+ok  	6.824/kvraft	21.151s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6476  786
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.246s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6758  848
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.344s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6649  814
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.118s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6402  833
+ 121 goroutines now
+PASS
+ok  	6.824/kvraft	19.688s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6552  848
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.492s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6559  807
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.163s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6768  820
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.545s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6498  841
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.101s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6860  850
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.477s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6579  825
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.098s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6591  813
+ 159 goroutines now
+PASS
+ok  	6.824/kvraft	20.402s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6795  879
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.199s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6894  883
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.537s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6664  851
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.474s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6901  875
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.817s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6758  810
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.362s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6876  930
+ 145 goroutines now
+PASS
+ok  	6.824/kvraft	20.626s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6639  869
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.336s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6580  867
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	19.906s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6809  809
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.535s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6506  772
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.362s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6516  885
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.774s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6563  832
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.074s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6805  845
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.117s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6531  895
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.778s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6553  788
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.156s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6746  838
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.476s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6601  841
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.375s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6652  748
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	21.187s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6635  873
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.479s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6772  896
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.265s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6716  843
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.457s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6763  837
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.925s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.2  5  7049  798
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	22.225s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6982  870
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.527s
+Test: restarts, snapshots, many clients (3B) ...
+--- FAIL: TestSnapshotRecoverManyClients3B (20.15s)
+    test_test.go:351: logs were not trimmed (19471 > 8*1000)
+FAIL
+exit status 1
+FAIL	6.824/kvraft	20.161s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6644  816
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.931s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6507  782
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.107s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6466  747
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.298s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6664  889
+ 107 goroutines now
+PASS
+ok  	6.824/kvraft	20.340s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6672  855
+ 100 goroutines now
+PASS
+ok  	6.824/kvraft	20.028s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6409  803
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.072s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6380  698
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.622s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6647  824
+ 153 goroutines now
+PASS
+ok  	6.824/kvraft	20.186s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6482  772
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.021s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6601  855
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.322s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6872  927
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.395s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6567  867
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.157s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6555  782
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.050s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6948  847
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.112s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6432  833
+ 100 goroutines now
+PASS
+ok  	6.824/kvraft	19.740s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6755  893
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.188s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.5  5  6961  854
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	21.548s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6741  817
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.138s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6816  850
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.296s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6692  886
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.315s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6960  893
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.298s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6473  776
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	19.896s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6750  771
+ 149 goroutines now
+PASS
+ok  	6.824/kvraft	20.889s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6924  848
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	21.010s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6462  818
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	19.959s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6699  796
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.898s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6780  830
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.482s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6763  853
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.005s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6574  855
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.376s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  24.3  5  7295  815
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	24.385s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6477  784
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.386s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.1  5  7051  797
+ 149 goroutines now
+PASS
+ok  	6.824/kvraft	22.168s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6826  892
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.720s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6746  765
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	21.132s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6712  855
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.344s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6825  905
+ 162 goroutines now
+PASS
+ok  	6.824/kvraft	20.427s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.5  5  6843  776
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	21.487s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6579  800
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.552s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  6733  799
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	21.200s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6725  834
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.476s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6680  799
+ 174 goroutines now
+PASS
+ok  	6.824/kvraft	20.880s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6713  836
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.456s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6572  758
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.522s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6822  837
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	20.744s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6501  792
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.357s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6587  818
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.607s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6718  780
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.882s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6830  814
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.088s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6961  921
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.466s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6532  790
+ 170 goroutines now
+PASS
+ok  	6.824/kvraft	20.445s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6604  784
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.301s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6675  822
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	19.751s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6576  833
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.905s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  7058  870
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	21.246s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6620  796
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.149s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6806  837
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.302s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6538  838
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.393s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6677  792
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.579s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6331  692
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.525s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6576  784
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	20.274s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6710  802
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.260s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6963  887
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.448s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6918  939
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.168s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6566  812
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.279s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6577  823
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	19.927s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6605  823
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.607s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6450  833
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.498s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6798  786
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.761s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6688  894
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	19.870s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6634  832
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.419s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.8  5  7122  826
+ 196 goroutines now
+PASS
+ok  	6.824/kvraft	22.876s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6610  751
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.819s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6866  854
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.721s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6912  865
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.672s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6470  807
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.343s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6627  802
+ 147 goroutines now
+PASS
+ok  	6.824/kvraft	20.013s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6619  840
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.206s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6964  866
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.005s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6805  821
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	20.294s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6766  847
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	21.029s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6878  852
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.374s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6894  889
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.282s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6772  867
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.729s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6490  819
+ 151 goroutines now
+PASS
+ok  	6.824/kvraft	19.919s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6774  907
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.127s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6546  880
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.112s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6627  771
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.320s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6518  789
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.336s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6462  811
+ 89 goroutines now
+PASS
+ok  	6.824/kvraft	19.798s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6649  807
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.673s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6761  884
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.413s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6536  812
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	19.871s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6741  818
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.195s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6705  815
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	20.384s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6515  772
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.155s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6535  838
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.141s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6776  847
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.027s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6618  819
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.318s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6702  836
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.333s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.7  5  7128  772
+ 98 goroutines now
+PASS
+ok  	6.824/kvraft	22.691s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6378  749
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	19.979s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6732  903
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.241s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6760  836
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.210s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6892  827
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.307s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6322  780
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	19.730s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6732  854
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.974s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6818  838
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.673s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6824  845
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.119s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6532  821
+ 95 goroutines now
+PASS
+ok  	6.824/kvraft	19.767s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6528  837
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	20.082s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6518  816
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.627s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  6840  787
+ 168 goroutines now
+PASS
+ok  	6.824/kvraft	21.212s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6542  797
+ 176 goroutines now
+PASS
+ok  	6.824/kvraft	20.839s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6571  840
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.342s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6509  768
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.755s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6595  750
+ 151 goroutines now
+PASS
+ok  	6.824/kvraft	20.451s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6641  826
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.179s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6783  903
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.666s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6522  863
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	19.740s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6819  866
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.495s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6599  810
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.533s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6633  864
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	19.799s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6577  901
+ 109 goroutines now
+PASS
+ok  	6.824/kvraft	19.986s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6422  787
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.130s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6789  873
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.436s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6432  800
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.264s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6834  871
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.484s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6538  864
+ 147 goroutines now
+PASS
+ok  	6.824/kvraft	20.485s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6751  793
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.832s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6554  840
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.427s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6915  843
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.646s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6483  820
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.071s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6736  820
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.801s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6962  846
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.376s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6774  823
+ 107 goroutines now
+PASS
+ok  	6.824/kvraft	20.208s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6656  811
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	20.174s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.8  5  7150  837
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	22.848s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6744  807
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.883s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6652  855
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	20.150s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6770  868
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.655s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6818  849
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.268s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6776  799
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.602s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6630  786
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.225s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6699  859
+ 98 goroutines now
+PASS
+ok  	6.824/kvraft	19.786s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6581  867
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	20.072s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6522  816
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.422s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6529  837
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	19.964s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6580  774
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.050s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6694  787
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.225s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6589  836
+ 100 goroutines now
+PASS
+ok  	6.824/kvraft	20.082s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6796  871
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.169s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6672  895
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.052s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6917  855
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	19.757s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6686  815
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.212s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6615  857
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.236s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6585  770
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.559s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6718  805
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.394s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6791  849
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.056s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6582  873
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.343s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6800  883
+ 164 goroutines now
+PASS
+ok  	6.824/kvraft	20.530s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6537  822
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.501s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6488  874
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.314s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6531  766
+ 117 goroutines now
+PASS
+ok  	6.824/kvraft	20.203s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6852  887
+ 137 goroutines now
+PASS
+ok  	6.824/kvraft	20.523s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6631  903
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	19.916s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6568  758
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.064s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6589  813
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.287s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6872  802
+ 162 goroutines now
+PASS
+ok  	6.824/kvraft	21.010s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6719  865
+ 115 goroutines now
+PASS
+ok  	6.824/kvraft	20.012s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6868  853
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	21.156s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6640  868
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	19.799s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6619  763
+ 166 goroutines now
+PASS
+ok  	6.824/kvraft	20.373s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6664  812
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.311s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6770  871
+ 178 goroutines now
+PASS
+ok  	6.824/kvraft	20.734s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6595  814
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	19.974s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6568  867
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.480s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6550  782
+ 176 goroutines now
+PASS
+ok  	6.824/kvraft	20.380s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6568  863
+ 162 goroutines now
+PASS
+ok  	6.824/kvraft	20.181s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6552  795
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.631s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6552  800
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	19.687s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6700  837
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.219s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6868  911
+ 115 goroutines now
+PASS
+ok  	6.824/kvraft	20.150s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6679  796
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.578s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6857  868
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.869s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6625  824
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.460s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6688  808
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.797s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6631  811
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.235s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6532  817
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.034s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6856  809
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.650s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6775  872
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.698s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6589  812
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.705s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6723  861
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.661s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6702  808
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.246s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6620  800
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.186s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6744  884
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.995s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6513  756
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.343s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6612  807
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	19.977s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6510  845
+ 111 goroutines now
+PASS
+ok  	6.824/kvraft	20.005s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6641  808
+ 113 goroutines now
+PASS
+ok  	6.824/kvraft	20.526s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6382  785
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	19.796s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6632  778
+ 163 goroutines now
+PASS
+ok  	6.824/kvraft	20.187s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6843  867
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	20.484s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6816  860
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.335s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6748  912
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.181s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6520  894
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	19.983s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6624  860
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.242s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6648  876
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.406s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6750  816
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.472s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6672  821
+ 117 goroutines now
+PASS
+ok  	6.824/kvraft	19.781s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6665  820
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.900s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6820  854
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.932s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6776  822
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.917s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6520  756
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.867s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6684  825
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.304s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.6  5  6948  825
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	21.663s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6471  822
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.215s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6836  814
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.252s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6579  808
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.303s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  7119  901
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.661s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6530  823
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.230s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6503  753
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.287s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6519  803
+ 178 goroutines now
+PASS
+ok  	6.824/kvraft	20.252s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6825  888
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.759s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6754  863
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	19.987s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6646  800
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.437s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6542  772
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.695s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  7028  856
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.798s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6603  834
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.078s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6799  874
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	19.835s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6770  861
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.407s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6970  903
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.356s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6461  715
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.047s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6698  780
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.942s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6939  908
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.783s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6719  787
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.436s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6552  789
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.069s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6527  735
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.337s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6613  834
+ 121 goroutines now
+PASS
+ok  	6.824/kvraft	19.737s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6533  805
+ 119 goroutines now
+PASS
+ok  	6.824/kvraft	19.965s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6643  844
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.247s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6939  799
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	20.264s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6597  790
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.054s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6587  856
+ 143 goroutines now
+PASS
+ok  	6.824/kvraft	20.639s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6998  944
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	19.844s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6537  803
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.729s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6880  950
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.839s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6725  838
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.258s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6597  841
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.168s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6751  919
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	21.095s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6750  866
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.163s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6661  825
+ 153 goroutines now
+PASS
+ok  	6.824/kvraft	20.251s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6665  865
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.271s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6600  831
+ 111 goroutines now
+PASS
+ok  	6.824/kvraft	19.760s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6480  806
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	19.996s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  7003  866
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.380s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6826  840
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	20.598s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6774  880
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.014s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  6815  824
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	21.255s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6691  831
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.305s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6744  902
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.596s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6535  834
+ 119 goroutines now
+PASS
+ok  	6.824/kvraft	19.992s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  23.0  5  7374  858
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	22.996s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6377  851
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.952s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6709  883
+ 117 goroutines now
+PASS
+ok  	6.824/kvraft	20.410s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6414  805
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.363s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6654  843
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.182s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6881  850
+ 162 goroutines now
+PASS
+ok  	6.824/kvraft	20.433s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6771  846
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.778s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6511  768
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.008s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6420  774
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.074s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6633  834
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.330s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6930  900
+ 105 goroutines now
+PASS
+ok  	6.824/kvraft	20.614s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6558  749
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.544s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6751  885
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.808s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6622  879
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	19.862s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6618  822
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.559s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  25.3  5  7690  844
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	25.322s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6558  840
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.725s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6746  838
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.757s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6455  776
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.038s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6724  866
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.023s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6699  841
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.451s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6775  899
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.357s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6867  859
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.369s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6683  895
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.607s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6711  854
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.373s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6682  831
+ 155 goroutines now
+PASS
+ok  	6.824/kvraft	20.352s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6483  773
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.129s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6639  853
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.427s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6742  831
+ 121 goroutines now
+PASS
+ok  	6.824/kvraft	20.672s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6611  869
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.598s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6705  812
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	19.877s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6652  745
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.588s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6718  867
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.032s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6644  830
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.327s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6554  817
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.311s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6985  893
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.525s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6846  856
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.615s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6599  885
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.274s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6758  832
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.981s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  6903  804
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	21.279s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6757  814
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.099s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6651  829
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	19.967s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6883  899
+ 97 goroutines now
+PASS
+ok  	6.824/kvraft	20.085s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6593  777
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.849s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6700  875
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.427s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6500  855
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.107s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6756  815
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	19.909s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6796  868
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.770s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6749  797
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.998s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6753  827
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	20.340s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6710  895
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.311s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6991  909
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.394s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6719  871
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.368s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6610  787
+ 137 goroutines now
+PASS
+ok  	6.824/kvraft	20.063s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6672  856
+ 172 goroutines now
+PASS
+ok  	6.824/kvraft	20.509s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6470  792
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	19.966s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6680  950
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.363s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  6784  772
+ 89 goroutines now
+PASS
+ok  	6.824/kvraft	21.229s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6673  874
+ 143 goroutines now
+PASS
+ok  	6.824/kvraft	20.817s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6462  821
+ 123 goroutines now
+PASS
+ok  	6.824/kvraft	19.927s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6608  902
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.510s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6627  803
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.788s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6488  811
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.012s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6705  818
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.038s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6703  848
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.471s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6697  811
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.582s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6442  847
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	19.729s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6694  834
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.883s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6990  918
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.882s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6732  780
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.207s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6574  827
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.213s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6890  795
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.494s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6719  876
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.940s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6458  827
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.030s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6868  814
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.399s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6709  776
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.341s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6465  811
+ 113 goroutines now
+PASS
+ok  	6.824/kvraft	19.953s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6639  846
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.076s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6781  836
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.437s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6640  821
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.123s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6563  878
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	19.676s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6421  821
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	19.837s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6528  782
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.182s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6649  819
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.011s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6439  842
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.392s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6719  838
+ 105 goroutines now
+PASS
+ok  	6.824/kvraft	20.032s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6604  857
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.906s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6852  904
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.426s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6549  882
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.787s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  7133  929
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.877s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6590  846
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.450s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6871  861
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.160s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6703  875
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.942s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6470  755
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	19.990s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6950  896
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.725s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6522  796
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.076s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6556  850
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.709s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6596  798
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.204s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6576  826
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.486s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6785  891
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.437s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6831  933
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.873s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6488  823
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.170s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6743  872
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.251s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6510  787
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.339s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  23.8  5  7485  880
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	23.843s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6710  835
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.627s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6408  828
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.017s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6684  868
+ 119 goroutines now
+PASS
+ok  	6.824/kvraft	20.635s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6748  860
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.209s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6672  867
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.050s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6626  812
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.192s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6656  835
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.355s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6814  867
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.982s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6431  705
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.180s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6789  873
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.398s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6700  834
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.452s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6677  766
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.229s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  25.0  5  7507  859
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	24.994s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6700  815
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	19.744s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6699  782
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.975s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6661  806
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.095s
+Test: restarts, snapshots, many clients (3B) ...
+--- FAIL: TestSnapshotRecoverManyClients3B (20.25s)
+    test_test.go:351: logs were not trimmed (12133 > 8*1000)
+FAIL
+exit status 1
+FAIL	6.824/kvraft	20.262s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6842  823
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.488s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6633  802
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.132s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6566  830
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.272s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6634  796
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.388s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6554  848
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.477s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6705  835
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.412s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6548  852
+ 123 goroutines now
+PASS
+ok  	6.824/kvraft	20.632s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6586  849
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.075s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6974  892
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.867s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6799  875
+ 119 goroutines now
+PASS
+ok  	6.824/kvraft	20.346s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6912  908
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.504s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6675  822
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.261s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6494  881
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.692s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6749  810
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.227s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6572  807
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.281s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6483  754
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.766s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6356  859
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.899s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6936  793
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.672s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6535  807
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	19.837s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6553  772
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.011s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6613  809
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.634s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6791  836
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.499s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6990  934
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.512s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6631  832
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	19.969s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6745  828
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.064s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6819  771
+ 166 goroutines now
+PASS
+ok  	6.824/kvraft	19.867s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  7006  918
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.984s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6441  725
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.270s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6484  770
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.582s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  33.1  5  8829  841
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	33.182s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6850  819
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.776s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6603  768
+ 182 goroutines now
+PASS
+ok  	6.824/kvraft	20.903s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6677  792
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.378s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6633  852
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	19.654s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6625  731
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.245s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6566  781
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.384s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6471  778
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.024s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6713  800
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	21.014s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.7  5  6810  788
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	21.721s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6848  856
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.717s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6794  775
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.951s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6870  879
+ 90 goroutines now
+PASS
+ok  	6.824/kvraft	20.550s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6726  867
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.207s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6555  802
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.050s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6792  901
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.528s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6650  844
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	19.959s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6905  914
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	19.990s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6572  769
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.162s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6660  765
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.071s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6824  862
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.335s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6720  931
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	20.061s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.4  5  6797  800
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	21.409s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6538  818
+ 159 goroutines now
+PASS
+ok  	6.824/kvraft	20.409s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6695  889
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.348s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6611  823
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	19.898s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6500  736
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.109s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6533  822
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.050s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6643  851
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.955s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6560  719
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.380s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6604  794
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.090s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6558  754
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	19.728s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6707  863
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.148s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6511  781
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.298s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6662  765
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.498s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6803  821
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.612s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6727  931
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.267s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6579  800
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.991s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6809  849
+ 149 goroutines now
+PASS
+ok  	6.824/kvraft	20.844s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6968  827
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.615s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6530  815
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.171s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6819  839
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.214s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6798  831
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.673s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6602  816
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.721s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6555  821
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.106s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6582  806
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.138s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  24.3  5  7469  763
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	24.337s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6499  749
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.359s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6804  847
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.131s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6640  745
+ 147 goroutines now
+PASS
+ok  	6.824/kvraft	20.162s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6497  840
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.005s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6775  825
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.249s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6641  799
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.927s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6683  789
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.433s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6658  798
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.374s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6664  871
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	19.710s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6853  846
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.735s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6696  819
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.930s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6500  825
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	19.981s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6584  861
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	19.828s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6833  916
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.432s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6686  853
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	20.117s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6788  888
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.254s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6791  876
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.368s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6634  877
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.043s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6710  815
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.450s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.5  5  6538  852
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	19.559s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6707  803
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.158s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6582  838
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.101s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6663  849
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.155s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6624  772
+ 168 goroutines now
+PASS
+ok  	6.824/kvraft	20.943s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6953  804
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	21.163s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6761  862
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.326s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6710  786
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.729s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6571  788
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.738s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.7  5  6766  817
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	21.774s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6872  866
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.524s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6683  773
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.479s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6883  894
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.053s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6673  858
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.253s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6644  771
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.083s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6730  841
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.144s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6603  797
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	19.899s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6462  759
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.177s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6639  875
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.001s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6696  812
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.448s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6699  892
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.903s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6704  823
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.432s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6777  847
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.346s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6471  741
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.715s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6623  866
+ 145 goroutines now
+PASS
+ok  	6.824/kvraft	20.246s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6675  835
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.028s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6808  930
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.582s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6411  708
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.014s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6907  905
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.181s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6575  727
+ 174 goroutines now
+PASS
+ok  	6.824/kvraft	20.675s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6767  834
+ 164 goroutines now
+PASS
+ok  	6.824/kvraft	20.868s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6426  796
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.192s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6603  812
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.410s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6629  780
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.747s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  23.8  5  7396  833
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	23.782s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6683  883
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.031s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  7037  877
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	21.170s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6659  783
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.687s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6775  837
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.516s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6761  860
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.512s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6635  842
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.390s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6693  873
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.181s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6882  871
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.619s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6658  844
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.525s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6448  771
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	19.781s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6650  853
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	19.968s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6576  854
+ 145 goroutines now
+PASS
+ok  	6.824/kvraft	19.950s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6911  830
+ 147 goroutines now
+PASS
+ok  	6.824/kvraft	20.275s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6648  847
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	19.970s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6697  868
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.222s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6518  872
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	19.958s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6673  792
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.247s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6623  886
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.020s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6432  807
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	19.673s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6467  801
+ 147 goroutines now
+PASS
+ok  	6.824/kvraft	20.050s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6567  746
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.769s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6423  776
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.013s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6667  846
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.992s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  6863  866
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	21.227s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6756  755
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.764s
+Test: restarts, snapshots, many clients (3B) ...
+--- FAIL: TestSnapshotRecoverManyClients3B (13.16s)
+    test_test.go:351: logs were not trimmed (18785 > 8*1000)
+FAIL
+exit status 1
+FAIL	6.824/kvraft	13.172s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6625  870
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.088s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6734  813
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.506s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6880  851
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.928s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6615  773
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.226s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6512  822
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	20.164s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6594  850
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	19.940s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6676  817
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.002s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6749  878
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.159s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6888  894
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.890s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6743  840
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.242s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6718  836
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.220s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6666  781
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.523s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6730  842
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.297s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6530  816
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.321s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6636  819
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	19.996s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6660  809
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.622s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6820  869
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.950s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6863  877
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.429s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6730  857
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.374s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6652  754
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.729s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6732  803
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.335s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6655  803
+ 113 goroutines now
+PASS
+ok  	6.824/kvraft	20.029s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6966  905
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	21.076s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  7018  891
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.282s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6560  817
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.618s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6763  880
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.011s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6711  856
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.267s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6751  903
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.914s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6574  883
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.042s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.4  5  7235  817
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	22.425s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6681  864
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.632s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6628  834
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.421s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6680  847
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.037s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6693  860
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.279s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6669  842
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.100s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6788  836
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.687s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6627  822
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.360s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6633  783
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.827s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6532  834
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.348s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6921  823
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	21.156s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6817  871
+ 145 goroutines now
+PASS
+ok  	6.824/kvraft	20.375s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6576  873
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.157s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6579  779
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.149s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6717  868
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	20.726s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6996  905
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.698s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6680  835
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.506s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6563  797
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.725s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6669  854
+ 117 goroutines now
+PASS
+ok  	6.824/kvraft	20.363s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6890  905
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.079s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6523  858
+ 113 goroutines now
+PASS
+ok  	6.824/kvraft	19.911s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6458  795
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.026s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6994  938
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	21.083s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6691  792
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.614s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6976  860
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.983s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6644  822
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.456s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6550  743
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	20.535s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6703  898
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.094s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6675  770
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	19.875s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6952  841
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.424s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6507  775
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.190s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6530  796
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.106s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6846  869
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.052s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6791  812
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.547s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6779  826
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.562s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6724  836
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.209s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6757  847
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.094s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6767  884
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.945s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6523  804
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.478s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6733  834
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.235s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.3  5  6633  777
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	21.356s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6934  900
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.253s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6534  797
+ 164 goroutines now
+PASS
+ok  	6.824/kvraft	20.093s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6524  839
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.745s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6638  853
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.105s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6985  865
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.878s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6863  790
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	20.294s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6886  855
+ 117 goroutines now
+PASS
+ok  	6.824/kvraft	20.270s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6991  816
+ 163 goroutines now
+PASS
+ok  	6.824/kvraft	20.673s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6692  834
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.445s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6734  826
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.495s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6856  907
+ 121 goroutines now
+PASS
+ok  	6.824/kvraft	19.943s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6584  746
+ 151 goroutines now
+PASS
+ok  	6.824/kvraft	20.172s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6522  807
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.072s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6745  769
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.675s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6542  883
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.392s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6984  879
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	19.844s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6550  843
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.077s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6698  844
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.745s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6498  768
+ 115 goroutines now
+PASS
+ok  	6.824/kvraft	20.203s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.9  5  7184  835
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	22.966s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6745  831
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.314s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6657  757
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.257s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6626  889
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.360s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6803  808
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.933s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6631  893
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	20.603s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6501  814
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.895s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6682  845
+ 145 goroutines now
+PASS
+ok  	6.824/kvraft	20.430s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  7085  917
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.981s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6920  867
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.109s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6685  833
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.201s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6769  888
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	20.470s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6920  942
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	21.024s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6822  833
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.738s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6604  847
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.320s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6622  803
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.103s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6742  774
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.194s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6808  793
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.213s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6607  757
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.417s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6792  863
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.501s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6642  773
+ 113 goroutines now
+PASS
+ok  	6.824/kvraft	21.095s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6755  853
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.618s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6692  839
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.012s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6951  854
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.330s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6542  828
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.896s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6534  758
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.155s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6624  807
+ 107 goroutines now
+PASS
+ok  	6.824/kvraft	19.670s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6423  782
+ 137 goroutines now
+PASS
+ok  	6.824/kvraft	20.078s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6679  841
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	19.895s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6570  799
+ 162 goroutines now
+PASS
+ok  	6.824/kvraft	20.525s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6747  796
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.667s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6785  875
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.561s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6474  817
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.955s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6601  841
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.520s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6771  839
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.122s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6642  842
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.398s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6555  776
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	19.990s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6713  874
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.132s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6595  804
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.917s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6686  814
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.400s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6654  806
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.382s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6572  861
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.073s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6732  864
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.113s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6509  807
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.117s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6603  822
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.427s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.2  5  7099  921
+ 184 goroutines now
+PASS
+ok  	6.824/kvraft	21.185s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6564  764
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	19.935s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6560  839
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.386s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6654  791
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.128s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6662  828
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.464s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6858  870
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.169s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6660  894
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.139s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6627  824
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.191s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6665  806
+ 137 goroutines now
+PASS
+ok  	6.824/kvraft	20.651s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6582  875
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	20.342s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6780  883
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.719s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  23.1  5  7345  930
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	23.166s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6596  798
+ 172 goroutines now
+PASS
+ok  	6.824/kvraft	20.198s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6678  846
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.039s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6689  811
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.827s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6562  829
+ 117 goroutines now
+PASS
+ok  	6.824/kvraft	19.952s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6580  852
+ 143 goroutines now
+PASS
+ok  	6.824/kvraft	20.351s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6588  802
+ 115 goroutines now
+PASS
+ok  	6.824/kvraft	20.329s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6540  812
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	19.973s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6469  828
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.308s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  7015  894
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.695s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6858  877
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.575s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6649  739
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.327s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6587  776
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.285s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6560  889
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.194s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6625  821
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	20.211s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6639  786
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.943s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6450  803
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.262s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6510  800
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.148s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6536  789
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	19.918s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6727  839
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.500s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6767  879
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.867s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6763  805
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.376s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6658  820
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.228s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6672  877
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.223s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6650  848
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.052s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6424  798
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.357s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  7038  864
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.704s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6852  824
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	21.099s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.3  5  7104  859
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	22.293s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6646  919
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.176s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6811  836
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.326s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6909  929
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.743s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6808  862
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.466s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6503  814
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	19.835s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6421  794
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.181s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6777  844
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.320s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6651  796
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.984s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6660  831
+ 95 goroutines now
+PASS
+ok  	6.824/kvraft	20.084s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6468  837
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.219s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6360  811
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.453s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6580  801
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	20.122s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6531  802
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.980s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6769  901
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.227s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6633  868
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.861s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6610  799
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.483s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6418  701
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.160s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6800  863
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.221s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6562  815
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.346s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6572  784
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.021s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6676  877
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.070s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6715  910
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	20.416s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6526  769
+ 163 goroutines now
+PASS
+ok  	6.824/kvraft	20.388s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6713  863
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.255s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6603  780
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	19.705s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6762  918
+ 117 goroutines now
+PASS
+ok  	6.824/kvraft	19.924s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6781  785
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.321s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6561  702
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	20.301s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6929  918
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.214s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6663  826
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.794s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6576  743
+ 165 goroutines now
+PASS
+ok  	6.824/kvraft	20.896s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6640  806
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.531s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6742  831
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.255s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6682  860
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	20.468s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6465  784
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.138s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6747  922
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.186s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6796  826
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.217s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6751  863
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.531s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  7019  847
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	20.634s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6882  868
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	19.989s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6510  831
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.589s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6643  821
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	19.929s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6717  893
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.301s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6846  858
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.235s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6972  900
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	21.050s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6694  834
+ 164 goroutines now
+PASS
+ok  	6.824/kvraft	20.470s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6421  692
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.478s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6768  881
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.675s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6720  875
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	20.517s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6430  799
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.252s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6828  868
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.353s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6496  771
+ 143 goroutines now
+PASS
+ok  	6.824/kvraft	20.314s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6733  866
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.644s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6639  806
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.483s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6679  790
+ 100 goroutines now
+PASS
+ok  	6.824/kvraft	20.257s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6784  911
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.022s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6755  852
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.480s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6568  836
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.323s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6492  786
+ 149 goroutines now
+PASS
+ok  	6.824/kvraft	20.152s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  27.3  5  7967  848
+ 154 goroutines now
+PASS
+ok  	6.824/kvraft	27.298s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6769  824
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.502s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6796  887
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.185s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6609  840
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.392s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6547  878
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.853s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6493  755
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.108s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6545  790
+ 109 goroutines now
+PASS
+ok  	6.824/kvraft	19.802s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6727  855
+ 94 goroutines now
+PASS
+ok  	6.824/kvraft	19.624s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6544  854
+ 137 goroutines now
+PASS
+ok  	6.824/kvraft	19.927s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6745  724
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.679s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6723  858
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.480s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6682  834
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	21.098s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6724  867
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.202s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6697  745
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	20.287s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6661  861
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	19.874s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6639  759
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	20.082s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6712  813
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.448s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6583  884
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.057s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6580  825
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.206s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6622  754
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.506s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6611  844
+ 113 goroutines now
+PASS
+ok  	6.824/kvraft	20.014s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6946  883
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.399s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6545  792
+ 160 goroutines now
+PASS
+ok  	6.824/kvraft	20.378s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6832  895
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.573s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6673  794
+ 166 goroutines now
+PASS
+ok  	6.824/kvraft	20.591s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6773  835
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.342s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6652  792
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.443s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6475  836
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.005s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  22.3  5  7038  769
+ 153 goroutines now
+PASS
+ok  	6.824/kvraft	22.371s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6663  793
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	21.092s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6611  845
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.366s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6667  887
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.822s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6764  840
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.179s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6782  774
+ 148 goroutines now
+PASS
+ok  	6.824/kvraft	20.256s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6739  807
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.001s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6489  840
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	19.954s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6323  814
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	19.746s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  35.3  5  9418  846
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	35.315s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6741  790
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.369s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6705  858
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.121s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6676  841
+ 129 goroutines now
+PASS
+ok  	6.824/kvraft	19.906s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6597  817
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.346s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6465  808
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	19.756s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6539  709
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.771s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6826  845
+ 143 goroutines now
+PASS
+ok  	6.824/kvraft	20.208s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6804  857
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.394s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6497  770
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.863s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6627  838
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	20.325s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.0  5  6693  806
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	21.009s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6915  874
+ 110 goroutines now
+PASS
+ok  	6.824/kvraft	20.893s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6580  777
+ 144 goroutines now
+PASS
+ok  	6.824/kvraft	20.473s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6618  879
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.407s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6772  884
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.137s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6876  946
+ 127 goroutines now
+PASS
+ok  	6.824/kvraft	20.196s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6433  797
+ 104 goroutines now
+PASS
+ok  	6.824/kvraft	19.949s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6587  807
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	20.000s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6772  781
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.247s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6688  777
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	19.910s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6766  883
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.637s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6704  844
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.190s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6607  814
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	19.915s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6793  818
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.800s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6674  826
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	19.863s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6720  887
+ 136 goroutines now
+PASS
+ok  	6.824/kvraft	20.484s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6955  824
+ 133 goroutines now
+PASS
+ok  	6.824/kvraft	20.519s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6844  862
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.466s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6740  793
+ 146 goroutines now
+PASS
+ok  	6.824/kvraft	20.649s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6515  804
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.090s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6581  845
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	20.043s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6583  844
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.382s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6649  862
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	21.136s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  23.9  5  7622  824
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	23.900s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6737  784
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.036s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6391  794
+ 120 goroutines now
+PASS
+ok  	6.824/kvraft	19.806s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.7  5  6500  851
+ 108 goroutines now
+PASS
+ok  	6.824/kvraft	19.766s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.1  5  6735  838
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	21.128s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6565  779
+ 156 goroutines now
+PASS
+ok  	6.824/kvraft	20.707s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6563  835
+ 153 goroutines now
+PASS
+ok  	6.824/kvraft	20.217s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  7141  935
+ 139 goroutines now
+PASS
+ok  	6.824/kvraft	20.442s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6652  801
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	20.112s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  7093  883
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.851s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6654  890
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.177s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6608  879
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	20.435s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6603  860
+ 143 goroutines now
+PASS
+ok  	6.824/kvraft	20.021s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6600  779
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	20.732s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6640  794
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	19.955s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6615  774
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	19.951s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6613  808
+ 121 goroutines now
+PASS
+ok  	6.824/kvraft	19.886s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6711  850
+ 138 goroutines now
+PASS
+ok  	6.824/kvraft	20.205s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6667  860
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.154s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6531  804
+ 111 goroutines now
+PASS
+ok  	6.824/kvraft	19.912s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6592  816
+ 152 goroutines now
+PASS
+ok  	6.824/kvraft	20.271s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6609  765
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	20.200s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6568  779
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.381s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  24.0  5  7636  868
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	24.028s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.5  5  6734  860
+ 131 goroutines now
+PASS
+ok  	6.824/kvraft	20.515s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.0  5  6693  848
+ 114 goroutines now
+PASS
+ok  	6.824/kvraft	19.980s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6579  807
+ 158 goroutines now
+PASS
+ok  	6.824/kvraft	20.356s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6952  864
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.700s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6618  764
+ 130 goroutines now
+PASS
+ok  	6.824/kvraft	20.378s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6618  841
+ 124 goroutines now
+PASS
+ok  	6.824/kvraft	20.341s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6697  811
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.682s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6367  840
+ 102 goroutines now
+PASS
+ok  	6.824/kvraft	19.877s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6706  851
+ 135 goroutines now
+PASS
+ok  	6.824/kvraft	20.178s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.4  5  6640  823
+ 132 goroutines now
+PASS
+ok  	6.824/kvraft	20.473s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6533  743
+ 185 goroutines now
+PASS
+ok  	6.824/kvraft	20.233s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6858  890
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.161s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.9  5  6943  774
+ 150 goroutines now
+PASS
+ok  	6.824/kvraft	20.941s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6514  809
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	20.253s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.2  5  6725  822
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	20.225s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.6  5  6441  787
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	19.655s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6578  844
+ 118 goroutines now
+PASS
+ok  	6.824/kvraft	19.948s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6740  859
+ 125 goroutines now
+PASS
+ok  	6.824/kvraft	20.176s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  21.3  5  6795  813
+ 142 goroutines now
+PASS
+ok  	6.824/kvraft	21.348s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.8  5  6897  839
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.844s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6520  866
+ 134 goroutines now
+PASS
+ok  	6.824/kvraft	19.820s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.9  5  6557  776
+ 141 goroutines now
+PASS
+ok  	6.824/kvraft	19.955s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.7  5  6792  936
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.770s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6781  848
+ 116 goroutines now
+PASS
+ok  	6.824/kvraft	20.094s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.5  5  6543  827
+ 106 goroutines now
+PASS
+ok  	6.824/kvraft	19.556s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.6  5  6637  844
+ 140 goroutines now
+PASS
+ok  	6.824/kvraft	20.615s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.1  5  6654  776
+ 128 goroutines now
+PASS
+ok  	6.824/kvraft	20.115s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6699  829
+ 112 goroutines now
+PASS
+ok  	6.824/kvraft	19.793s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6533  844
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	19.830s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  19.8  5  6483  805
+ 126 goroutines now
+PASS
+ok  	6.824/kvraft	19.850s
+Test: restarts, snapshots, many clients (3B) ...
+  ... Passed --  20.3  5  6621  825
+ 122 goroutines now
+PASS
+ok  	6.824/kvraft	20.358s

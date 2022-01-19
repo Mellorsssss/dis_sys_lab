@@ -234,7 +234,7 @@ func (kv *KVServer) procApplyMsg() {
 				kv.mu.Unlock()
 
 				if ok {
-					go fn(appmsg, value)
+					fn(appmsg, value)
 				}
 			}(appmsg, value)
 

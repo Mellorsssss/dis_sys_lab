@@ -7,11 +7,11 @@ const (
 )
 
 const (
-	RpcTimeout        = 100
+	RpcTimeout        = 200
 	NoLeader          = -1
 	NoneSerialNumber  = -1
 	RequestInterval   = 50
-	RaftSizeThreshold = 0.95
+	RaftSizeThreshold = 0.8
 )
 
 const (
