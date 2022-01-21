@@ -120,6 +120,7 @@ func (rf *Raft) InstallSnapShot(server, term, lastInd, lastTerm int) {
 
 		// check if still leader
 		if !rf.IsStillLeader(term) || rf.snapshots.LastIncludedIndex != lastInd || lastTerm != rf.snapshots.LastIncludedTerm {
+			Info("leader %v give up handle installsnapshot", rf.me)
 			rf.sending[server] = false
 			rf.mu.Unlock()
 			return

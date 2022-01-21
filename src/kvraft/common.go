@@ -11,7 +11,7 @@ const (
 	NoLeader          = -1
 	NoneSerialNumber  = -1
 	RequestInterval   = 50
-	RaftSizeThreshold = 0.8
+	RaftSizeThreshold = 1.2
 )
 
 const (

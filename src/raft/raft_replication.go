@@ -238,6 +238,7 @@ func (rf *Raft) replicateOnCommand(server, term int) {
 
 	// follower is lagging, send the snapshot
 	if rf.snapshots.LastIncludedIndex >= rf.nextInd[server] {
+		Info("leader %v send snapshot to %v", rf.me, server)
 		go rf.InstallSnapShot(server, term, rf.snapshots.LastIncludedIndex, rf.snapshots.LastIncludedTerm)
 		rf.mu.Unlock()
 		return

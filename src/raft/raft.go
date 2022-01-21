@@ -19,6 +19,7 @@ package raft
 
 import (
 	"bytes"
+	"fmt"
 
 	"6.824/labgob"
 
@@ -221,6 +222,13 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		return false
 	}
 
+	if rf.snapshots.LastIncludedIndex == lastIncludedIndex {
+		if rf.snapshots.LastIncludedTerm != lastIncludedTerm {
+			panic("wrong snapshot")
+		}
+		return true
+	}
+
 	if rf.lastApply > lastIncludedIndex { // apply new msg
 		DPrintf("CondInstallSnapshot: %v apply newer(%v) than condsnapshot(%v)", rf.me, rf.lastApply, lastIncludedIndex)
 		return false
@@ -234,8 +242,9 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	rf.commitInd = MaxInt(rf.commitInd, rf.snapshots.LastIncludedIndex)
 	rf.lastApply = MaxInt(rf.lastApply, rf.snapshots.LastIncludedIndex)
 
-	DPrintf("CondInstallSnapshot: to %v, commitInd -> %v, lastApply -> %v", rf.me, rf.commitInd, rf.lastApply)
+	Info("CondInstallSnapshot: to %v, lastInd->%v, commitInd -> %v, lastApply -> %v, logs:%v", rf.me, lastIncludedIndex, rf.commitInd, rf.lastApply, rf.logs)
 	ind := rf.GetLogWithIndex(lastIncludedIndex)
+	Info("trimmed start is %v", ind)
 	if ind == -1 || ind+1 == len(rf.logs) {
 		rf.logs = []Log{}
 	} else {
@@ -243,7 +252,10 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	}
 
 	if len(rf.logs) != 0 {
-		DPrintf("CondInstallSnapshot: %v's log is %v after installing snapshot(%v)", rf.me, rf.logs, lastIncludedIndex)
+		Info("CondInstallSnapshot: %v's log is %v after installing snapshot(%v)", rf.me, rf.logs, lastIncludedIndex)
+	} else {
+		Info("CondInstallSnapshot: %v's log is none", rf.me)
+
 	}
 	rf.persist()
 
@@ -259,19 +271,20 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	Info("snapshot is called %v to %v", index, rf.me)
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
-	if len(rf.logs) == 0 || rf.logs[len(rf.logs)-1].Index < index {
-		Error("No index match when installing snapshot.")
-		rf.snapshots = SnapShotData{
-			LastIncludedIndex: index,
-			LastIncludedTerm:  0,
-			Data:              snapshot,
-		}
-		return
+	if (len(rf.logs) == 0 && rf.snapshots.LastIncludedIndex < index) || rf.logs[len(rf.logs)-1].Index < index {
+		panic("No index match when installing snapshot.")
+		// rf.snapshots = SnapShotData{
+		// 	LastIncludedIndex: index,
+		// 	LastIncludedTerm:  0,
+		// 	Data:              snapshot,
+		// }
+		// return
 	}
 
 	ind := rf.GetLogWithIndex(index)
 	if ind == -1 {
 		Error("Install an old snapshot")
+		return
 	}
 	rf.snapshots = SnapShotData{
 		LastIncludedIndex: index,
@@ -280,9 +293,17 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	}
 	Info("%v install snapshot[index:%v, term:%v]", rf.me, index, rf.snapshots.LastIncludedTerm)
 
+	oldLen := len(rf.logs)
 	if ind+1 <= len(rf.logs) {
 		rf.logs = rf.logs[ind+1:] // trim logs
+	} else {
+		panic("wrong ind")
 	}
+	newLen := len(rf.logs)
+	if oldLen == newLen {
+		panic("logs hasn't been trimmed")
+	}
+
 	if len(rf.logs) != 0 {
 		DPrintf("%v's log is %v after installing snapshot", rf.me, rf.logs)
 	}
@@ -326,7 +347,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	newLog.Index = index
 	newLog.Command = command
 	newLog.Term = term
-	Info("%v start %v[%v] at term %v", rf.me, newLog.Index, newLog.Command, newLog.Term)
+	// Info("%v start %v[%v] at term %v", rf.me, newLog.Index, newLog.Command, newLog.Term)
 
 	rf.logs = append(rf.logs, newLog)
 
@@ -402,12 +423,19 @@ func (rf *Raft) ticker() {
 
 // applier will apply the command to the applyCh
 func (rf *Raft) applier(appCh chan ApplyMsg) {
+	go func() {
+		for !rf.killed() {
+			time.Sleep(time.Millisecond * time.Duration(300))
+			rf.appCond.Signal()
+		}
+	}()
 	applyInterval := 10
 	rf.appCond.L.Lock()
 	for !rf.killed() {
 		// wait until should apply new msg
 		rf.mu.Lock()
 		for rf.commitInd == rf.lastApply {
+			Info("%v give up commit: %v, lastApply: %v, snapshotInd:%v", rf.me, rf.commitInd, rf.lastApply, rf.snapshots.LastIncludedIndex)
 			rf.mu.Unlock()
 			rf.appCond.Wait()
 			if rf.killed() { // make sure not stall here
@@ -415,13 +443,16 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 			}
 			rf.mu.Lock()
 		}
+		Info("%v begins commit: %v, lastApply: %v, snapshotInd:%v", rf.me, rf.commitInd, rf.lastApply, rf.snapshots.LastIncludedIndex)
 
 		// apply new msg
 		indToCommit := rf.GetLogWithIndex(rf.lastApply + 1)
 		if indToCommit == -1 {
-			Error("applier: Log should be commited is None in %v in term %v", rf.me, rf.term)
-			rf.mu.Unlock()
-			return
+			Info("applier: Log should be commited(%v) is None in %v with logs %v", rf.lastApply+1, rf.me, rf.logs)
+			err := fmt.Sprintf("applier: Log should be commited is None in %v in term %v", rf.me, rf.term)
+			panic(err)
+			// rf.mu.Unlock()
+			// return
 		}
 
 		block := false
@@ -437,11 +468,11 @@ func (rf *Raft) applier(appCh chan ApplyMsg) {
 				0,
 				0,
 			}:
-				DPrintf("applier: %v apply msg %v[%v]  in term %v", rf.me, rf.lastApply, indToCommit, rf.term)
+				// Info("applier: %v apply msg %v[%v]  in term %v", rf.me, rf.lastApply, indToCommit, rf.term)
 				indToCommit++
 			case <-time.After(time.Duration(applyInterval) * time.Millisecond):
 				rf.lastApply--
-				DPrintf("applie: appch of %v is blocked to send %v in term %v", rf.me, rf.lastApply, rf.term)
+				Info("applie: appch of %v is blocked to send %v in term %v", rf.me, rf.lastApply+1, rf.term)
 				block = true
 			}
 		}

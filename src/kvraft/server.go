@@ -129,13 +129,14 @@ func (kv *KVServer) isExecuted(id string, sn int64) (bool, Response) {
 func (kv *KVServer) memorizeOp(id string, sn int64, r Response) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
-	v, exist := kv.clientMap[id]
-	if exist {
-		if v.SerialNumber != sn-1 {
-			Error("cilent %v send op out of order: before:%v, cur:%v ", id, v.SerialNumber, sn)
-			panic("client send op out of order")
-		}
-	}
+	// v, exist := kv.clientMap[id]
+	// if exist {
+	// 	if v.SerialNumber != sn-1 {
+	// 		Error("cilent %v send op out of order: before:%v, cur:%v ", id, v.SerialNumber, sn)
+	// 		err := fmt.Sprintf("cilent %v send op out of order: before:%v, cur:%v ", id, v.SerialNumber, sn)
+	// 		panic(err)
+	// 	}
+	// }
 	kv.clientMap[id] = r
 }
 
@@ -216,6 +217,7 @@ func (kv *KVServer) readPersist(data []byte) {
 // procApplyMsg process msg from applyCh
 // and broadcast to subs
 func (kv *KVServer) procApplyMsg() {
+	snapshotIndex := 0
 	for appmsg := range kv.applyCh {
 		if kv.killed() {
 			return
@@ -237,21 +239,27 @@ func (kv *KVServer) procApplyMsg() {
 					fn(appmsg, value)
 				}
 			}(appmsg, value)
-
 			// raft state is too large, need to snapshot
 			if kv.maxraftstate != -1 && kv.persister.RaftStateSize() > int(float32(kv.maxraftstate)*RaftSizeThreshold) {
+				Info("server %v takes snapshot(%v > %v)", kv.me, kv.persister.RaftStateSize(), kv.maxraftstate)
+				if appmsg.SnapshotValid {
+					Info("server %v should snapshot after condinstall.", kv.me)
+				}
 				kv.rf.Snapshot(appmsg.CommandIndex, kv.persist())
+				snapshotIndex = raft.MaxInt(snapshotIndex, appmsg.CommandIndex)
 			}
 		} else if appmsg.SnapshotValid { // CondInstallSnapshot
 			if kv.rf.CondInstallSnapshot(appmsg.SnapshotTerm, appmsg.SnapshotIndex, appmsg.Snapshot) {
-				Error("server %v begins to switch to snapshot", kv.me)
+				Info("server %v begins to switch to snapshot", kv.me)
 				kv.readPersist(kv.persister.ReadSnapshot())
-				Error("server %v succs to switch to snapshot", kv.me)
+				Info("server %v succs to switch to snapshot, raftsize is %v", kv.me, kv.persister.RaftStateSize())
+				snapshotIndex = raft.MaxInt(snapshotIndex, appmsg.SnapshotIndex)
 			} else {
-				Error("server %v fails to switch to snapshot", kv.me)
+				Info("server %v fails to switch to snapshot", kv.me)
 			}
 		}
 
+		Info("server %v's raftsize is %v (snapshotIndex:%v)now", kv.me, kv.persister.RaftStateSize(), snapshotIndex)
 	}
 }
 
@@ -395,6 +403,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 func (kv *KVServer) Kill() {
 	atomic.StoreInt32(&kv.dead, 1)
 	kv.rf.Kill()
+	Error("server %v is killed", kv.me)
 	// Your code here, if desired.
 }
 
