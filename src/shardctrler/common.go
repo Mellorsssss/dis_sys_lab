@@ -29,13 +29,30 @@ type Config struct {
 }
 
 const (
-	OK = "OK"
+	OK             = "OK"
+	ErrWrongLeader = "ErrWrongLeader"
+)
+
+const (
+	JOIN  = 0
+	LEAVE = 1
+	MOVE  = 3
+	QUERY = 4
+)
+
+const (
+	RpcTimeout       = 200
+	NoLeader         = -1
+	NoneSerialNumber = -1
+	RequestInterval  = 50
 )
 
 type Err string
 
 type JoinArgs struct {
-	Servers map[int][]string // new GID -> servers mappings
+	Servers      map[int][]string // new GID -> servers mappings
+	SerialNumber int64            // client request id
+	Id           string           // client id
 }
 
 type JoinReply struct {
@@ -44,7 +61,9 @@ type JoinReply struct {
 }
 
 type LeaveArgs struct {
-	GIDs []int
+	GIDs         []int
+	SerialNumber int64  // client request id
+	Id           string // client id
 }
 
 type LeaveReply struct {
@@ -53,8 +72,10 @@ type LeaveReply struct {
 }
 
 type MoveArgs struct {
-	Shard int
-	GID   int
+	Shard        int
+	GID          int
+	SerialNumber int64  // client request id
+	Id           string // client id
 }
 
 type MoveReply struct {
@@ -63,7 +84,9 @@ type MoveReply struct {
 }
 
 type QueryArgs struct {
-	Num int // desired config number
+	Num          int    // desired config number
+	SerialNumber int64  // client request id
+	Id           string // client id
 }
 
 type QueryReply struct {
