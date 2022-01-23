@@ -139,6 +139,7 @@ func (sc *ShardCtrler) execMoveUnlocked(op *Op) {
 	Error("move shard %v to gid %v", gidshard.Shard, gidshard.Gid)
 	config.Groups = make(map[int][]string)
 	copyMap(config.Groups, cfg.Groups)
+	sc.divideShardsAfterJoin(&cfg, &config)
 	sc.configs = append(sc.configs, config)
 }
 
