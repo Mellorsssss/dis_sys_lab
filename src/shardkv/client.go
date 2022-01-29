@@ -8,11 +8,15 @@ package shardkv
 // talks to the group that holds the key's shard.
 //
 
-import "6.824/labrpc"
-import "crypto/rand"
-import "math/big"
-import "6.824/shardctrler"
-import "time"
+import (
+	"crypto/rand"
+	"math/big"
+	"time"
+
+	"6.824/labrpc"
+	"6.824/shardctrler"
+	"github.com/segmentio/ksuid"
+)
 
 //
 // which shard is a key in?
@@ -35,11 +39,20 @@ func nrand() int64 {
 	return x
 }
 
+func genUUID() string {
+	id := ksuid.New()
+	return id.String()
+}
+
 type Clerk struct {
 	sm       *shardctrler.Clerk
 	config   shardctrler.Config
 	make_end func(string) *labrpc.ClientEnd
-	// You will have to modify this struct.
+
+	// prevLeader int    // last leader seen
+	prevSerNum int64  // last serial number
+	id         string // client unique id
+	// mu         sync.Mutex
 }
 
 //
@@ -55,7 +68,10 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 	ck := new(Clerk)
 	ck.sm = shardctrler.MakeClerk(ctrlers)
 	ck.make_end = make_end
-	// You'll have to add code here.
+	ck.config = ck.sm.Query(-1)
+
+	ck.prevSerNum = 0
+	ck.id = genUUID()
 	return ck
 }
 
@@ -66,10 +82,20 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 // You will have to modify this function.
 //
 func (ck *Clerk) Get(key string) string {
+	DPrintf("ck %v begin get \"%v\"", ck.id, key)
+
+	// prepare args
 	args := GetArgs{}
 	args.Key = key
+	// ck.mu.Lock()
+	ck.prevSerNum++ // sn increase
+	args.SerialNumber = ck.prevSerNum
+	// ck.mu.Unlock()
+	args.Id = ck.id
 
+	// send rpcs until success
 	for {
+		showConfigInfo(&ck.config)
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
@@ -79,20 +105,20 @@ func (ck *Clerk) Get(key string) string {
 				var reply GetReply
 				ok := srv.Call("ShardKV.Get", &args, &reply)
 				if ok && (reply.Err == OK || reply.Err == ErrNoKey) {
+					DPrintf("ck %v get \"%v\": \"%v\"", ck.id, key, reply.Value)
 					return reply.Value
 				}
 				if ok && (reply.Err == ErrWrongGroup) {
+					DPrintf("ck %v get \"%v\": \"%v\"", ck.id, key, reply.Value)
 					break
 				}
 				// ... not ok, or ErrWrongLeader
 			}
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(ClientRPCPeriod * time.Millisecond)
 		// ask controler for the latest configuration.
 		ck.config = ck.sm.Query(-1)
 	}
-
-	return ""
 }
 
 //
@@ -105,8 +131,14 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Value = value
 	args.Op = op
 
+	// ck.mu.Lock()
+	ck.prevSerNum++ // sn increase
+	args.SerialNumber = ck.prevSerNum
+	// ck.mu.Unlock()
+	args.Id = ck.id
 
 	for {
+		showConfigInfo(&ck.config)
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
@@ -123,15 +155,19 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 				// ... not ok, or ErrWrongLeader
 			}
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(ClientRPCPeriod * time.Millisecond)
 		// ask controler for the latest configuration.
 		ck.config = ck.sm.Query(-1)
 	}
 }
 
 func (ck *Clerk) Put(key string, value string) {
+	DPrintf("ck %v begin put :< \"%v\", \"%v\">", ck.id, key, value)
 	ck.PutAppend(key, value, "Put")
+	DPrintf("ck %v successfully put :< \"%v\", \"%v\">", ck.id, key, value)
 }
 func (ck *Clerk) Append(key string, value string) {
+	DPrintf("ck %v begin append :< \"%v\", \"%v\">", ck.id, key, value)
 	ck.PutAppend(key, value, "Append")
+	DPrintf("ck %v successfully append :< \"%v\", \"%v\">", ck.id, key, value)
 }
