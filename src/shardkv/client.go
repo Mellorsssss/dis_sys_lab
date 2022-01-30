@@ -95,7 +95,7 @@ func (ck *Clerk) Get(key string) string {
 
 	// send rpcs until success
 	for {
-		showConfigInfo(&ck.config)
+		// showConfigInfo(&ck.config)
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
@@ -138,7 +138,7 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Id = ck.id
 
 	for {
-		showConfigInfo(&ck.config)
+		// showConfigInfo(&ck.config)
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {

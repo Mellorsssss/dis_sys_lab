@@ -16,8 +16,20 @@ const (
 	ErrWrongLeader = "ErrWrongLeader"
 )
 
+// client params
 const (
-	ClientRPCPeriod = 100
+	ClientRPCPeriod = 100 // time between round of rpc sending
+)
+
+// server params
+const (
+	ServerConfigUpdatePeriod = 100
+)
+
+const (
+	GET    = 0
+	PUT    = 1
+	APPEND = 2
 )
 
 type Err string
