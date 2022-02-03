@@ -9,11 +9,26 @@ package shardkv
 import (
 	"fmt"
 	"sync/atomic"
-	"time"
 
-	"6.824/kvraft"
 	"6.824/raft"
 )
+
+// MigrationCtx is the data of migrating
+type MigrationCtx struct {
+	Shard     int    // the shards to migrate
+	Data      []byte // store data
+	Gid       int    // target id(valid when Sending is true)
+	ConfigNum int
+}
+
+type MigrationOp struct {
+	Term    int // current term
+	Gid     int // target gid
+	Cfgnum  int
+	Shard   int    // shard to move
+	Sending bool   // true for sending shard
+	Data    []byte // if sending is false, then the data of store
+}
 
 func (kv *ShardKV) killed() bool {
 	z := atomic.LoadInt32(&kv.dead)
@@ -23,6 +38,7 @@ func (kv *ShardKV) killed() bool {
 // loop process msg from applyCh, e.g, client-request/migration
 func (kv *ShardKV) loop() {
 	for appmsg := range kv.applyCh {
+
 		if kv.killed() {
 			return
 		}
@@ -32,71 +48,29 @@ func (kv *ShardKV) loop() {
 			case Op:
 				// execute the cmd
 				op := appmsg.Command.(Op)
-				value := kv.execOp(op)
+				value, res := kv.execOp(op)
 
-				// broadcast to all the subscribers(handlers)
-				// non-blocking
-				go func(appmsg raft.ApplyMsg, value string) {
+				go func(appmsg raft.ApplyMsg, ctx KVRPCContext) {
 					kv.mu.Lock()
 					fn, ok := kv.sub[appmsg.CommandIndex]
 					kv.mu.Unlock()
 
 					if ok {
-						fn(appmsg, value)
+						fn(appmsg, ctx)
 					}
-				}(appmsg, value)
-			case Migration:
-				continue
+				}(appmsg, KVRPCContext{value, res})
+			case MigrationOp:
+				kv.execMigrate(appmsg.Command.(MigrationOp))
+				kv.mu.Lock()
+				fn, ok := kv.sub[appmsg.CommandIndex]
+				kv.mu.Unlock()
+				if ok {
+					fn(appmsg, KVRPCContext{"", 0})
+				}
 			default:
 				err := fmt.Sprintf("Wrong msg:%v", appmsg)
 				panic(err)
 			}
-
-		}
-
-	}
-}
-
-// fetchConfig fetches the latest config
-// and changes the shard
-func (kv *ShardKV) fetchConfig() {
-	// update the config atomically
-	for !kv.killed() {
-		kv.mu.Lock()
-		ncfg := kv.ck.Query(-1)
-		if kv.cfg.Num == 0 && ncfg.Num != 0 {
-			DPrintf("server %v get the first config", kv.me)
-			kv.cfg = ncfg
-			// add initial store without waiting for it
-
-			for shard, gid := range kv.cfg.Shards {
-				if gid == kv.gid {
-					_, ok := kv.shards[shard]
-					if !ok {
-						DPrintf("server <%v, %v> get shard %v", kv.me, kv.gid, shard)
-						kv.shards[shard] = kvraft.MakeMapStore()
-					}
-				}
-			}
-			kv.mu.Unlock()
-			time.Sleep(ServerConfigUpdatePeriod * time.Millisecond)
-		} else {
-			kv.cfg = ncfg
-			// todo: migrate the shard(only the leader)
-			for shard := range kv.shards {
-				if shard >= len(kv.cfg.Shards) {
-					err := fmt.Sprintf("server %v has shard which range out:%v > %v", kv.me, shard, len(kv.cfg.Shards))
-					panic(err)
-				}
-
-				if kv.cfg.Shards[shard] != kv.gid {
-					DPrintf("server %v, %v removes shard %v", kv.me, kv.gid, shard)
-					delete(kv.shards, shard)
-				}
-			}
-
-			kv.mu.Unlock()
-			time.Sleep(ServerConfigUpdatePeriod * time.Millisecond)
 		}
 	}
 }
@@ -151,47 +125,53 @@ func (kv *ShardKV) memorizeOp(id string, sn int64, r Response) {
 
 // isInShards return true if shard is in kv's shards
 func (kv *ShardKV) isInShardsUnlocked(shard int) bool {
-	_, ok := kv.shards[shard]
-	return ok
+	return kv.cfg.Shards[shard] == kv.gid // must in current config
 }
 
 // execOp executes op in statemachine
-func (kv *ShardKV) execOp(op Op) string {
+func (kv *ShardKV) execOp(op Op) (string, Res) {
 	ok, v := kv.isDuplicatedOp(op.Id, op.SerialNumber)
 	if ok {
-		return v.Value
+		DPrintf("server %v,%v: op is duplicated: %v", kv.me, kv.gid, op.SerialNumber)
+		return v.Value, Succ
 	}
 
 	shard := key2shard(op.Key)
 	kv.mu.Lock()
 	if !kv.isInShardsUnlocked(shard) { // key is not in current shard
-		DPrintf("server %v: %v is not in %v's shard", kv.me, op.Key, kv.gid)
+		DPrintf("exec op: server %v: %v is not in %v's shard", kv.me, op.Key, kv.gid)
 		kv.mu.Unlock()
-		return ""
+		return "", WrongGroup
 	}
 
+	_, ok = kv.shards[shard]
+	if !ok {
+		DPrintf("server %v,%v: op is not ready for shard: %v", kv.me, kv.gid, shard)
+		kv.mu.Unlock()
+		return "", WrongGroup
+	}
 	switch op.OpType {
 	case GET:
 		value := kv.shards[shard].Get(op.Key)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, value, op.OpType})
-		return value
+
+		DPrintf("server %v, %v exec GET: %v, %v", kv.me, kv.gid, op.Key, op.SerialNumber)
+		return value, Succ
 	case PUT:
 		kv.shards[shard].Put(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		return ""
+		DPrintf("server %v, %v exec PUT: %v,%v,%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
+		return "", Succ
 	case APPEND:
 		kv.shards[shard].Append(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		return ""
+		DPrintf("server %v, %v exec APPEND: %v,%v,%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
+		return "", Succ
 	default:
 		kv.mu.Unlock()
 		panic("exec wrong type of op")
 	}
-}
-
-func (kv *ShardKV) execMigrate(m Migration) {
-	// todo: migrate for every server
 }

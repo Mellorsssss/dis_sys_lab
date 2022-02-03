@@ -14,6 +14,7 @@ const (
 	ErrNoKey       = "ErrNoKey"
 	ErrWrongGroup  = "ErrWrongGroup"
 	ErrWrongLeader = "ErrWrongLeader"
+	ErrOldShard    = "ErrOldShard"
 )
 
 // client params
@@ -24,6 +25,7 @@ const (
 // server params
 const (
 	ServerConfigUpdatePeriod = 100
+	ServerRPCPeriod          = 100
 )
 
 const (
@@ -33,6 +35,12 @@ const (
 )
 
 type Err string
+type Res int
+
+const (
+	Succ       = 0
+	WrongGroup = 1
+)
 
 // Put or Append
 type PutAppendArgs struct {
@@ -59,4 +67,15 @@ type GetArgs struct {
 type GetReply struct {
 	Err   Err
 	Value string
+}
+
+type MigrateArgs struct {
+	Shard  int
+	Data   []byte
+	CfgNum int
+	Gid    int
+}
+
+type MigrateReply struct {
+	Err Err
 }

@@ -21,18 +21,17 @@ type Op struct {
 	Id           string
 }
 
-type Migration struct {
-	Shard int    // the shard to migrate
-	Data  []byte // store data
-}
-
 type Response struct {
 	SerialNumber int64
 	Value        string
 	OpType       int
 }
 
-type KVRPCHandler func(raft.ApplyMsg, string)
+type KVRPCContext struct {
+	value string
+	Err   Res
+}
+type KVRPCHandler func(raft.ApplyMsg, KVRPCContext)
 
 type ShardKV struct {
 	mu           sync.Mutex
@@ -46,7 +45,7 @@ type ShardKV struct {
 
 	// must hold lock
 	gid       int
-	cfg       shardctrler.Config     // latest config, fetch periodically
+	cfg       shardctrler.Config     // current config, fetch periodically
 	shards    map[int]kvraft.KVStore // shard id -> data, all data from different shards
 	dead      int32                  // true if shardkv is dead
 	sub       map[int]KVRPCHandler   // msg_id -> handler
@@ -102,7 +101,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 		return
 	}
 
-	kv.registerHandler(index, func(msg raft.ApplyMsg, value string) {
+	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
 		newTerm, isStillLeader := kv.rf.GetState()
 		if !isStillLeader || newTerm != term || msg.Command != cmd {
 			reply.Err = ErrWrongLeader
@@ -111,10 +110,18 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 			return
 		}
 
-		reply.Value = value
-		reply.Err = OK
-		kv.removeHandler(index)
-		done <- struct{}{}
+		if ctx.Err == Succ {
+			reply.Value = ctx.value
+			reply.Err = OK
+			kv.removeHandler(index)
+			done <- struct{}{}
+		} else if ctx.Err == WrongGroup {
+			reply.Err = ErrWrongGroup
+			kv.removeHandler(index)
+			done <- struct{}{}
+		} else {
+			panic("wrong err")
+		}
 	})
 	kv.mu.Unlock()
 	// wait for the msg is applied
@@ -183,7 +190,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		return
 	}
 
-	kv.registerHandler(index, func(msg raft.ApplyMsg, _ string) {
+	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
 		newTerm, isStillLeader := kv.rf.GetState()
 		if !isStillLeader || newTerm != term || msg.Command != cmd {
 			reply.Err = ErrWrongLeader
@@ -191,6 +198,82 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 			done <- struct{}{}
 			return
 		}
+
+		if ctx.Err == Succ {
+			reply.Err = OK
+			kv.removeHandler(index)
+			done <- struct{}{}
+		} else if ctx.Err == WrongGroup {
+			reply.Err = ErrWrongGroup
+			kv.removeHandler(index)
+			done <- struct{}{}
+		} else {
+			panic("wrong err")
+		}
+	})
+	kv.mu.Unlock()
+	// wait for the msg is applied
+
+	<-done
+	DPrintf("leader %v,%v PutAppend \"%v\" : \"%v\" in term %v", kv.me, kv.gid, cmd.Key, cmd.Value, term)
+}
+
+// migrate rpc between shardkv peers
+func (kv *ShardKV) Migrate(args *MigrateArgs, reply *MigrateReply) {
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	term, isLeader := kv.rf.GetState()
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	kv.mu.Lock()
+
+	// duplicated shard transition
+	_, ok := kv.shards[args.Shard]
+	if ok && kv.cfg.Num == args.CfgNum { // this shard has been translated
+		reply.Err = OK
+		kv.mu.Unlock()
+		return
+	}
+
+	if ok && args.CfgNum < kv.cfg.Num { // detect old config
+		reply.Err = ErrOldShard
+		kv.mu.Unlock()
+		return
+	}
+
+	// start the agree
+	done := make(chan struct{}, 1)
+	index, _, ok := kv.rf.Start(MigrationOp{term, kv.gid, args.CfgNum, args.Shard, false, args.Data})
+	if !ok {
+		reply.Err = ErrWrongLeader
+		kv.mu.Unlock()
+		return
+	}
+
+	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
+		op := msg.Command.(MigrationOp)
+		newTerm, isStillLeader := kv.rf.GetState()
+		if !isStillLeader || newTerm != term {
+			reply.Err = ErrOldShard
+			kv.removeHandler(index)
+			done <- struct{}{}
+			return
+		}
+		kv.mu.Lock()
+		if op.Cfgnum < kv.cfg.Num {
+			reply.Err = ErrOldShard
+			kv.removeHandler(index)
+			done <- struct{}{}
+			kv.mu.Unlock()
+			return
+		}
+		kv.mu.Unlock()
 
 		reply.Err = OK
 		kv.removeHandler(index)
@@ -200,7 +283,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	// wait for the msg is applied
 
 	<-done
-	DPrintf("leader %v,%v PutAppend \"%v\" : \"%v\" in term %v", kv.me, kv.gid, cmd.Key, cmd.Value, term)
+	DPrintf("server <%v, %v> receive shard %v succ", kv.me, kv.gid, args.Shard)
 }
 
 //
@@ -213,7 +296,7 @@ func (kv *ShardKV) Kill() {
 	kv.rf.Kill()
 	// Your code here, if desired.
 	atomic.StoreInt32(&kv.dead, 1)
-	DPrintf("server %v is killed", kv.me)
+	DPrintf("server %v,%v is killed", kv.me, kv.gid)
 }
 
 //
@@ -248,6 +331,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
 	labgob.Register(Op{})
+	labgob.Register(MigrationOp{})
 
 	kv := new(ShardKV)
 	kv.me = me
@@ -260,13 +344,14 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
 	kv.ck = shardctrler.MakeClerk(kv.ctrlers) // never change during lifetime, used to communicate with ctrlers
-	kv.cfg = kv.ck.Query(0)                   // fetch the frist config for recover
+	kv.cfg = kv.ck.Query(0)
 	kv.shards = make(map[int]kvraft.KVStore)
 
 	kv.clientMap = make(map[string]Response)
 	kv.sub = make(map[int]KVRPCHandler)
 
-	go kv.fetchConfig() // periodically fetch latest config
+	go kv.fetchConfigLoop() // periodically fetch latest config
 	go kv.loop()
+	DPrintf("server %v, %v restart", kv.me, kv.gid)
 	return kv
 }
