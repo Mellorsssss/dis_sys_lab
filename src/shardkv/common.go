@@ -79,3 +79,13 @@ type MigrateArgs struct {
 type MigrateReply struct {
 	Err Err
 }
+
+type MultiMigrateArgs struct {
+	ShardData map[int][]byte
+	CfgNum    int
+	Gid       int
+}
+
+type MultiMigrateReply struct {
+	Err Err
+}

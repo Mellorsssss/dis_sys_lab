@@ -21,6 +21,12 @@ type MigrationCtx struct {
 	ConfigNum int
 }
 
+type MultiMigrationCtx struct {
+	ShardData map[int][]byte // shard -> shard data
+	Gid       int
+	ConfigNum int
+}
+
 type MigrationOp struct {
 	Term    int // current term
 	Gid     int // target gid
@@ -28,6 +34,13 @@ type MigrationOp struct {
 	Shard   int    // shard to move
 	Sending bool   // true for sending shard
 	Data    []byte // if sending is false, then the data of store
+}
+type MultiMigrationOp struct {
+	Term      int // current term
+	Gid       int // target gid
+	Cfgnum    int
+	Sending   bool           // true for sending shard
+	ShardData map[int][]byte // shard -> shard data
 }
 
 func (kv *ShardKV) killed() bool {
@@ -61,6 +74,14 @@ func (kv *ShardKV) loop() {
 				}(appmsg, KVRPCContext{value, res})
 			case MigrationOp:
 				kv.execMigrate(appmsg.Command.(MigrationOp))
+				kv.mu.Lock()
+				fn, ok := kv.sub[appmsg.CommandIndex]
+				kv.mu.Unlock()
+				if ok {
+					fn(appmsg, KVRPCContext{"", 0})
+				}
+			case MultiMigrationOp:
+				kv.execMultiMigrate(appmsg.Command.(MultiMigrationOp))
 				kv.mu.Lock()
 				fn, ok := kv.sub[appmsg.CommandIndex]
 				kv.mu.Unlock()

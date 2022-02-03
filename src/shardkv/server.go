@@ -286,6 +286,86 @@ func (kv *ShardKV) Migrate(args *MigrateArgs, reply *MigrateReply) {
 	DPrintf("server <%v, %v> receive shard %v succ", kv.me, kv.gid, args.Shard)
 }
 
+func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply) {
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	term, isLeader := kv.rf.GetState()
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	// duplicated shard transition
+	has_new_shard := false
+	kv.mu.Lock()
+	for shard := range args.ShardData {
+		_, ok := kv.shards[shard]
+		if !ok {
+			has_new_shard = true
+			break
+		}
+	}
+
+	if !has_new_shard {
+		if args.CfgNum < kv.cfg.Num { // detect old config
+			reply.Err = ErrOldShard
+			kv.mu.Unlock()
+			return
+		} else {
+			reply.Err = OK
+			kv.mu.Unlock()
+			return
+		}
+	}
+
+	// start the agree
+	done := make(chan struct{}, 1)
+	index, _, ok := kv.rf.Start(MultiMigrationOp{term, kv.gid, args.CfgNum, false, args.ShardData})
+	if !ok {
+		reply.Err = ErrWrongLeader
+		kv.mu.Unlock()
+		return
+	}
+
+	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
+		op := msg.Command.(MultiMigrationOp)
+		newTerm, isStillLeader := kv.rf.GetState()
+		if !isStillLeader || newTerm != term {
+			reply.Err = ErrOldShard
+			kv.removeHandler(index)
+			done <- struct{}{}
+			return
+		}
+		kv.mu.Lock()
+		if op.Cfgnum < kv.cfg.Num {
+			reply.Err = ErrOldShard
+			kv.removeHandler(index)
+			done <- struct{}{}
+			kv.mu.Unlock()
+			return
+		}
+		kv.mu.Unlock()
+
+		reply.Err = OK
+		kv.removeHandler(index)
+		done <- struct{}{}
+	})
+	kv.mu.Unlock()
+	// wait for the msg is applied
+
+	<-done
+	all_shards := []int{}
+	for shard := range args.ShardData {
+		all_shards = append(all_shards, shard)
+	}
+	DPrintf("server %v, %v translate shard %v to gid %v", kv.me, kv.gid, all_shards, args.Gid)
+
+	DPrintf("server <%v, %v> receive shards %v succ", kv.me, kv.gid, all_shards)
+}
+
 //
 // the tester calls Kill() when a ShardKV instance won't
 // be needed again. you are not required to do anything
@@ -332,6 +412,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// Go's RPC library to marshall/unmarshall.
 	labgob.Register(Op{})
 	labgob.Register(MigrationOp{})
+	labgob.Register(MultiMigrationOp{})
 
 	kv := new(ShardKV)
 	kv.me = me

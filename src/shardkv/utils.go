@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	Debug = true
+	Debug = false
 	INFO  = false
 	ERROR = false
 )
