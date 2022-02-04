@@ -9,6 +9,7 @@ import (
 
 // query the Config 1 to init shards
 func (kv *ShardKV) initShards() {
+	kv.shards = make(map[int]kvraft.KVStore)
 	cfg := kv.ck.Query(1)
 	for ; cfg.Num != 1; cfg = kv.ck.Query(1) {
 		DPrintf("initing...")
@@ -32,7 +33,9 @@ func (kv *ShardKV) initShards() {
 // and if ck's rq's Num is larger than kv.cfg, don't serve it(todo: optimize)
 func (kv *ShardKV) fetchConfigLoop() {
 	// update the config atomically
-	kv.initShards()
+	if kv.shards == nil {
+		kv.initShards()
+	}
 	for !kv.killed() {
 		kv.mu.Lock()
 		ncfg := kv.ck.Query(-1)

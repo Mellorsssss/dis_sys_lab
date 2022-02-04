@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	Debug = false
+	Debug = true
 	INFO  = false
 	ERROR = false
 )
@@ -35,4 +35,10 @@ func Error(format string, a ...interface{}) (n int, err error) {
 
 func showConfigInfo(cfg *shardctrler.Config) {
 	DPrintf("all the shards : %v", cfg.Shards)
+}
+
+func cloneBytes(src []byte) []byte {
+	res := make([]byte, len(src))
+	copy(res, src)
+	return res
 }

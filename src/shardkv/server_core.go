@@ -50,6 +50,7 @@ func (kv *ShardKV) killed() bool {
 
 // loop process msg from applyCh, e.g, client-request/migration
 func (kv *ShardKV) loop() {
+	snapshotIndex := 0
 	for appmsg := range kv.applyCh {
 
 		if kv.killed() {
@@ -72,6 +73,7 @@ func (kv *ShardKV) loop() {
 						fn(appmsg, ctx)
 					}
 				}(appmsg, KVRPCContext{value, res})
+
 			case MigrationOp:
 				kv.execMigrate(appmsg.Command.(MigrationOp))
 				kv.mu.Lock()
@@ -92,7 +94,26 @@ func (kv *ShardKV) loop() {
 				err := fmt.Sprintf("Wrong msg:%v", appmsg)
 				panic(err)
 			}
+
+			if kv.maxraftstate != -1 && kv.persister.RaftStateSize() > int(float32(kv.maxraftstate)*RaftSizeThreshold) {
+				Info("server %v,%v takes snapshot(%v > %v)", kv.me, kv.gid, kv.persister.RaftStateSize(), kv.maxraftstate)
+				if appmsg.SnapshotValid {
+					Info("server %v,%v should snapshot after condinstall.", kv.me, kv.gid)
+				}
+				kv.rf.Snapshot(appmsg.CommandIndex, kv.persist())
+				snapshotIndex = raft.MaxInt(snapshotIndex, appmsg.CommandIndex)
+			}
+		} else if appmsg.SnapshotValid { // CondInstallSnapshot
+			if kv.rf.CondInstallSnapshot(appmsg.SnapshotTerm, appmsg.SnapshotIndex, appmsg.Snapshot) {
+				Info("server %v,%v begins to switch to snapshot", kv.me, kv.gid)
+				kv.readPersist(kv.persister.ReadSnapshot())
+				Info("server %v,%v succs to switch to snapshot, raftsize is %v", kv.me, kv.gid, kv.persister.RaftStateSize())
+				snapshotIndex = raft.MaxInt(snapshotIndex, appmsg.SnapshotIndex)
+			} else {
+				Info("server %v,%v fails to switch to snapshot", kv.me, kv.gid)
+			}
 		}
+		Info("server %v,%v's raftsize is %v (snapshotIndex:%v)now", kv.me, kv.gid, kv.persister.RaftStateSize(), snapshotIndex)
 	}
 }
 

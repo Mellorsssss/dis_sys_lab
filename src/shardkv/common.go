@@ -26,6 +26,7 @@ const (
 const (
 	ServerConfigUpdatePeriod = 100
 	ServerRPCPeriod          = 100
+	RaftSizeThreshold        = 0.8
 )
 
 const (

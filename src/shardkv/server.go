@@ -50,6 +50,7 @@ type ShardKV struct {
 	dead      int32                  // true if shardkv is dead
 	sub       map[int]KVRPCHandler   // msg_id -> handler
 	clientMap map[string]Response    // ck_id -> latest response
+	persister *raft.Persister
 }
 
 func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
@@ -420,16 +421,17 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	kv.make_end = make_end
 	kv.gid = gid
 	kv.ctrlers = ctrlers
+	kv.persister = persister
 
 	kv.applyCh = make(chan raft.ApplyMsg)
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
 	kv.ck = shardctrler.MakeClerk(kv.ctrlers) // never change during lifetime, used to communicate with ctrlers
 	kv.cfg = kv.ck.Query(0)
-	kv.shards = make(map[int]kvraft.KVStore)
 
 	kv.clientMap = make(map[string]Response)
 	kv.sub = make(map[int]KVRPCHandler)
+	kv.readPersist(kv.persister.ReadSnapshot())
 
 	go kv.fetchConfigLoop() // periodically fetch latest config
 	go kv.loop()
