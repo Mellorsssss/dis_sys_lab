@@ -167,6 +167,10 @@ func (kv *ShardKV) memorizeOp(id string, sn int64, r Response) {
 
 // isInShards return true if shard is in kv's shards
 func (kv *ShardKV) isInShardsUnlocked(shard int) bool {
+	_, ok := kv.shards[shard]
+	if ok {
+		return true
+	}
 	return kv.cfg.Shards[shard] == kv.gid // must in current config
 }
 
@@ -188,7 +192,7 @@ func (kv *ShardKV) execOp(op Op) (string, Res) {
 
 	_, ok = kv.shards[shard]
 	if !ok {
-		DPrintf("server %v,%v: op is not ready for shard: %v", kv.me, kv.gid, shard)
+		DPrintf("server %v,%v: op is not ready for shard: %v, with key: \"%v\"", kv.me, kv.gid, shard, op.Key)
 		kv.mu.Unlock()
 		return "", WrongGroup
 	}
@@ -198,19 +202,19 @@ func (kv *ShardKV) execOp(op Op) (string, Res) {
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, value, op.OpType})
 
-		DPrintf("server %v, %v exec GET: %v, %v", kv.me, kv.gid, op.Key, op.SerialNumber)
+		DPrintf("server %v, %v exec GET: \"%v\", %v", kv.me, kv.gid, op.Key, op.SerialNumber)
 		return value, Succ
 	case PUT:
 		kv.shards[shard].Put(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		DPrintf("server %v, %v exec PUT: %v,%v,%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
+		DPrintf("server %v, %v exec PUT: \"%v,%v\",%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
 		return "", Succ
 	case APPEND:
 		kv.shards[shard].Append(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		DPrintf("server %v, %v exec APPEND: %v,%v,%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
+		DPrintf("server %v, %v exec APPEND: \"%v,%v\",%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
 		return "", Succ
 	default:
 		kv.mu.Unlock()

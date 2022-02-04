@@ -362,7 +362,6 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 	for shard := range args.ShardData {
 		all_shards = append(all_shards, shard)
 	}
-	DPrintf("server %v, %v translate shard %v to gid %v", kv.me, kv.gid, all_shards, args.Gid)
 
 	DPrintf("server <%v, %v> receive shards %v succ", kv.me, kv.gid, all_shards)
 }
