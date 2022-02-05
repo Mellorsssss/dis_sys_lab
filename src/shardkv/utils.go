@@ -1,6 +1,7 @@
 package shardkv
 
 import (
+	"fmt"
 	"log"
 
 	"6.824/shardctrler"
@@ -41,4 +42,8 @@ func cloneBytes(src []byte) []byte {
 	res := make([]byte, len(src))
 	copy(res, src)
 	return res
+}
+
+func (kv *ShardKV) shardkvInfo() string {
+	return fmt.Sprintf(" server [%v, %v] ", kv.gid, kv.me)
 }

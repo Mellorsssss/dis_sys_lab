@@ -6,7 +6,6 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"6.824/kvraft"
 	"6.824/labgob"
 	"6.824/labrpc"
 	"6.824/raft"
@@ -45,11 +44,10 @@ type ShardKV struct {
 
 	// must hold lock
 	gid       int
-	cfg       shardctrler.Config     // current config, fetch periodically
-	shards    map[int]kvraft.KVStore // shard id -> data, all data from different shards
-	dead      int32                  // true if shardkv is dead
-	sub       map[int]KVRPCHandler   // msg_id -> handler
-	clientMap map[string]Response    // ck_id -> latest response
+	cfg       shardctrler.Config   // current config, fetch periodically
+	shards    map[int]*ShardStore  // shard id -> data, all data from different shards
+	dead      int32                // true if shardkv is dead
+	sub       map[int]KVRPCHandler // msg_id -> handler
 	persister *raft.Persister
 }
 
@@ -428,7 +426,6 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	kv.ck = shardctrler.MakeClerk(kv.ctrlers) // never change during lifetime, used to communicate with ctrlers
 	kv.cfg = kv.ck.Query(0)
 
-	kv.clientMap = make(map[string]Response)
 	kv.sub = make(map[int]KVRPCHandler)
 	kv.readPersist(kv.persister.ReadSnapshot())
 

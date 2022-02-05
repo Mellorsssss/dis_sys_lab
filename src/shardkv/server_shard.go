@@ -7,6 +7,12 @@ import (
 	"6.824/kvraft"
 )
 
+// ShardStore contains the data and duplicate detection
+type ShardStore struct {
+	store kvraft.KVStore      // key-value pairs
+	mem   map[string]Response // ck id -> latest response
+}
+
 // query the Config 1 to init shards
 func (kv *ShardKV) initShards() {
 	kv.shards = make(map[int]kvraft.KVStore)
