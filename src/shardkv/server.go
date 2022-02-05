@@ -43,16 +43,16 @@ type ShardKV struct {
 	ck           *shardctrler.Clerk // communicate with ctrlers
 
 	// must hold lock
-	gid       int
-	cfg       shardctrler.Config   // current config, fetch periodically
-	shards    map[int]*ShardStore  // shard id -> data, all data from different shards
-	dead      int32                // true if shardkv is dead
-	sub       map[int]KVRPCHandler // msg_id -> handler
-	persister *raft.Persister
+	gid          int
+	cfg          shardctrler.Config   // current config, fetch periodically
+	shards       map[int]*ShardStore  // shard id -> data, all data from different shards
+	shards_state map[int]int          // shard id -> Valid/Pushing/GC, only Valid state can serve rq
+	dead         int32                // true if shardkv is dead
+	sub          map[int]KVRPCHandler // msg_id -> handler
+	persister    *raft.Persister
 }
 
 func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
-	// Your code here
 	if kv.killed() {
 		reply.Err = ErrWrongLeader
 		return
@@ -65,21 +65,26 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	}
 
 	shard := key2shard(args.Key)
-	kv.mu.Lock()
-	if !kv.isInShardsUnlocked(shard) {
-		DPrintf("leader %v,%v doesn't have shard %v(%v)", kv.me, kv.gid, shard, kv.shards)
-		kv.mu.Unlock()
+	// four cases:
+	// | shard in config | has valid shard | solve
+	// | true            | true            | full check
+	// | true            | false           | add op, not check(since no shard)
+	// | false           | true            | full check(still as normal shard)
+	// | false           | false           | drop
+	if !kv.shardInConfig(shard) && !kv.hasValidShard(shard) {
 		reply.Err = ErrWrongGroup
+		DPrintf("leader %v,%v doesn't have shard %v(%v)", kv.me, kv.gid, shard, kv.shards)
 		return
 	}
-	kv.mu.Unlock()
 
-	ok, r := kv.isDuplicatedOp(args.Id, args.SerialNumber)
-	if ok {
-		DPrintf("leader %v Get but commit before by %v", kv.me, args.Id)
-		reply.Err = OK
-		reply.Value = r.Value
-		return
+	if kv.hasValidShard(shard) {
+		ok, r := kv.isDuplicatedOpInShard(shard, args.Id, args.SerialNumber)
+		if ok {
+			DPrintf("leader %v Get in shard %v but commit before by %v", kv.me, shard, args.Id)
+			reply.Err = OK
+			reply.Value = r.Value
+			return
+		}
 	}
 
 	// start the agree
@@ -145,22 +150,25 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	}
 
 	shard := key2shard(args.Key)
-	kv.mu.Lock()
-	if !kv.isInShardsUnlocked(shard) {
-		DPrintf("leader <%v, %v> doesn't have shard %v(%v)", kv.me, kv.gid, shard, kv.shards)
+	// four cases:
+	// | shard in config | has valid shard | solve
+	// | true            | true            | full check
+	// | true            | false           | add op, not check(since no shard)
+	// | false           | true            | full check(still as normal shard)
+	// | false           | false           | drop
+	if !kv.shardInConfig(shard) && !kv.hasValidShard(shard) {
 		reply.Err = ErrWrongGroup
-		kv.mu.Unlock()
+		DPrintf("leader %v,%v doesn't have shard %v(%v)", kv.me, kv.gid, shard, kv.shards)
 		return
 	}
-	kv.mu.Unlock()
 
-	DPrintf("leader %v PutAppend in term %v", kv.me, term)
-
-	ok, _ := kv.isDuplicatedOp(args.Id, args.SerialNumber)
-	if ok {
-		DPrintf("leader %v Get but commit before by %v", kv.me, args.Id)
-		reply.Err = OK
-		return
+	if kv.hasValidShard(shard) {
+		ok, _ := kv.isDuplicatedOpInShard(shard, args.Id, args.SerialNumber)
+		if ok {
+			DPrintf("leader %v Get in shard %v but commit before by %v", kv.me, shard, args.Id)
+			reply.Err = OK
+			return
+		}
 	}
 
 	// start the agree
@@ -217,73 +225,73 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	DPrintf("leader %v,%v PutAppend \"%v\" : \"%v\" in term %v", kv.me, kv.gid, cmd.Key, cmd.Value, term)
 }
 
-// migrate rpc between shardkv peers
-func (kv *ShardKV) Migrate(args *MigrateArgs, reply *MigrateReply) {
-	if kv.killed() {
-		reply.Err = ErrWrongLeader
-		return
-	}
+// // migrate rpc between shardkv peers
+// func (kv *ShardKV) Migrate(args *MigrateArgs, reply *MigrateReply) {
+// 	if kv.killed() {
+// 		reply.Err = ErrWrongLeader
+// 		return
+// 	}
 
-	term, isLeader := kv.rf.GetState()
-	if !isLeader {
-		reply.Err = ErrWrongLeader
-		return
-	}
+// 	term, isLeader := kv.rf.GetState()
+// 	if !isLeader {
+// 		reply.Err = ErrWrongLeader
+// 		return
+// 	}
 
-	kv.mu.Lock()
+// 	kv.mu.Lock()
 
-	// duplicated shard transition
-	_, ok := kv.shards[args.Shard]
-	if ok && kv.cfg.Num == args.CfgNum { // this shard has been translated
-		reply.Err = OK
-		kv.mu.Unlock()
-		return
-	}
+// 	// duplicated shard transition
+// 	_, ok := kv.shards[args.Shard]
+// 	if ok && kv.cfg.Num == args.CfgNum { // this shard has been translated
+// 		reply.Err = OK
+// 		kv.mu.Unlock()
+// 		return
+// 	}
 
-	if ok && args.CfgNum < kv.cfg.Num { // detect old config
-		reply.Err = ErrOldShard
-		kv.mu.Unlock()
-		return
-	}
+// 	if ok && args.CfgNum < kv.cfg.Num { // detect old config
+// 		reply.Err = ErrOldShard
+// 		kv.mu.Unlock()
+// 		return
+// 	}
 
-	// start the agree
-	done := make(chan struct{}, 1)
-	index, _, ok := kv.rf.Start(MigrationOp{term, kv.gid, args.CfgNum, args.Shard, false, args.Data})
-	if !ok {
-		reply.Err = ErrWrongLeader
-		kv.mu.Unlock()
-		return
-	}
+// 	// start the agree
+// 	done := make(chan struct{}, 1)
+// 	index, _, ok := kv.rf.Start(MigrationOp{term, kv.gid, args.CfgNum, args.Shard, false, args.Data})
+// 	if !ok {
+// 		reply.Err = ErrWrongLeader
+// 		kv.mu.Unlock()
+// 		return
+// 	}
 
-	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
-		op := msg.Command.(MigrationOp)
-		newTerm, isStillLeader := kv.rf.GetState()
-		if !isStillLeader || newTerm != term {
-			reply.Err = ErrOldShard
-			kv.removeHandler(index)
-			done <- struct{}{}
-			return
-		}
-		kv.mu.Lock()
-		if op.Cfgnum < kv.cfg.Num {
-			reply.Err = ErrOldShard
-			kv.removeHandler(index)
-			done <- struct{}{}
-			kv.mu.Unlock()
-			return
-		}
-		kv.mu.Unlock()
+// 	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
+// 		op := msg.Command.(MigrationOp)
+// 		newTerm, isStillLeader := kv.rf.GetState()
+// 		if !isStillLeader || newTerm != term {
+// 			reply.Err = ErrOldShard
+// 			kv.removeHandler(index)
+// 			done <- struct{}{}
+// 			return
+// 		}
+// 		kv.mu.Lock()
+// 		if op.Cfgnum < kv.cfg.Num {
+// 			reply.Err = ErrOldShard
+// 			kv.removeHandler(index)
+// 			done <- struct{}{}
+// 			kv.mu.Unlock()
+// 			return
+// 		}
+// 		kv.mu.Unlock()
 
-		reply.Err = OK
-		kv.removeHandler(index)
-		done <- struct{}{}
-	})
-	kv.mu.Unlock()
-	// wait for the msg is applied
+// 		reply.Err = OK
+// 		kv.removeHandler(index)
+// 		done <- struct{}{}
+// 	})
+// 	kv.mu.Unlock()
+// 	// wait for the msg is applied
 
-	<-done
-	DPrintf("server <%v, %v> receive shard %v succ", kv.me, kv.gid, args.Shard)
-}
+// 	<-done
+// 	DPrintf("server <%v, %v> receive shard %v succ", kv.me, kv.gid, args.Shard)
+// }
 
 func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply) {
 	if kv.killed() {
@@ -322,7 +330,7 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 
 	// start the agree
 	done := make(chan struct{}, 1)
-	index, _, ok := kv.rf.Start(MultiMigrationOp{term, kv.gid, args.CfgNum, false, args.ShardData})
+	index, _, ok := kv.rf.Start(MultiMigrationOp{term, kv.gid, args.CfgNum, false, args.ShardData, args.ShardMem})
 	if !ok {
 		reply.Err = ErrWrongLeader
 		kv.mu.Unlock()
@@ -409,8 +417,9 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
 	labgob.Register(Op{})
-	labgob.Register(MigrationOp{})
+	// labgob.Register(MigrationOp{})
 	labgob.Register(MultiMigrationOp{})
+	labgob.Register(GCShardOp{})
 
 	kv := new(ShardKV)
 	kv.me = me

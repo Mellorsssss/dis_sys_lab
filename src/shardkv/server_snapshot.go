@@ -12,8 +12,9 @@ import (
 /* snapshot library */
 
 type SnapShotData struct {
-	ShardData map[int][]byte
-	Mem       map[int]map[string]Response
+	ShardData  map[int][]byte
+	Mem        map[int]map[string]Response
+	ShardState map[int]int
 }
 
 func (kv *ShardKV) dumpShardDataUnlocked() map[int][]byte {
@@ -34,12 +35,14 @@ func (kv *ShardKV) dumpMemUnlocked() map[int]map[string]Response {
 	return data
 }
 
+// loadShardUnlocked load snapshot data into ShardStore
 func (kv *ShardKV) loadShardUnlocked(sn *SnapShotData) {
 	if len(sn.Mem) != len(sn.ShardData) {
 		err := fmt.Sprintf("fail to load shard data of %v", kv.shardkvInfo())
 		panic(err)
 	}
 
+	kv.shards_state = sn.ShardState
 	kv.shards = make(map[int]*ShardStore)
 	for shard, sharddata := range sn.ShardData {
 		kv.shards[shard] = &ShardStore{}
@@ -53,8 +56,9 @@ func (kv *ShardKV) persist() []byte {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	ss := SnapShotData{
-		ShardData: kv.dumpShardDataUnlocked(),
-		Mem:       kv.dumpMemUnlocked(),
+		ShardData:  kv.dumpShardDataUnlocked(),
+		Mem:        kv.dumpMemUnlocked(),
+		ShardState: kv.shards_state,
 	}
 
 	sb := new(bytes.Buffer)
@@ -72,6 +76,7 @@ func (kv *ShardKV) readPersist(data []byte) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	if data == nil || len(data) < 1 {
+		kv.shards_state = make(map[int]int)
 		return
 	} else {
 		sbuffer := bytes.NewBuffer(data)

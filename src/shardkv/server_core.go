@@ -17,30 +17,39 @@ import (
 type MigrationCtx struct {
 	Shard     int    // the shards to migrate
 	Data      []byte // store data
-	Gid       int    // target id(valid when Sending is true)
+	Mem       map[int]Response
+	Gid       int // target id(valid when Sending is true)
 	ConfigNum int
 }
 
 type MultiMigrationCtx struct {
 	ShardData map[int][]byte // shard -> shard data
+	ShardMem  map[int]map[string]Response
 	Gid       int
 	ConfigNum int
 }
 
-type MigrationOp struct {
-	Term    int // current term
-	Gid     int // target gid
-	Cfgnum  int
-	Shard   int    // shard to move
-	Sending bool   // true for sending shard
-	Data    []byte // if sending is false, then the data of store
-}
+// type MigrationOp struct {
+// 	Term    int // current term
+// 	Gid     int // target gid
+// 	Cfgnum  int
+// 	Shard   int    // shard to move
+// 	Sending bool   // true for sending shard
+// 	Data    []byte // if sending is false, then the data of store
+// 	Mem     map[int]Response
+// }
+
 type MultiMigrationOp struct {
 	Term      int // current term
 	Gid       int // target gid
 	Cfgnum    int
 	Sending   bool           // true for sending shard
 	ShardData map[int][]byte // shard -> shard data
+	ShardMem  map[int]map[string]Response
+}
+
+type GCShardOp struct {
+	Shards []int
 }
 
 func (kv *ShardKV) killed() bool {
@@ -74,14 +83,14 @@ func (kv *ShardKV) loop() {
 					}
 				}(appmsg, KVRPCContext{value, res})
 
-			case MigrationOp:
-				kv.execMigrate(appmsg.Command.(MigrationOp))
-				kv.mu.Lock()
-				fn, ok := kv.sub[appmsg.CommandIndex]
-				kv.mu.Unlock()
-				if ok {
-					fn(appmsg, KVRPCContext{"", 0})
-				}
+			// case MigrationOp:
+			// 	kv.execMigrate(appmsg.Command.(MigrationOp))
+			// 	kv.mu.Lock()
+			// 	fn, ok := kv.sub[appmsg.CommandIndex]
+			// 	kv.mu.Unlock()
+			// 	if ok {
+			// 		fn(appmsg, KVRPCContext{"", 0})
+			// 	}
 			case MultiMigrationOp:
 				kv.execMultiMigrate(appmsg.Command.(MultiMigrationOp))
 				kv.mu.Lock()
@@ -90,6 +99,8 @@ func (kv *ShardKV) loop() {
 				if ok {
 					fn(appmsg, KVRPCContext{"", 0})
 				}
+			case GCShardOp:
+				kv.execGC(appmsg.Command.(GCShardOp))
 			default:
 				err := fmt.Sprintf("Wrong msg:%v", appmsg)
 				panic(err)
@@ -140,10 +151,10 @@ func (kv *ShardKV) removeHandler(index int) {
 }
 
 // isDuplicated return true if op with sn has been executed before
-func (kv *ShardKV) isDuplicatedOp(id string, sn int64) (bool, Response) {
+func (kv *ShardKV) isDuplicatedOpInShard(shard int, id string, sn int64) (bool, Response) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
-	v, exist := kv.clientMap[id]
+	v, exist := kv.shards[shard].mem[id]
 	if !exist {
 		return false, Response{}
 	}
@@ -151,70 +162,73 @@ func (kv *ShardKV) isDuplicatedOp(id string, sn int64) (bool, Response) {
 	if v.SerialNumber < sn {
 		return false, Response{}
 	} else if v.SerialNumber == sn {
+		DPrintf("%v for %v's latest id is %v", kv.shardkvInfo(), id, v.SerialNumber)
 		return true, v
 	} else {
+		DPrintf("%v for %v's latest id is %v", kv.shardkvInfo(), id, v.SerialNumber)
 		return true, Response{} // for any before requests, just response anything
 		// client must have handled the correct reponse before
 	}
 }
 
 // memorizeOp memorize the op for duplicating detecting
-func (kv *ShardKV) memorizeOp(id string, sn int64, r Response) {
+func (kv *ShardKV) memorizeOpInShard(shard int, id string, sn int64, r Response) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
-	kv.clientMap[id] = r
+	kv.shards[shard].mem[id] = r
 }
 
-// isInShards return true if shard is in kv's shards
-func (kv *ShardKV) isInShardsUnlocked(shard int) bool {
+// hasValidShard return ture if kv can process shard
+func (kv *ShardKV) hasValidShard(shard int) bool {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
 	_, ok := kv.shards[shard]
-	if ok {
-		return true
+	if !ok {
+		return false
 	}
-	return kv.cfg.Shards[shard] == kv.gid // must in current config
+
+	return kv.shards_state[shard] == Valid
+}
+
+func (kv *ShardKV) shardInConfig(shard int) bool {
+	return kv.cfg.Shards[shard] == kv.gid
 }
 
 // execOp executes op in statemachine
+// if shard is not valid, just return WrongGroup
 func (kv *ShardKV) execOp(op Op) (string, Res) {
-	ok, v := kv.isDuplicatedOp(op.Id, op.SerialNumber)
+	shard := key2shard(op.Key)
+	if !kv.hasValidShard(shard) {
+		return "", WrongGroup
+	}
+
+	ok, v := kv.isDuplicatedOpInShard(shard, op.Id, op.SerialNumber)
 	if ok {
-		DPrintf("server %v,%v: op is duplicated: %v", kv.me, kv.gid, op.SerialNumber)
+		DPrintf("%v: op is duplicated: %v in shard %v", kv.shardkvInfo(), op.SerialNumber, shard)
 		return v.Value, Succ
 	}
 
-	shard := key2shard(op.Key)
 	kv.mu.Lock()
-	if !kv.isInShardsUnlocked(shard) { // key is not in current shard
-		DPrintf("exec op: server %v: %v is not in %v's shard", kv.me, op.Key, kv.gid)
-		kv.mu.Unlock()
-		return "", WrongGroup
-	}
 
-	_, ok = kv.shards[shard]
-	if !ok {
-		DPrintf("server %v,%v: op is not ready for shard: %v, with key: \"%v\"", kv.me, kv.gid, shard, op.Key)
-		kv.mu.Unlock()
-		return "", WrongGroup
-	}
 	switch op.OpType {
 	case GET:
-		value := kv.shards[shard].Get(op.Key)
+		value := kv.shards[shard].store.Get(op.Key)
 		kv.mu.Unlock()
-		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, value, op.OpType})
+		kv.memorizeOpInShard(shard, op.Id, op.SerialNumber, Response{op.SerialNumber, value, op.OpType})
 
-		DPrintf("server %v, %v exec GET: \"%v\", %v", kv.me, kv.gid, op.Key, op.SerialNumber)
+		DPrintf("%v exec GET: \"%v\", %v", kv.shardkvInfo(), op.Key, op.SerialNumber)
 		return value, Succ
 	case PUT:
-		kv.shards[shard].Put(op.Key, op.Value)
+		kv.shards[shard].store.Put(op.Key, op.Value)
 		kv.mu.Unlock()
-		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		DPrintf("server %v, %v exec PUT: \"%v,%v\",%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
+		kv.memorizeOpInShard(shard, op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
+		DPrintf("%v exec PUT: \"%v,%v\",%v", kv.shardkvInfo(), op.Key, op.Value, op.SerialNumber)
 		return "", Succ
 	case APPEND:
-		kv.shards[shard].Append(op.Key, op.Value)
+		kv.shards[shard].store.Append(op.Key, op.Value)
 		kv.mu.Unlock()
-		kv.memorizeOp(op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		DPrintf("server %v, %v exec APPEND: \"%v,%v\",%v", kv.me, kv.gid, op.Key, op.Value, op.SerialNumber)
+		kv.memorizeOpInShard(shard, op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
+		DPrintf("%v exec APPEND: \"%v,%v\",%v", kv.shardkvInfo(), op.Key, op.Value, op.SerialNumber)
 		return "", Succ
 	default:
 		kv.mu.Unlock()

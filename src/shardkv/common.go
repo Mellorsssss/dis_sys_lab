@@ -43,6 +43,13 @@ const (
 	WrongGroup = 1
 )
 
+// shard state
+const (
+	Valid   = 0
+	Pushing = 1
+	GC      = 2
+)
+
 // Put or Append
 type PutAppendArgs struct {
 	// You'll have to add definitions here.
@@ -70,19 +77,20 @@ type GetReply struct {
 	Value string
 }
 
-type MigrateArgs struct {
-	Shard  int
-	Data   []byte
-	CfgNum int
-	Gid    int
-}
+// type MigrateArgs struct {
+// 	Shard  int
+// 	Data   []byte
+// 	CfgNum int
+// 	Gid    int
+// }
 
-type MigrateReply struct {
-	Err Err
-}
+// type MigrateReply struct {
+// 	Err Err
+// }
 
 type MultiMigrateArgs struct {
 	ShardData map[int][]byte
+	ShardMem  map[int]map[string]Response
 	CfgNum    int
 	Gid       int
 }
