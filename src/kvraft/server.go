@@ -335,7 +335,6 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		reply.Err = ErrWrongLeader
 		return
 	}
-	DPrintf("leader %v PutAppend in term %v", kv.me, term)
 
 	ok, _ := kv.isExecuted(args.Id, args.SerialNumber)
 	if ok {

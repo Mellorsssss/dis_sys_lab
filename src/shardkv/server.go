@@ -73,7 +73,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	// | false           | false           | drop
 	if !kv.shardInConfig(shard) && !kv.hasValidShard(shard) {
 		reply.Err = ErrWrongGroup
-		DPrintf("leader %v,%v doesn't have shard %v(%v)", kv.me, kv.gid, shard, kv.shards)
+		DPrintf("leader %v,%v doesn't have shard %v", kv.me, kv.gid, shard)
 		return
 	}
 
@@ -172,7 +172,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	}
 
 	// start the agree
-	done := make(chan struct{}, 1)
+	done := make(chan bool, 1)
 	var optype int
 	if args.Op == "Put" {
 		optype = PUT
@@ -202,18 +202,18 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		if !isStillLeader || newTerm != term || msg.Command != cmd {
 			reply.Err = ErrWrongLeader
 			kv.removeHandler(index)
-			done <- struct{}{}
+			done <- false
 			return
 		}
 
 		if ctx.Err == Succ {
 			reply.Err = OK
 			kv.removeHandler(index)
-			done <- struct{}{}
+			done <- true
 		} else if ctx.Err == WrongGroup {
 			reply.Err = ErrWrongGroup
 			kv.removeHandler(index)
-			done <- struct{}{}
+			done <- false
 		} else {
 			panic("wrong err")
 		}
@@ -221,8 +221,10 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	kv.mu.Unlock()
 	// wait for the msg is applied
 
-	<-done
-	DPrintf("leader %v,%v PutAppend \"%v\" : \"%v\" in term %v", kv.me, kv.gid, cmd.Key, cmd.Value, term)
+	res := <-done
+	if res {
+		DPrintf("leader %v,%v PutAppend \"%v\" : \"%v\" in term %v", kv.me, kv.gid, cmd.Key, cmd.Value, term)
+	}
 }
 
 // // migrate rpc between shardkv peers
@@ -347,14 +349,14 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 			return
 		}
 		kv.mu.Lock()
-		if op.Cfgnum < kv.cfg.Num {
+		cur_cfg_num := kv.cfg.Num
+		kv.mu.Unlock()
+		if op.Cfgnum < cur_cfg_num {
 			reply.Err = ErrOldShard
 			kv.removeHandler(index)
 			done <- struct{}{}
-			kv.mu.Unlock()
 			return
 		}
-		kv.mu.Unlock()
 
 		reply.Err = OK
 		kv.removeHandler(index)

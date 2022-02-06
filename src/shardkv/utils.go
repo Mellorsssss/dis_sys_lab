@@ -3,12 +3,10 @@ package shardkv
 import (
 	"fmt"
 	"log"
-
-	"6.824/shardctrler"
 )
 
 const (
-	Debug = true
+	Debug = false
 	INFO  = false
 	ERROR = false
 )
@@ -33,11 +31,6 @@ func Error(format string, a ...interface{}) (n int, err error) {
 	}
 	return
 }
-
-func showConfigInfo(cfg *shardctrler.Config) {
-	DPrintf("all the shards : %v", cfg.Shards)
-}
-
 func cloneBytes(src []byte) []byte {
 	res := make([]byte, len(src))
 	copy(res, src)

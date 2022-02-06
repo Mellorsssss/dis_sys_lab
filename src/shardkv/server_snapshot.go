@@ -29,7 +29,7 @@ func (kv *ShardKV) dumpShardDataUnlocked() map[int][]byte {
 func (kv *ShardKV) dumpMemUnlocked() map[int]map[string]Response {
 	data := make(map[int]map[string]Response) // shard id -> shard mem serialized data
 	for shard, v := range kv.shards {
-		data[shard] = v.mem
+		data[shard] = copySingleShardMem(v.mem)
 	}
 
 	return data
@@ -43,6 +43,13 @@ func (kv *ShardKV) loadShardUnlocked(sn *SnapShotData) {
 	}
 
 	kv.shards_state = sn.ShardState
+	// re-send the shards not be gc
+	for shard := range kv.shards_state {
+		if kv.shards_state[shard] == Pushing {
+			kv.shards_state[shard] = RePushing
+		}
+	}
+
 	kv.shards = make(map[int]*ShardStore)
 	for shard, sharddata := range sn.ShardData {
 		kv.shards[shard] = &ShardStore{}

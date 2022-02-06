@@ -57,8 +57,7 @@ func (kv *ShardKV) fetchConfigLoop() {
 				panic(err)
 			}
 
-			if ncfg.Shards[shard] != kv.gid {
-				// kv.removeShardUnlocked(shard, ncfg.Shards[shard], ncfg.Num)
+			if ncfg.Shards[shard] != kv.gid && kv.shards_state[shard] != Pushing { // only valid shard or repushing shard should be pushed
 				shards_to_move = append(shards_to_move, shard)
 			}
 		}
@@ -73,7 +72,6 @@ func (kv *ShardKV) fetchConfigLoop() {
 		kv.cfg = ncfg // change to newst config
 		kv.mu.Unlock()
 		time.Sleep(ServerConfigUpdatePeriod * time.Millisecond)
-		// }
 	}
 }
 
@@ -187,7 +185,7 @@ func copyShardMem(src map[int]map[string]Response) map[int]map[string]Response {
 
 func copySingleShardMem(src map[string]Response) map[string]Response {
 	dst := make(map[string]Response)
-	for ckid, r := range dst {
+	for ckid, r := range src {
 		dst[ckid] = r
 	}
 	return dst
@@ -215,6 +213,7 @@ func (kv *ShardKV) execMultiMigrate(m MultiMigrationOp) {
 			newdata := make([]byte, len(goaldata))
 			copy(newdata, goaldata)
 			copysharddata[shard] = newdata
+			copyshardmem[shard] = copySingleShardMem(kv.shards[shard].mem)
 		}
 
 		// asynchronous handler:
@@ -225,10 +224,12 @@ func (kv *ShardKV) execMultiMigrate(m MultiMigrationOp) {
 		go func() {
 			kv.multimigrateHandler(MultiMigrationCtx{copysharddata, copyshardmem, m.Gid, m.Cfgnum})
 			// debug output
+			kv.mu.Lock()
 			all_shards := []int{}
 			for shard := range kv.shards {
 				all_shards = append(all_shards, shard)
 			}
+			kv.mu.Unlock()
 
 			shards_gc := []int{}
 			for shard := range copysharddata {
@@ -237,18 +238,16 @@ func (kv *ShardKV) execMultiMigrate(m MultiMigrationOp) {
 
 			kv.mu.Lock()
 			kv.gcMultiShardUnlocked(shards_gc)
-			kv.mu.Unlock()
 
 			DPrintf("server %v,%v succ send the shard %v, still have %v shards:%v ", kv.me, kv.gid, len(kv.shards), all_shards)
+			kv.mu.Unlock()
 		}()
 
 	} else {
 		install_shards := []int{}
 		for shard, data := range m.ShardData {
 			_, ok := kv.shards[shard]
-			if ok {
-				DPrintf("server %v,%v already has install the shard %v", kv.me, kv.gid, shard)
-			} else {
+			if !ok {
 				_, memok := m.ShardMem[shard]
 				if !memok {
 					err := fmt.Sprintf("%v receive shard %v without mem", kv.shardkvInfo(), shard)
@@ -282,9 +281,10 @@ func (kv *ShardKV) execGC(gc GCShardOp) {
 			continue
 		}
 
-		if kv.shards_state[shard] != Pushing {
-			err := fmt.Sprintf("%v has shard %v to be gc but not in pushing state", kv.shardkvInfo(), shard)
-			panic(err)
+		if kv.shards_state[shard] != Pushing && kv.shards_state[shard] != RePushing {
+			continue
+			// err := fmt.Sprintf("%v has shard %v to be gc but not in pushing state:%v", kv.shardkvInfo(), shard, kv.shards_state[shard])
+			// panic(err)
 		}
 
 		delete(kv.shards, shard)
@@ -343,8 +343,10 @@ func (kv *ShardKV) multimigrateHandler(ctx MultiMigrationCtx) {
 	// send rpcs until success
 	for !kv.killed() {
 		kv.mu.Lock()
-		if servers, ok := kv.cfg.Groups[args.Gid]; ok {
-			kv.mu.Unlock()
+		servers, ok := kv.cfg.Groups[args.Gid]
+		kv.mu.Unlock()
+
+		if ok {
 			// try each server for the shard.
 			for si := 0; si < len(servers); si++ {
 				srv := kv.make_end(servers[si])

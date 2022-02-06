@@ -73,15 +73,15 @@ func (kv *ShardKV) loop() {
 				op := appmsg.Command.(Op)
 				value, res := kv.execOp(op)
 
-				go func(appmsg raft.ApplyMsg, ctx KVRPCContext) {
-					kv.mu.Lock()
-					fn, ok := kv.sub[appmsg.CommandIndex]
-					kv.mu.Unlock()
+				// go func(appmsg raft.ApplyMsg, ctx KVRPCContext) {
+				kv.mu.Lock()
+				fn, ok := kv.sub[appmsg.CommandIndex]
+				kv.mu.Unlock()
 
-					if ok {
-						fn(appmsg, ctx)
-					}
-				}(appmsg, KVRPCContext{value, res})
+				if ok {
+					fn(appmsg, KVRPCContext{value, res})
+				}
+				// }(appmsg, KVRPCContext{value, res})
 
 			// case MigrationOp:
 			// 	kv.execMigrate(appmsg.Command.(MigrationOp))
@@ -191,6 +191,8 @@ func (kv *ShardKV) hasValidShard(shard int) bool {
 }
 
 func (kv *ShardKV) shardInConfig(shard int) bool {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
 	return kv.cfg.Shards[shard] == kv.gid
 }
 
@@ -208,6 +210,11 @@ func (kv *ShardKV) execOp(op Op) (string, Res) {
 		return v.Value, Succ
 	}
 
+	latest_ck_mem, ok := kv.shards[shard].mem[op.Id]
+	latest_ck_sq := 0
+	if ok {
+		latest_ck_sq = int(latest_ck_mem.SerialNumber)
+	}
 	kv.mu.Lock()
 
 	switch op.OpType {
@@ -216,19 +223,19 @@ func (kv *ShardKV) execOp(op Op) (string, Res) {
 		kv.mu.Unlock()
 		kv.memorizeOpInShard(shard, op.Id, op.SerialNumber, Response{op.SerialNumber, value, op.OpType})
 
-		DPrintf("%v exec GET: \"%v\", %v", kv.shardkvInfo(), op.Key, op.SerialNumber)
+		DPrintf("%v exec GET: \"%v\", %v(while %v)", kv.shardkvInfo(), op.Key, op.SerialNumber, latest_ck_sq)
 		return value, Succ
 	case PUT:
 		kv.shards[shard].store.Put(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOpInShard(shard, op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		DPrintf("%v exec PUT: \"%v,%v\",%v", kv.shardkvInfo(), op.Key, op.Value, op.SerialNumber)
+		DPrintf("%v exec PUT: \"%v,%v\",%v(while %v)", kv.shardkvInfo(), op.Key, op.Value, op.SerialNumber, latest_ck_sq)
 		return "", Succ
 	case APPEND:
 		kv.shards[shard].store.Append(op.Key, op.Value)
 		kv.mu.Unlock()
 		kv.memorizeOpInShard(shard, op.Id, op.SerialNumber, Response{op.SerialNumber, "", op.OpType})
-		DPrintf("%v exec APPEND: \"%v,%v\",%v", kv.shardkvInfo(), op.Key, op.Value, op.SerialNumber)
+		DPrintf("%v exec APPEND: \"%v,%v\",%v(while %v)", kv.shardkvInfo(), op.Key, op.Value, op.SerialNumber, latest_ck_sq)
 		return "", Succ
 	default:
 		kv.mu.Unlock()
