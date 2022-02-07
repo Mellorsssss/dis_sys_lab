@@ -15,6 +15,7 @@ const (
 	ErrWrongGroup  = "ErrWrongGroup"
 	ErrWrongLeader = "ErrWrongLeader"
 	ErrOldShard    = "ErrOldShard"
+	ErrFailTrans   = "ErrFailTrans"
 )
 
 // client params

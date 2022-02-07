@@ -276,7 +276,7 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 		op := msg.Command.(MultiMigrationOp)
 		newTerm, isStillLeader := kv.rf.GetState()
 		if !isStillLeader || newTerm != term {
-			reply.Err = ErrOldShard
+			reply.Err = ErrFailTrans
 			kv.removeHandler(index)
 			done <- struct{}{}
 			return
@@ -285,7 +285,7 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 		cur_cfg_num := kv.cfg.Num
 		kv.mu.Unlock()
 		if op.Cfgnum < cur_cfg_num {
-			reply.Err = ErrOldShard
+			reply.Err = ErrFailTrans
 			kv.removeHandler(index)
 			done <- struct{}{}
 			return
@@ -304,7 +304,7 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 		all_shards = append(all_shards, shard)
 	}
 
-	DPrintf("server <%v, %v> receive shards %v succ", kv.me, kv.gid, all_shards)
+	DPrintf("%v receive shards %v succ", kv.shardkvInfo(), all_shards)
 }
 
 //

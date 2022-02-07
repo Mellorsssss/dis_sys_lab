@@ -144,11 +144,6 @@ func (kv *ShardKV) execMultiMigrate(m MultiMigrationOp) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	if m.Sending {
-
-		if m.Cfgnum < kv.cfg.Num {
-			DPrintf("%v migrate is out of date(%v < %v), drop it", kv.shardkvInfo(), m.Cfgnum, kv.cfg.Num)
-			return
-		}
 		copysharddata := copyShardData(m.ShardData)
 		copyshardmem := copyShardMem(m.ShardMem)
 
