@@ -83,14 +83,6 @@ func (kv *ShardKV) loop() {
 				}
 				// }(appmsg, KVRPCContext{value, res})
 
-			// case MigrationOp:
-			// 	kv.execMigrate(appmsg.Command.(MigrationOp))
-			// 	kv.mu.Lock()
-			// 	fn, ok := kv.sub[appmsg.CommandIndex]
-			// 	kv.mu.Unlock()
-			// 	if ok {
-			// 		fn(appmsg, KVRPCContext{"", 0})
-			// 	}
 			case MultiMigrationOp:
 				kv.execMultiMigrate(appmsg.Command.(MultiMigrationOp))
 				kv.mu.Lock()
@@ -162,10 +154,8 @@ func (kv *ShardKV) isDuplicatedOpInShard(shard int, id string, sn int64) (bool, 
 	if v.SerialNumber < sn {
 		return false, Response{}
 	} else if v.SerialNumber == sn {
-		DPrintf("%v for %v's latest id is %v", kv.shardkvInfo(), id, v.SerialNumber)
 		return true, v
 	} else {
-		DPrintf("%v for %v's latest id is %v", kv.shardkvInfo(), id, v.SerialNumber)
 		return true, Response{} // for any before requests, just response anything
 		// client must have handled the correct reponse before
 	}
@@ -201,6 +191,7 @@ func (kv *ShardKV) shardInConfig(shard int) bool {
 func (kv *ShardKV) execOp(op Op) (string, Res) {
 	shard := key2shard(op.Key)
 	if !kv.hasValidShard(shard) {
+		DPrintf("%v doesn't have shard %v now(%v)", kv.shardkvInfo(), shard, kv.shardInfo())
 		return "", WrongGroup
 	}
 

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	Debug = false
+	Debug = true
 	INFO  = false
 	ERROR = false
 )
@@ -39,4 +39,17 @@ func cloneBytes(src []byte) []byte {
 
 func (kv *ShardKV) shardkvInfo() string {
 	return fmt.Sprintf(" server [%v, %v] ", kv.gid, kv.me)
+}
+
+func (kv *ShardKV) shardInfo() string {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	shards := []int{}
+	for shard := range kv.shards {
+		if kv.shards_state[shard] == Valid {
+			shards = append(shards, shard)
+		}
+	}
+
+	return fmt.Sprintf(" valid shards: %v", shards)
 }

@@ -45,9 +45,8 @@ const (
 
 // shard state
 const (
-	Valid     = 0
-	Pushing   = 1
-	GC        = 2
+	Valid     = 1
+	Pushing   = 2
 	RePushing = 3
 )
 

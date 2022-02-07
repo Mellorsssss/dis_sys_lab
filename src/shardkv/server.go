@@ -88,7 +88,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	}
 
 	// start the agree
-	done := make(chan struct{}, 1)
+	done := make(chan bool, 1)
 	cmd := Op{
 		OpType:       GET,
 		Key:          args.Key,
@@ -110,7 +110,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 		if !isStillLeader || newTerm != term || msg.Command != cmd {
 			reply.Err = ErrWrongLeader
 			kv.removeHandler(index)
-			done <- struct{}{}
+			done <- false
 			return
 		}
 
@@ -118,11 +118,11 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 			reply.Value = ctx.value
 			reply.Err = OK
 			kv.removeHandler(index)
-			done <- struct{}{}
+			done <- true
 		} else if ctx.Err == WrongGroup {
 			reply.Err = ErrWrongGroup
 			kv.removeHandler(index)
-			done <- struct{}{}
+			done <- false
 		} else {
 			panic("wrong err")
 		}
@@ -130,8 +130,10 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	kv.mu.Unlock()
 	// wait for the msg is applied
 
-	<-done
-	DPrintf("leader %v,%v Get \"%v\" : \"%v\" in term %v", kv.me, kv.gid, cmd.Key, reply.Value, term)
+	res := <-done
+	if res {
+		DPrintf("%v Get \"%v\" : \"%v\" in term %v", kv.shardkvInfo(), cmd.Key, reply.Value, term)
+	}
 }
 
 func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
@@ -144,7 +146,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 	term, isLeader := kv.rf.GetState()
 	if !isLeader {
-		DPrintf("sever %v is not leader in term %v", kv.me, term)
+		DPrintf("%v is not leader in term %v", kv.shardkvInfo(), term)
 		reply.Err = ErrWrongLeader
 		return
 	}
@@ -158,7 +160,6 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	// | false           | false           | drop
 	if !kv.shardInConfig(shard) && !kv.hasValidShard(shard) {
 		reply.Err = ErrWrongGroup
-		DPrintf("leader %v,%v doesn't have shard %v(%v)", kv.me, kv.gid, shard, kv.shards)
 		return
 	}
 
@@ -223,77 +224,9 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 	res := <-done
 	if res {
-		DPrintf("leader %v,%v PutAppend \"%v\" : \"%v\" in term %v", kv.me, kv.gid, cmd.Key, cmd.Value, term)
+		DPrintf("%v PutAppend \"%v\" : \"%v\" in term %v", kv.shardkvInfo(), cmd.Key, cmd.Value, term)
 	}
 }
-
-// // migrate rpc between shardkv peers
-// func (kv *ShardKV) Migrate(args *MigrateArgs, reply *MigrateReply) {
-// 	if kv.killed() {
-// 		reply.Err = ErrWrongLeader
-// 		return
-// 	}
-
-// 	term, isLeader := kv.rf.GetState()
-// 	if !isLeader {
-// 		reply.Err = ErrWrongLeader
-// 		return
-// 	}
-
-// 	kv.mu.Lock()
-
-// 	// duplicated shard transition
-// 	_, ok := kv.shards[args.Shard]
-// 	if ok && kv.cfg.Num == args.CfgNum { // this shard has been translated
-// 		reply.Err = OK
-// 		kv.mu.Unlock()
-// 		return
-// 	}
-
-// 	if ok && args.CfgNum < kv.cfg.Num { // detect old config
-// 		reply.Err = ErrOldShard
-// 		kv.mu.Unlock()
-// 		return
-// 	}
-
-// 	// start the agree
-// 	done := make(chan struct{}, 1)
-// 	index, _, ok := kv.rf.Start(MigrationOp{term, kv.gid, args.CfgNum, args.Shard, false, args.Data})
-// 	if !ok {
-// 		reply.Err = ErrWrongLeader
-// 		kv.mu.Unlock()
-// 		return
-// 	}
-
-// 	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
-// 		op := msg.Command.(MigrationOp)
-// 		newTerm, isStillLeader := kv.rf.GetState()
-// 		if !isStillLeader || newTerm != term {
-// 			reply.Err = ErrOldShard
-// 			kv.removeHandler(index)
-// 			done <- struct{}{}
-// 			return
-// 		}
-// 		kv.mu.Lock()
-// 		if op.Cfgnum < kv.cfg.Num {
-// 			reply.Err = ErrOldShard
-// 			kv.removeHandler(index)
-// 			done <- struct{}{}
-// 			kv.mu.Unlock()
-// 			return
-// 		}
-// 		kv.mu.Unlock()
-
-// 		reply.Err = OK
-// 		kv.removeHandler(index)
-// 		done <- struct{}{}
-// 	})
-// 	kv.mu.Unlock()
-// 	// wait for the msg is applied
-
-// 	<-done
-// 	DPrintf("server <%v, %v> receive shard %v succ", kv.me, kv.gid, args.Shard)
-// }
 
 func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply) {
 	if kv.killed() {
@@ -312,7 +245,7 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 	kv.mu.Lock()
 	for shard := range args.ShardData {
 		_, ok := kv.shards[shard]
-		if !ok {
+		if !ok || kv.shards_state[shard] != Valid { // no such valid shard
 			has_new_shard = true
 			break
 		}

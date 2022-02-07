@@ -87,10 +87,8 @@ func (ck *Clerk) Get(key string) string {
 	// prepare args
 	args := GetArgs{}
 	args.Key = key
-	// ck.mu.Lock()
 	ck.prevSerNum++ // sn increase
 	args.SerialNumber = ck.prevSerNum
-	// ck.mu.Unlock()
 	args.Id = ck.id
 
 	// send rpcs until success
@@ -109,7 +107,7 @@ func (ck *Clerk) Get(key string) string {
 					return reply.Value
 				}
 				if ok && (reply.Err == ErrWrongGroup) {
-					DPrintf("ck %v get \"%v\": \"%v\"", ck.id, key, reply.Value)
+					DPrintf("ck %v get \"%v\" fail with sn %v", ck.id, key, reply.Value, args.SerialNumber)
 					break
 				}
 				// ... not ok, or ErrWrongLeader
@@ -131,10 +129,8 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Value = value
 	args.Op = op
 
-	// ck.mu.Lock()
 	ck.prevSerNum++ // sn increase
 	args.SerialNumber = ck.prevSerNum
-	// ck.mu.Unlock()
 	args.Id = ck.id
 
 	for {
@@ -149,7 +145,9 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 				if ok && reply.Err == OK {
 					return
 				}
+
 				if ok && reply.Err == ErrWrongGroup {
+					DPrintf("ck %v putappend fail with sn %v", ck.id, args.SerialNumber)
 					break
 				}
 				// ... not ok, or ErrWrongLeader
