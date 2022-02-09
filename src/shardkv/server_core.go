@@ -51,6 +51,7 @@ type MultiMigrationOp struct {
 
 type GCShardOp struct {
 	Shards []int
+	CfgNum int
 }
 
 type ConfigOp struct {
@@ -106,24 +107,16 @@ func (kv *ShardKV) loop() {
 			}
 
 			if kv.maxraftstate != -1 && kv.persister.RaftStateSize() > int(float32(kv.maxraftstate)*RaftSizeThreshold) {
-				Info("server %v,%v takes snapshot(%v > %v)", kv.me, kv.gid, kv.persister.RaftStateSize(), kv.maxraftstate)
-				if appmsg.SnapshotValid {
-					Info("server %v,%v should snapshot after condinstall.", kv.me, kv.gid)
-				}
 				kv.rf.Snapshot(appmsg.CommandIndex, kv.persist())
 				snapshotIndex = raft.MaxInt(snapshotIndex, appmsg.CommandIndex)
 			}
 		} else if appmsg.SnapshotValid { // CondInstallSnapshot
 			if kv.rf.CondInstallSnapshot(appmsg.SnapshotTerm, appmsg.SnapshotIndex, appmsg.Snapshot) {
-				Info("server %v,%v begins to switch to snapshot", kv.me, kv.gid)
 				kv.readPersist(kv.persister.ReadSnapshot())
-				Info("server %v,%v succs to switch to snapshot, raftsize is %v", kv.me, kv.gid, kv.persister.RaftStateSize())
 				snapshotIndex = raft.MaxInt(snapshotIndex, appmsg.SnapshotIndex)
 			} else {
-				Info("server %v,%v fails to switch to snapshot", kv.me, kv.gid)
 			}
 		}
-		Info("server %v,%v's raftsize is %v (snapshotIndex:%v)now", kv.me, kv.gid, kv.persister.RaftStateSize(), snapshotIndex)
 	}
 }
 
@@ -197,7 +190,7 @@ func (kv *ShardKV) shardInConfig(shard int) bool {
 // if shard is not valid, just return WrongGroup
 func (kv *ShardKV) execOp(op Op) (string, Res) {
 	shard := key2shard(op.Key)
-	if !kv.hasValidShard(shard) {
+	if !kv.hasValidShard(shard) || !kv.shardInConfig(shard) {
 		DPrintf("%v doesn't have shard %v now(%v)", kv.shardkvInfo(), shard, kv.shardInfo())
 		return "", WrongGroup
 	}

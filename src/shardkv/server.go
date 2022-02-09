@@ -71,16 +71,16 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	// | true            | false           | add op, not check(since no shard)
 	// | false           | true            | full check(still as normal shard)
 	// | false           | false           | drop
-	if !kv.shardInConfig(shard) && !kv.hasValidShard(shard) {
+	if args.CfgNum < kv.cfg.Num {
 		reply.Err = ErrWrongGroup
-		DPrintf("leader %v,%v doesn't have shard %v", kv.me, kv.gid, shard)
+		DPrintf("%v(leader) doesn't have shard %v now", kv.shardkvInfo(), shard)
 		return
 	}
 
 	if kv.hasValidShard(shard) {
 		ok, r := kv.isDuplicatedOpInShard(shard, args.Id, args.SerialNumber)
 		if ok {
-			DPrintf("leader %v Get in shard %v but commit before by %v", kv.me, shard, args.Id)
+			DPrintf("%v Get in shard %v but commit before by %v", kv.shardkvInfo(), shard, args.Id)
 			reply.Err = OK
 			reply.Value = r.Value
 			return
@@ -146,7 +146,6 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 	term, isLeader := kv.rf.GetState()
 	if !isLeader {
-		DPrintf("%v is not leader in term %v", kv.shardkvInfo(), term)
 		reply.Err = ErrWrongLeader
 		return
 	}
@@ -158,7 +157,8 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	// | true            | false           | add op, not check(since no shard)
 	// | false           | true            | full check(still as normal shard)
 	// | false           | false           | drop
-	if !kv.shardInConfig(shard) && !kv.hasValidShard(shard) {
+	if args.CfgNum < kv.cfg.Num {
+		DPrintf("%v(leader) doesn't have shard %v now", kv.shardkvInfo(), shard)
 		reply.Err = ErrWrongGroup
 		return
 	}
@@ -166,7 +166,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	if kv.hasValidShard(shard) {
 		ok, _ := kv.isDuplicatedOpInShard(shard, args.Id, args.SerialNumber)
 		if ok {
-			DPrintf("leader %v Get in shard %v but commit before by %v", kv.me, shard, args.Id)
+			DPrintf("%v Putappend in shard %v but commit before by %v", kv.shardkvInfo(), shard, args.Id)
 			reply.Err = OK
 			return
 		}
@@ -241,26 +241,19 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 	}
 
 	// duplicated shard transition
-	has_new_shard := false
 	kv.mu.Lock()
-	for shard := range args.ShardData {
-		_, ok := kv.shards[shard]
-		if !ok || kv.shards_state[shard] != Valid { // no such valid shard
-			has_new_shard = true
-			break
-		}
-	}
-
-	if !has_new_shard {
-		if args.CfgNum < kv.cfg.Num { // detect old config
+	if args.CfgNum <= kv.cfg.Num {
+		if kv.ConfigOutOfDateUnlocked(args.CfgNum) {
 			reply.Err = ErrOldShard
 			kv.mu.Unlock()
 			return
-		} else {
-			reply.Err = OK
-			kv.mu.Unlock()
-			return
 		}
+	}
+
+	if args.CfgNum > kv.cfg.Num+1 {
+		reply.Err = ErrFailTrans
+		kv.mu.Unlock()
+		return
 	}
 
 	// start the agree
@@ -273,18 +266,8 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 	}
 
 	kv.registerHandler(index, func(msg raft.ApplyMsg, ctx KVRPCContext) {
-		op := msg.Command.(MultiMigrationOp)
 		newTerm, isStillLeader := kv.rf.GetState()
 		if !isStillLeader || newTerm != term {
-			reply.Err = ErrFailTrans
-			kv.removeHandler(index)
-			done <- struct{}{}
-			return
-		}
-		kv.mu.Lock()
-		cur_cfg_num := kv.cfg.Num
-		kv.mu.Unlock()
-		if op.Cfgnum < cur_cfg_num {
 			reply.Err = ErrFailTrans
 			kv.removeHandler(index)
 			done <- struct{}{}
@@ -304,7 +287,7 @@ func (kv *ShardKV) MultiMigrate(args *MultiMigrateArgs, reply *MultiMigrateReply
 		all_shards = append(all_shards, shard)
 	}
 
-	DPrintf("%v receive shards %v succ", kv.shardkvInfo(), all_shards)
+	Info("%v receive shards %v succ in %v", kv.shardkvInfo(), all_shards, args.CfgNum)
 }
 
 //

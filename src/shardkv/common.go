@@ -60,6 +60,7 @@ type PutAppendArgs struct {
 	// mark client
 	SerialNumber int64
 	Id           string // client id
+	CfgNum       int
 }
 
 type PutAppendReply struct {
@@ -71,6 +72,7 @@ type GetArgs struct {
 	// mark client
 	SerialNumber int64
 	Id           string // client id
+	CfgNum       int
 }
 
 type GetReply struct {

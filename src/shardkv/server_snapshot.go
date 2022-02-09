@@ -7,6 +7,7 @@ import (
 	"6.824/kvraft"
 	"6.824/labgob"
 	"6.824/raft"
+	"6.824/shardctrler"
 )
 
 /* snapshot library */
@@ -15,6 +16,7 @@ type SnapShotData struct {
 	ShardData  map[int][]byte
 	Mem        map[int]map[string]Response
 	ShardState map[int]int
+	Config     shardctrler.Config
 }
 
 func (kv *ShardKV) dumpShardDataUnlocked() map[int][]byte {
@@ -43,9 +45,11 @@ func (kv *ShardKV) loadShardUnlocked(sn *SnapShotData) {
 	}
 
 	kv.shards_state = sn.ShardState
+	kv.cfg = sn.Config
 	// re-send the shards not be gc
 	for shard := range kv.shards_state {
 		if kv.shards_state[shard] == Pushing {
+			DPrintf("%v repushing shard %v in config %v", kv.shardkvInfo(), shard, kv.cfg.Num+1)
 			kv.shards_state[shard] = RePushing
 		}
 	}
@@ -66,6 +70,7 @@ func (kv *ShardKV) persist() []byte {
 		ShardData:  kv.dumpShardDataUnlocked(),
 		Mem:        kv.dumpMemUnlocked(),
 		ShardState: kv.shards_state,
+		Config:     kv.cfg,
 	}
 
 	sb := new(bytes.Buffer)

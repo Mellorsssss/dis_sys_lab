@@ -47,16 +47,47 @@ func (kv *ShardKV) shardInfo() string {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	shards := []int{}
+	invalid_shards := []int{}
 	for shard := range kv.shards {
 		if kv.shards_state[shard] == Valid {
 			shards = append(shards, shard)
+		} else {
+			invalid_shards = append(invalid_shards, shard)
 		}
 	}
 
-	return fmt.Sprintf(" valid shards: %v", shards)
+	return fmt.Sprintf(" valid shards: %v; invalid shards: %v", shards, invalid_shards)
+}
+
+func (kv *ShardKV) shardInfoUnlocked() string {
+	shards := []int{}
+	invalid_shards := []int{}
+	for shard := range kv.shards {
+		if kv.shards_state[shard] == Valid {
+			shards = append(shards, shard)
+		} else {
+			invalid_shards = append(invalid_shards, shard)
+		}
+	}
+
+	return fmt.Sprintf(" valid shards: %v; invalid shards: %v", shards, invalid_shards)
 }
 
 func (kv *ShardKV) exsitConfig(cfgNum int) (shardctrler.Config, bool) {
 	cfg := kv.ck.Query(cfgNum)
 	return cfg, cfg.Num == cfgNum
+}
+
+func (kv *ShardKV) ConfigOutOfDateUnlocked(cfgNum int) bool {
+	endCfg := kv.cfg.Num
+	for i := cfgNum + 1; i <= endCfg; i++ {
+		cfg := kv.ck.Query(i)
+		for _, gid := range cfg.Shards {
+			if gid == kv.gid {
+				return true
+			}
+		}
+	}
+
+	return false
 }

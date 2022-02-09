@@ -82,7 +82,7 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 // You will have to modify this function.
 //
 func (ck *Clerk) Get(key string) string {
-	DPrintf("ck %v begin get \"%v\"", ck.id, key)
+	// DPrintf("ck %v begin get \"%v\"", ck.id, key)
 
 	// prepare args
 	args := GetArgs{}
@@ -90,6 +90,7 @@ func (ck *Clerk) Get(key string) string {
 	ck.prevSerNum++ // sn increase
 	args.SerialNumber = ck.prevSerNum
 	args.Id = ck.id
+	args.CfgNum = ck.config.Num
 
 	// send rpcs until success
 	for {
@@ -103,7 +104,7 @@ func (ck *Clerk) Get(key string) string {
 				var reply GetReply
 				ok := srv.Call("ShardKV.Get", &args, &reply)
 				if ok && (reply.Err == OK || reply.Err == ErrNoKey) {
-					DPrintf("ck %v get \"%v\": \"%v\"", ck.id, key, reply.Value)
+					// DPrintf("ck %v get \"%v\": \"%v\"", ck.id, key, reply.Value)
 					return reply.Value
 				}
 				if ok && (reply.Err == ErrWrongGroup) {
@@ -116,6 +117,7 @@ func (ck *Clerk) Get(key string) string {
 		time.Sleep(ClientRPCPeriod * time.Millisecond)
 		// ask controler for the latest configuration.
 		ck.config = ck.sm.Query(-1)
+		args.CfgNum = ck.config.Num
 	}
 }
 
@@ -132,6 +134,7 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	ck.prevSerNum++ // sn increase
 	args.SerialNumber = ck.prevSerNum
 	args.Id = ck.id
+	args.CfgNum = ck.config.Num
 
 	for {
 		// showConfigInfo(&ck.config)
@@ -156,16 +159,17 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 		time.Sleep(ClientRPCPeriod * time.Millisecond)
 		// ask controler for the latest configuration.
 		ck.config = ck.sm.Query(-1)
+		args.CfgNum = ck.config.Num
 	}
 }
 
 func (ck *Clerk) Put(key string, value string) {
-	DPrintf("ck %v begin put :< \"%v\", \"%v\">", ck.id, key, value)
+	// DPrintf("ck %v begin put :< \"%v\", \"%v\">", ck.id, key, value)
 	ck.PutAppend(key, value, "Put")
-	DPrintf("ck %v successfully put :< \"%v\", \"%v\">", ck.id, key, value)
+	// DPrintf("ck %v successfully put :< \"%v\", \"%v\">", ck.id, key, value)
 }
 func (ck *Clerk) Append(key string, value string) {
-	DPrintf("ck %v begin append :< \"%v\", \"%v\">", ck.id, key, value)
+	// DPrintf("ck %v begin append :< \"%v\", \"%v\">", ck.id, key, value)
 	ck.PutAppend(key, value, "Append")
-	DPrintf("ck %v successfully append :< \"%v\", \"%v\">", ck.id, key, value)
+	// DPrintf("ck %v successfully append :< \"%v\", \"%v\">", ck.id, key, value)
 }
