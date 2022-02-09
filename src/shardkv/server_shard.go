@@ -32,11 +32,6 @@ func (kv *ShardKV) initShards() {
 // anytime, if shards are ready, change kv.cfg to latest config
 // and if ck's rq's Num is larger than kv.cfg, don't serve it(todo: optimize)
 func (kv *ShardKV) fetchConfigLoop() {
-	// if no shards(means no snapshot), query the first config
-	if kv.cfg.Num == 0 {
-		kv.initShards()
-	}
-
 	// update the config atomically
 	// start the migrate if necessary
 	for !kv.killed() {
@@ -44,24 +39,47 @@ func (kv *ShardKV) fetchConfigLoop() {
 		ccfg := kv.cfg
 
 		if ncfg, ok := kv.exsitConfig(ccfg.Num + 1); ok { // exsit new config, start migrate
-			// move all the leaving shards
-			shards_to_move := []int{}
+			if ncfg.Num == 1 { // initial situation, just apply it
+				kv.applyConfigUnlocked(ncfg)
+				kv.mu.Unlock()
+				time.Sleep(ServerConfigUpdatePeriod * time.Millisecond)
+			}
+			shards_need_push := false
+			shards_need_pull := false
+			// detect if shards to move
+			shard_gid_map := make(map[int][]int)
 			for shard := range kv.shards {
 				if shard >= len(kv.cfg.Shards) {
 					err := fmt.Sprintf("server %v has shard which range out:%v > %v", kv.me, shard, len(kv.cfg.Shards))
 					panic(err)
 				}
 
-				if ncfg.Shards[shard] != kv.gid && kv.shards_state[shard] != Pushing { // only valid shard or repushing shard should be pushed
-					shards_to_move = append(shards_to_move, shard)
+				gid := ncfg.Shards[shard]
+				if gid != kv.gid && kv.shards_state[shard] != Pushing { // only valid shard or repushing shard should be pushed
+					if _, ok := shard_gid_map[gid]; !ok {
+						shard_gid_map[gid] = []int{}
+					}
+					shard_gid_map[gid] = append(shard_gid_map[gid], shard)
 				}
 			}
 
-			if len(shards_to_move) > 1 {
-				kv.removeMultiShardUnlocked(shards_to_move, ncfg.Shards[shards_to_move[0]], ncfg.Num)
+			shards_need_push = len(shard_gid_map) > 0
+			for gid1, shards := range shard_gid_map {
+				kv.removeMultiShardUnlocked(shards, gid1, ncfg.Num)
 			}
 
-			kv.cfg = ncfg // change to newst config
+			for shard, gid := range ncfg.Shards {
+				if gid == kv.gid {
+					if v, ok := kv.shards_state[shard]; !ok || v != Valid {
+						shards_need_pull = true
+						break
+					}
+				}
+			}
+
+			if !shards_need_pull && !shards_need_push {
+				kv.applyConfigUnlocked(ncfg)
+			}
 			kv.mu.Unlock()
 			time.Sleep(ServerConfigUpdatePeriod * time.Millisecond)
 		}
