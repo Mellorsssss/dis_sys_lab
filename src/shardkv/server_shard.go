@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"6.824/kvraft"
+	"6.824/shardctrler"
 )
 
 // ShardStore contains the data and duplicate detection
@@ -15,20 +16,13 @@ type ShardStore struct {
 
 // query the Config 1 to init shards
 func (kv *ShardKV) initShards() {
-	kv.shards = make(map[int]*ShardStore)
 	cfg := kv.ck.Query(1)
 	for ; cfg.Num != 1; cfg = kv.ck.Query(1) {
 		time.Sleep(100 * time.Millisecond)
 	}
 
 	kv.mu.Lock()
-	for shard, gid := range cfg.Shards {
-		if gid == kv.gid {
-			kv.shards[shard] = &ShardStore{kvraft.MakeMapStore(), make(map[string]Response)}
-			kv.shards_state[shard] = Valid
-			DPrintf("server %v,%v get %v", kv.me, kv.gid, shard)
-		}
-	}
+	kv.applyConfigUnlocked(cfg)
 	kv.mu.Unlock()
 }
 
@@ -39,7 +33,7 @@ func (kv *ShardKV) initShards() {
 // and if ck's rq's Num is larger than kv.cfg, don't serve it(todo: optimize)
 func (kv *ShardKV) fetchConfigLoop() {
 	// if no shards(means no snapshot), query the first config
-	if kv.shards == nil {
+	if kv.cfg.Num == 0 {
 		kv.initShards()
 	}
 
@@ -47,28 +41,30 @@ func (kv *ShardKV) fetchConfigLoop() {
 	// start the migrate if necessary
 	for !kv.killed() {
 		kv.mu.Lock()
-		ncfg := kv.ck.Query(-1)
+		ccfg := kv.cfg
 
-		// move all the leaving shards
-		shards_to_move := []int{}
-		for shard := range kv.shards {
-			if shard >= len(kv.cfg.Shards) {
-				err := fmt.Sprintf("server %v has shard which range out:%v > %v", kv.me, shard, len(kv.cfg.Shards))
-				panic(err)
+		if ncfg, ok := kv.exsitConfig(ccfg.Num + 1); ok { // exsit new config, start migrate
+			// move all the leaving shards
+			shards_to_move := []int{}
+			for shard := range kv.shards {
+				if shard >= len(kv.cfg.Shards) {
+					err := fmt.Sprintf("server %v has shard which range out:%v > %v", kv.me, shard, len(kv.cfg.Shards))
+					panic(err)
+				}
+
+				if ncfg.Shards[shard] != kv.gid && kv.shards_state[shard] != Pushing { // only valid shard or repushing shard should be pushed
+					shards_to_move = append(shards_to_move, shard)
+				}
 			}
 
-			if ncfg.Shards[shard] != kv.gid && kv.shards_state[shard] != Pushing { // only valid shard or repushing shard should be pushed
-				shards_to_move = append(shards_to_move, shard)
+			if len(shards_to_move) > 1 {
+				kv.removeMultiShardUnlocked(shards_to_move, ncfg.Shards[shards_to_move[0]], ncfg.Num)
 			}
-		}
 
-		if len(shards_to_move) > 1 {
-			kv.removeMultiShardUnlocked(shards_to_move, ncfg.Shards[shards_to_move[0]], ncfg.Num)
+			kv.cfg = ncfg // change to newst config
+			kv.mu.Unlock()
+			time.Sleep(ServerConfigUpdatePeriod * time.Millisecond)
 		}
-
-		kv.cfg = ncfg // change to newst config
-		kv.mu.Unlock()
-		time.Sleep(ServerConfigUpdatePeriod * time.Millisecond)
 	}
 }
 
@@ -106,6 +102,20 @@ func (kv *ShardKV) gcMultiShardUnlocked(shards []int) {
 
 	kv.rf.Start(GCShardOp{Shards: shards})
 	DPrintf("leader %v start to gc shards %v", kv.shardkvInfo(), shards)
+}
+
+func (kv *ShardKV) applyConfigUnlocked(cfg shardctrler.Config) {
+	if kv.killed() {
+		return
+	}
+
+	_, isLeader := kv.rf.GetState()
+	if !isLeader {
+		return
+	}
+
+	kv.rf.Start(ConfigOp{cfg})
+	DPrintf("leader %v start to apply config %v", kv.shardkvInfo(), cfg.Num)
 }
 
 func copyShardData(src map[int][]byte) map[int][]byte {
@@ -251,6 +261,22 @@ func (kv *ShardKV) execGC(gc GCShardOp) {
 		shards_gc = append(shards_gc, shard)
 	}
 	DPrintf("%v gc shard %v", kv.shardkvInfo(), shards_gc)
+}
+
+func (kv *ShardKV) execConfig(cfg ConfigOp) {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	if cfg.Cfg.Num <= kv.cfg.Num {
+		err := fmt.Sprintf("%v try to apply an old config:%v< %v", kv.shardkvInfo(), cfg.Cfg.Num, kv.cfg.Num)
+		panic(err)
+	}
+
+	if cfg.Cfg.Num != kv.cfg.Num+1 {
+		err := fmt.Sprintf("%v try to apply an too later config:%v > %v + 1", kv.shardkvInfo(), cfg.Cfg.Num, kv.cfg.Num)
+		panic(err)
+	}
+
+	kv.cfg = cfg.Cfg
 }
 
 // move multi-shards one time

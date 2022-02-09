@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"6.824/raft"
+	"6.824/shardctrler"
 )
 
 // MigrationCtx is the data of migrating
@@ -50,6 +51,10 @@ type MultiMigrationOp struct {
 
 type GCShardOp struct {
 	Shards []int
+}
+
+type ConfigOp struct {
+	Cfg shardctrler.Config // config to apply
 }
 
 func (kv *ShardKV) killed() bool {
@@ -93,6 +98,8 @@ func (kv *ShardKV) loop() {
 				}
 			case GCShardOp:
 				kv.execGC(appmsg.Command.(GCShardOp))
+			case ConfigOp:
+				kv.execConfig(appmsg.Command.(ConfigOp))
 			default:
 				err := fmt.Sprintf("Wrong msg:%v", appmsg)
 				panic(err)

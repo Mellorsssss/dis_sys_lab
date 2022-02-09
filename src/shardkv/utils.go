@@ -3,10 +3,12 @@ package shardkv
 import (
 	"fmt"
 	"log"
+
+	"6.824/shardctrler"
 )
 
 const (
-	Debug = true
+	Debug = false
 	INFO  = false
 	ERROR = false
 )
@@ -52,4 +54,9 @@ func (kv *ShardKV) shardInfo() string {
 	}
 
 	return fmt.Sprintf(" valid shards: %v", shards)
+}
+
+func (kv *ShardKV) exsitConfig(cfgNum int) (shardctrler.Config, bool) {
+	cfg := kv.ck.Query(cfgNum)
+	return cfg, cfg.Num == cfgNum
 }

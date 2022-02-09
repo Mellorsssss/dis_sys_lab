@@ -352,9 +352,9 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
 	labgob.Register(Op{})
-	// labgob.Register(MigrationOp{})
 	labgob.Register(MultiMigrationOp{})
 	labgob.Register(GCShardOp{})
+	labgob.Register(ConfigOp{})
 
 	kv := new(ShardKV)
 	kv.me = me
