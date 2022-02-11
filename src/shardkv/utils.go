@@ -3,6 +3,7 @@ package shardkv
 import (
 	"fmt"
 	"log"
+	"sort"
 
 	"6.824/shardctrler"
 )
@@ -55,7 +56,8 @@ func (kv *ShardKV) shardInfo() string {
 			invalid_shards = append(invalid_shards, shard)
 		}
 	}
-
+	sort.Ints(shards)
+	sort.Ints(invalid_shards)
 	return fmt.Sprintf(" valid shards: %v; invalid shards: %v", shards, invalid_shards)
 }
 
@@ -70,6 +72,8 @@ func (kv *ShardKV) shardInfoUnlocked() string {
 		}
 	}
 
+	sort.Ints(shards)
+	sort.Ints(invalid_shards)
 	return fmt.Sprintf(" valid shards: %v; invalid shards: %v", shards, invalid_shards)
 }
 

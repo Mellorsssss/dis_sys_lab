@@ -165,6 +165,11 @@ func (kv *ShardKV) isDuplicatedOpInShard(shard int, id string, sn int64) (bool, 
 func (kv *ShardKV) memorizeOpInShard(shard int, id string, sn int64, r Response) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
+	if v, ok := kv.shards[shard].mem[id]; ok {
+		if v.SerialNumber >= r.SerialNumber {
+			panic(fmt.Sprintf("%v get old op to memorize in shard %v(%v < %v)", kv.shardkvInfo(), shard, v.SerialNumber, r.SerialNumber))
+		}
+	}
 	kv.shards[shard].mem[id] = r
 }
 
@@ -190,7 +195,7 @@ func (kv *ShardKV) shardInConfig(shard int) bool {
 // if shard is not valid, just return WrongGroup
 func (kv *ShardKV) execOp(op Op) (string, Res) {
 	shard := key2shard(op.Key)
-	if !kv.hasValidShard(shard) || !kv.shardInConfig(shard) {
+	if !kv.hasValidShard(shard) {
 		DPrintf("%v doesn't have shard %v now(%v)", kv.shardkvInfo(), shard, kv.shardInfo())
 		return "", WrongGroup
 	}

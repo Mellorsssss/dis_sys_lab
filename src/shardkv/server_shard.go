@@ -79,6 +79,9 @@ func (kv *ShardKV) fetchConfigLoop() {
 							shards_need_pull = true
 							break
 						}
+						if _, ok := kv.shards[shard]; !ok {
+							panic(fmt.Sprintf("%v has the state of shard%v but no shard", kv.shardkvInfo(), shard))
+						}
 					}
 				}
 
@@ -186,6 +189,18 @@ func (kv *ShardKV) execMultiMigrate(m MultiMigrationOp) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	if m.Sending {
+		// only leader should send shards
+		// follower just update the shards state
+		_, isLeader := kv.rf.GetState()
+		if !isLeader {
+			for shard := range m.ShardData {
+				if _, ok := kv.shards[shard]; ok {
+					kv.shards_state[shard] = Pushing
+				}
+			}
+			return
+		}
+
 		copysharddata := copyShardData(m.ShardData)
 		copyshardmem := copyShardMem(m.ShardMem)
 
@@ -218,14 +233,8 @@ func (kv *ShardKV) execMultiMigrate(m MultiMigrationOp) {
 		go func() {
 			kv.multimigrateHandler(MultiMigrationCtx{copysharddata, copyshardmem, m.Gid, m.Cfgnum})
 			// debug output
-			kv.mu.Lock()
-			all_shards := []int{}
-			for shard := range kv.shards {
-				all_shards = append(all_shards, shard)
-			}
-			kv.mu.Unlock()
-
 			shards_gc := []int{}
+
 			for shard := range copysharddata {
 				shards_gc = append(shards_gc, shard)
 			}
@@ -243,6 +252,7 @@ func (kv *ShardKV) execMultiMigrate(m MultiMigrationOp) {
 				Info("%v(%v) get old shards from %v", kv.shardkvInfo(), kv.cfg.Num, m.Cfgnum)
 				return
 			}
+			return
 		}
 		if m.Cfgnum > kv.cfg.Num+1 {
 			err := fmt.Sprintf("shit: %v > %v +1", m.Cfgnum, kv.cfg.Num)
